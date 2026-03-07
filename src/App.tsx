@@ -3,7 +3,16 @@ import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
-import Index from "./pages/Index";
+import AppShell from "./components/AppShell";
+import PatientsScreen from "./pages/PatientsScreen";
+import CasesScreen from "./pages/CasesScreen";
+import CaseDetailScreen from "./pages/CaseDetailScreen";
+import NewCaseScreen from "./pages/NewCaseScreen";
+import SearchScreen from "./pages/SearchScreen";
+import BackupScreen from "./pages/BackupScreen";
+import SettingsScreen from "./pages/SettingsScreen";
+import MediaGalleryScreen from "./pages/MediaGalleryScreen";
+import PatientDetailScreen from "./pages/PatientDetailScreen";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -15,8 +24,17 @@ const App = () => (
       <Sonner />
       <BrowserRouter>
         <Routes>
-          <Route path="/" element={<Index />} />
-          {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
+          <Route element={<AppShell />}>
+            <Route path="/" element={<PatientsScreen />} />
+            <Route path="/cases" element={<CasesScreen />} />
+            <Route path="/search" element={<SearchScreen />} />
+            <Route path="/backup" element={<BackupScreen />} />
+          </Route>
+          <Route path="/case/new" element={<NewCaseScreen />} />
+          <Route path="/case/:id" element={<CaseDetailScreen />} />
+          <Route path="/case/:id/media" element={<MediaGalleryScreen />} />
+          <Route path="/patient/:id" element={<PatientDetailScreen />} />
+          <Route path="/settings" element={<SettingsScreen />} />
           <Route path="*" element={<NotFound />} />
         </Routes>
       </BrowserRouter>
