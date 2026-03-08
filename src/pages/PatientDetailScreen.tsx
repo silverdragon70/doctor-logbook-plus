@@ -1,6 +1,6 @@
 import React from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
-import { ArrowLeft, Edit2, ChevronRight, FileText, Plus } from 'lucide-react';
+import { ArrowLeft, Edit2, FileText, Plus } from 'lucide-react';
 
 const mockPatient = {
   patientId: '1', name: 'Lucas Miller', age: 7, gender: 'male',
