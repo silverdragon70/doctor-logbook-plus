@@ -98,8 +98,8 @@ const MediaGalleryScreen = () => {
           </button>
           {(() => {
             const selected = media.find((m: any) => (m.id || m.mediaId) === selectedId);
-            return selected?.thumbnailUrl || selected?.file_path ? (
-              <img src={selected.thumbnailUrl || selected.file_path} alt="" className="max-w-[90vw] max-h-[80vh] rounded-2xl object-contain" />
+            return selected?.thumbnailUrl || selected?.filePath ? (
+              <img src={selected.thumbnailUrl || selected.filePath} alt="" className="max-w-[90vw] max-h-[80vh] rounded-2xl object-contain" />
             ) : (
               <div className="w-[300px] h-[300px] bg-muted rounded-2xl flex items-center justify-center">
                 <ImageIcon size={64} className="text-muted-foreground" />
