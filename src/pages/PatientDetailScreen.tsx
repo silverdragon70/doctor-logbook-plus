@@ -94,11 +94,20 @@ const PatientDetailScreen = () => {
                      All fields come from the same case record in the database
                      END BACKEND LOGIC */}
                   <div>
-                    <h4 className="text-[13px] font-bold" style={{ color: '#1A2332' }}>{c.diagnosis}</h4>
-                    <p className="text-[13px]" style={{ color: '#6B7C93' }}>{c.complaint}</p>
-                    <div className="flex items-center gap-2 mt-0.5">
-                      <span className="text-[13px]" style={{ color: '#6B7C93' }}>{c.date}</span>
+                    <h4 className="text-[15px] font-bold" style={{ color: '#1A2332' }}>{c.diagnosis}</h4>
+                    <div className="mt-0.5">
+                      {c.status === 'active' ? (
+                        <span className="text-[10px] font-bold uppercase" style={{ borderRadius: 20, padding: '3px 10px', backgroundColor: '#DCFCE7', color: '#16A34A' }}>
+                          Hospitalized
+                        </span>
+                      ) : c.outcome && outcomeBadgeMap[c.outcome] ? (
+                        <span className="text-[10px] font-bold uppercase" style={{ borderRadius: 20, padding: '3px 10px', backgroundColor: outcomeBadgeMap[c.outcome].bg, color: outcomeBadgeMap[c.outcome].color }}>
+                          {outcomeBadgeMap[c.outcome].label}
+                        </span>
+                      ) : null}
                     </div>
+                    <p className="text-[13px] mt-1" style={{ color: '#6B7C93' }}>{c.complaint}</p>
+                    <span className="text-[13px]" style={{ color: '#6B7C93' }}>{c.date}</span>
                   </div>
                 </div>
                 <div className="flex items-center gap-2">
@@ -107,17 +116,6 @@ const PatientDetailScreen = () => {
                   )}
                   <ChevronRight size={16} className="text-muted-foreground" />
                 </div>
-              </div>
-              <div className="flex justify-end mt-1">
-                {c.status === 'active' ? (
-                  <span className="text-[10px] font-bold uppercase" style={{ borderRadius: 20, padding: '3px 10px', backgroundColor: '#DCFCE7', color: '#16A34A' }}>
-                    Hospitalized
-                  </span>
-                ) : c.outcome && outcomeBadgeMap[c.outcome] ? (
-                  <span className="text-[10px] font-bold uppercase" style={{ borderRadius: 20, padding: '3px 10px', backgroundColor: outcomeBadgeMap[c.outcome].bg, color: outcomeBadgeMap[c.outcome].color }}>
-                    {outcomeBadgeMap[c.outcome].label}
-                  </span>
-                ) : null}
               </div>
             </div>
           ))}
