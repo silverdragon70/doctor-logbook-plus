@@ -75,8 +75,7 @@ const SettingsScreen = () => {
   const [autoSave, setAutoSave] = useState(true);
   const [exportOpen, setExportOpen] = useState(false);
   const [backupSheetOpen, setBackupSheetOpen] = useState(false);
-  const [backupLocation, setBackupLocation] = useState<'local' | 'gdrive'>('local');
-  const [lastBackupInfo, setLastBackupInfo] = useState({ date: '2025-01-15 · 08:30', size: '245 MB' });
+  const [lastBackupInfo, setLastBackupInfo] = useState<{ date: string; size: string; destination: 'local' | 'gdrive' } | null>({ date: '2025-01-15 · 08:30', size: '245 MB', destination: 'local' });
 
 
   const sw = (checked: boolean, onChange: (v: boolean) => void) => (
