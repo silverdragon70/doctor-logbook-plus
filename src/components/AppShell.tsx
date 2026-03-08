@@ -18,7 +18,21 @@ const AppShell = () => {
     { icon: Search, label: 'Search', path: '/search' },
   ];
 
-  const isActive = (path: string) => location.pathname === path;
+  const isMainTabScreen = navItems.some((item) => item.path === location.pathname);
+
+  const isActive = (path: string) => {
+    if (path === '/') return location.pathname === '/';
+    if (path === '/logbook') {
+      return (
+        location.pathname === '/logbook' ||
+        location.pathname.startsWith('/logbook/') ||
+        location.pathname.startsWith('/procedures') ||
+        location.pathname.startsWith('/group-pearl')
+      );
+    }
+
+    return location.pathname === path || location.pathname.startsWith(`${path}/`);
+  };
 
   // Hide shell chrome on detail pages
   const isDetailPage = location.pathname.includes('/case/') || location.pathname.includes('/patient/');
