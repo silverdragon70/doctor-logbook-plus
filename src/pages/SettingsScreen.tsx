@@ -6,6 +6,7 @@ import ThemeColorSheet from '@/components/ThemeColorSheet';
 import FontSizeSheet from '@/components/FontSizeSheet';
 import DateFormatSheet from '@/components/DateFormatSheet';
 import ManageHospitalsSheet from '@/components/ManageHospitalsSheet';
+import DefaultHospitalSheet from '@/components/DefaultHospitalSheet';
 import { useNavigate } from 'react-router-dom';
 import {
   ArrowLeft, Palette, Moon, Type, Globe, CalendarDays,
@@ -89,6 +90,15 @@ const SettingsScreen = () => {
   const [dateSheetOpen, setDateSheetOpen] = useState(false);
   const [dateFormat, setDateFormat] = useState('DD MMM YYYY');
   const [hospitalsSheetOpen, setHospitalsSheetOpen] = useState(false);
+  const [defaultHospitalSheetOpen, setDefaultHospitalSheetOpen] = useState(false);
+  const [defaultHospitalId, setDefaultHospitalId] = useState('2');
+
+  const hospitalsList = [
+    { id: '1', name: "St. Jude Children's", department: 'Main Wing', unit: 'Central Unit' },
+    { id: '2', name: 'Cairo University', department: 'Pediatrics Dept' },
+    { id: '3', name: 'Ain Shams Hospital', department: 'Ward B' },
+  ];
+  const defaultHospitalName = hospitalsList.find(h => h.id === defaultHospitalId)?.name || 'None';
 
   const sw = (checked: boolean, onChange: (v: boolean) => void) => (
     <Switch checked={checked} onCheckedChange={onChange} />
@@ -117,7 +127,7 @@ const SettingsScreen = () => {
         {/* ─── 2. HOSPITAL MANAGEMENT ─── */}
         <Section title="Hospital Management">
           <Row icon={Building2} iconColor="#0EA5E9" label="Manage Hospitals" subtitle="Add, edit or remove" right={<Chevron />} onClick={() => setHospitalsSheetOpen(true)} />
-          <Row icon={Home} iconColor="#0EA5E9" label="Default Hospital" subtitle="Cairo University" right={<Chevron />} noBorder />
+          <Row icon={Home} iconColor="#0EA5E9" label="Default Hospital" subtitle={defaultHospitalName} right={<Chevron />} onClick={() => setDefaultHospitalSheetOpen(true)} noBorder />
         </Section>
 
         {/* ─── 3. AI INTEGRATION ─── */}
@@ -286,6 +296,7 @@ const SettingsScreen = () => {
       <FontSizeSheet open={fontSheetOpen} onOpenChange={setFontSheetOpen} value={fontSize} onApply={setFontSize} />
       <DateFormatSheet open={dateSheetOpen} onOpenChange={setDateSheetOpen} value={dateFormat} onApply={setDateFormat} />
       <ManageHospitalsSheet open={hospitalsSheetOpen} onOpenChange={setHospitalsSheetOpen} />
+      <DefaultHospitalSheet open={defaultHospitalSheetOpen} onOpenChange={setDefaultHospitalSheetOpen} hospitals={hospitalsList} value={defaultHospitalId} onApply={setDefaultHospitalId} />
     </div>
   );
 };
