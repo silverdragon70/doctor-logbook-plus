@@ -1649,6 +1649,36 @@ CREATE INDEX idx_courses_date ON courses(date);
 - Background process dequeues and syncs when online
 - Conflict resolution: last-write-wins with timestamp comparison
 
+### ⚠️ Important Note for Backend Developer
+
+The current UI prototype runs entirely on **mock/local state data**.
+React Query is initialized but no actual queries or mutations
+are connected to a real data source.
+
+When implementing the backend:
+
+1. Replace all mock data arrays with React Query hooks
+2. Connect each hook to the local SQLite service layer
+3. Follow the query key conventions in Section 16
+4. Do NOT modify any UI component, screen, or styling
+5. Only modify or create files in:
+   - `/src/hooks/`
+   - `/src/services/`
+   - `/backend/`
+
+Example migration pattern:
+
+```javascript
+// BEFORE (mock data)
+const cases = mockCases.filter(...)
+
+// AFTER (React Query + SQLite)
+const { data: cases } = useQuery({
+  queryKey: ['patients', patientId, 'cases'],
+  queryFn: () => caseService.getByPatientId(patientId)
+})
+```
+
 ---
 
 ## 9. State Management & Data Flow
