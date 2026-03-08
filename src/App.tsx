@@ -40,6 +40,7 @@ const App = () => (
           <Route path="/patient/:id" element={<PatientDetailScreen />} />
           <Route path="/hospital/new" element={<AddHospitalScreen />} />
           <Route path="/settings" element={<SettingsScreen />} />
+          <Route path="/group-pearl" element={<GroupPearlScreen />} />
           <Route path="*" element={<NotFound />} />
         </Routes>
       </BrowserRouter>

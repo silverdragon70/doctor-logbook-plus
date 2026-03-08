@@ -437,13 +437,13 @@ const GroupPearlScreen = () => {
                 </div>
                 <div className="space-y-3">
                   {([
-                    { key: 'definition', label: 'Definition' },
-                    { key: 'symptoms', label: 'Symptoms' },
-                    { key: 'diagnosis', label: 'Diagnosis' },
-                    { key: 'treatment', label: 'Treatment' },
-                    { key: 'redFlags', label: 'Red Flags', isRed: true },
-                    { key: 'latestGuidelines', label: 'Latest Guidelines' },
-                  ] as const).map(({ key, label, isRed }) => (
+                    { key: 'definition' as const, label: 'Definition', isRed: false },
+                    { key: 'symptoms' as const, label: 'Symptoms', isRed: false },
+                    { key: 'diagnosis' as const, label: 'Diagnosis', isRed: false },
+                    { key: 'treatment' as const, label: 'Treatment', isRed: false },
+                    { key: 'redFlags' as const, label: 'Red Flags', isRed: true },
+                    { key: 'latestGuidelines' as const, label: 'Latest Guidelines', isRed: false },
+                  ]).map(({ key, label, isRed }) => (
                     <div
                       key={key}
                       className={cn(
