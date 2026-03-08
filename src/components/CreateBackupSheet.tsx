@@ -33,7 +33,7 @@ const CreateBackupSheet = ({ open, onOpenChange, defaultLocation, onBackupComple
   const [saveLocation, setSaveLocation] = useState<SaveLocation>(defaultLocation);
   const [isRunning, setIsRunning] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [showLocationDropdown, setShowLocationDropdown] = useState(false);
+  
 
   const handleStartBackup = () => {
     if (!selectedType) return;
