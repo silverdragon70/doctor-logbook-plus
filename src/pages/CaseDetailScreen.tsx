@@ -508,8 +508,6 @@ const CaseDetailScreen = () => {
           onToggle={() => toggleSection('management')}
           sectionRef={sectionRefs.management}
           onAdd={() => console.log('add management')}
-          onEdit={() => toggleEdit('management')}
-          isEditing={editingSections.includes('management')}
         >
           {/* UI LOGIC — Management Cards
               Render one card per management entry.
