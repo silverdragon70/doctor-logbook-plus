@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useRef, useEffect, useCallback } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { ArrowLeft, Edit2, Trash2, Camera, Image, ChevronDown, ChevronUp, Save, Upload, Lightbulb } from 'lucide-react';
 import ExportSheet from '@/components/ExportSheet';
@@ -33,12 +33,21 @@ const sections = [
   { key: 'notes', label: 'Notes', icon: '📝' },
 ] as const;
 
+const navPills = [
+  { key: 'complaint', label: 'Complaint' },
+  { key: 'history', label: 'History' },
+  { key: 'examination', label: 'Exam' },
+  { key: 'investigations', label: 'Inv' },
+  { key: 'diagnosis', label: 'Diagnosis' },
+  { key: 'management', label: 'Management' },
+  { key: 'notes', label: 'Notes' },
+];
+
 const exportColumns = [
   { header: 'Field', key: 'field' },
   { header: 'Value', key: 'value' },
 ];
 
-// Mock case history for this patient
 const patientCaseHistory = [
   { id: '1', diagnosis: 'Acute bronchitis', date: '2025-01-15', complaint: 'Persistent cough' },
   { id: '2', diagnosis: 'Viral infection', date: '2024-11-20', complaint: 'Fever' },
@@ -46,13 +55,27 @@ const patientCaseHistory = [
   { id: '4', diagnosis: 'Healthy', date: '2024-06-10', complaint: 'Well-child check' },
 ];
 
+// Multi-line fields get taller display boxes
+const multiLineKeys = ['complaint', 'history', 'examination', 'investigations', 'management', 'notes'];
+
 const CaseDetailScreen = () => {
   const navigate = useNavigate();
   const { id } = useParams();
   const [expandedSections, setExpandedSections] = useState<string[]>(['complaint', 'diagnosis', 'management']);
-  const [isEditing, setIsEditing] = useState(false);
   const [showExport, setShowExport] = useState(false);
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
+  const [activePill, setActivePill] = useState('complaint');
+
+  // Refs for each section
+  const sectionRefs: Record<string, React.RefObject<HTMLDivElement>> = {
+    complaint: useRef<HTMLDivElement>(null),
+    history: useRef<HTMLDivElement>(null),
+    examination: useRef<HTMLDivElement>(null),
+    investigations: useRef<HTMLDivElement>(null),
+    diagnosis: useRef<HTMLDivElement>(null),
+    management: useRef<HTMLDivElement>(null),
+    notes: useRef<HTMLDivElement>(null),
+  };
 
   const toggleSection = (key: string) => {
     setExpandedSections(prev =>
@@ -60,7 +83,45 @@ const CaseDetailScreen = () => {
     );
   };
 
-  // Prepare export data: each clinical section as a row
+  const handlePillClick = useCallback((key: string) => {
+    // Expand section if collapsed
+    setExpandedSections(prev => prev.includes(key) ? prev : [...prev, key]);
+    setActivePill(key);
+
+    setTimeout(() => {
+      const ref = sectionRefs[key];
+      if (ref?.current) {
+        const offset = 110;
+        const top = ref.current.getBoundingClientRect().top + window.scrollY - offset;
+        window.scrollTo({ top, behavior: 'smooth' });
+      }
+    }, 100);
+  }, []);
+
+  // IntersectionObserver for active pill tracking
+  useEffect(() => {
+    const observers: IntersectionObserver[] = [];
+    const keys = navPills.map(p => p.key);
+
+    keys.forEach(key => {
+      const ref = sectionRefs[key];
+      if (ref?.current) {
+        const observer = new IntersectionObserver(
+          ([entry]) => {
+            if (entry.isIntersecting) {
+              setActivePill(key);
+            }
+          },
+          { rootMargin: '-120px 0px -60% 0px', threshold: 0 }
+        );
+        observer.observe(ref.current);
+        observers.push(observer);
+      }
+    });
+
+    return () => observers.forEach(o => o.disconnect());
+  }, []);
+
   const exportData = sections.map(({ key, label }) => ({
     field: label,
     value: mockCase[key as keyof typeof mockCase] as string,
@@ -73,6 +134,29 @@ const CaseDetailScreen = () => {
     navigate(-1);
   };
 
+  const renderDisplayField = (label: string, value: string, isMultiLine: boolean) => (
+    <div className="space-y-1.5">
+      <span
+        className="text-[12px] font-bold uppercase tracking-wide"
+        style={{ color: '#6B7C93' }}
+      >
+        {label}
+      </span>
+      <div
+        className={`rounded-[12px] px-4 py-3 ${isMultiLine ? 'min-h-[80px]' : ''}`}
+        style={{
+          background: '#F8FAFC',
+          border: '1.5px solid #DDE3EA',
+          color: '#1A2332',
+          fontSize: '15px',
+          lineHeight: '1.5',
+        }}
+      >
+        {value || '—'}
+      </div>
+    </div>
+  );
+
   return (
     <div className="min-h-screen bg-background animate-fade-in">
       {/* Header */}
@@ -82,7 +166,6 @@ const CaseDetailScreen = () => {
         </button>
         <h1 className="text-[16px] font-bold text-foreground">Case Details</h1>
         <div className="flex gap-1">
-          {/* Export */}
           <button
             onClick={() => setShowExport(true)}
             className="p-2 rounded-full hover:bg-muted transition-colors"
@@ -90,7 +173,6 @@ const CaseDetailScreen = () => {
           >
             <Upload size={18} />
           </button>
-          {/* CasePearl */}
           <button
             onClick={() => navigate(`/case/${id}/pearl`, { state: { caseData: mockCase } })}
             className="p-2 rounded-full hover:bg-muted transition-colors"
@@ -98,14 +180,12 @@ const CaseDetailScreen = () => {
           >
             <Lightbulb size={18} />
           </button>
-          {/* Edit */}
           <button
-            onClick={() => setIsEditing(!isEditing)}
-            className={`p-2 rounded-full transition-colors ${isEditing ? 'bg-primary text-primary-foreground' : 'hover:bg-muted text-muted-foreground'}`}
+            onClick={() => navigate(`/case/${id}/edit`)}
+            className="p-2 rounded-full hover:bg-muted text-muted-foreground"
           >
-            {isEditing ? <Save size={18} /> : <Edit2 size={18} />}
+            <Edit2 size={18} />
           </button>
-          {/* Delete */}
           <button onClick={() => setShowDeleteDialog(true)} className="p-2 rounded-full hover:bg-muted text-destructive">
             <Trash2 size={18} />
           </button>
@@ -130,12 +210,33 @@ const CaseDetailScreen = () => {
           </div>
         </div>
 
-        {/* Clinical Sections */}
+        {/* Quick Navigation Bar */}
+        <div className="sticky top-[52px] z-40 -mx-5 px-4 py-2.5 overflow-x-auto no-scrollbar flex gap-2" style={{ background: '#F0F4F8' }}>
+          {navPills.map(({ key, label }) => (
+            <button
+              key={key}
+              onClick={() => handlePillClick(key)}
+              className="flex-shrink-0 text-[13px] font-semibold transition-colors"
+              style={{
+                padding: '8px 14px',
+                borderRadius: '20px',
+                background: activePill === key ? '#2563EB' : '#FFFFFF',
+                color: activePill === key ? '#FFFFFF' : '#6B7C93',
+                border: activePill === key ? 'none' : '1.5px solid #DDE3EA',
+              }}
+            >
+              {label}
+            </button>
+          ))}
+        </div>
+
+        {/* Clinical Sections — Read Only */}
         {sections.map(({ key, label, icon }) => {
           const value = mockCase[key as keyof typeof mockCase] as string;
           const isExpanded = expandedSections.includes(key);
+          const isMultiLine = multiLineKeys.includes(key);
           return (
-            <div key={key} className="bg-card border border-border rounded-xl overflow-hidden shadow-card">
+            <div key={key} ref={sectionRefs[key]} className="bg-card border border-border rounded-xl overflow-hidden shadow-card">
               <button
                 onClick={() => toggleSection(key)}
                 className="w-full px-4 py-3 flex items-center justify-between hover:bg-muted/50 transition-colors"
@@ -148,15 +249,7 @@ const CaseDetailScreen = () => {
               </button>
               {isExpanded && (
                 <div className="px-4 pb-4 border-t border-border pt-3">
-                  {isEditing ? (
-                    <textarea
-                      defaultValue={value}
-                      onChange={() => console.log('editing', key)}
-                      className="w-full min-h-[80px] text-[13px] text-foreground bg-muted/50 rounded-lg p-3 border border-border focus:outline-none focus:border-primary resize-none"
-                    />
-                  ) : (
-                    <p className="text-[13px] text-foreground leading-relaxed">{value || <span className="text-muted-foreground italic">Not recorded</span>}</p>
-                  )}
+                  {renderDisplayField(label, value, isMultiLine)}
                 </div>
               )}
             </div>
