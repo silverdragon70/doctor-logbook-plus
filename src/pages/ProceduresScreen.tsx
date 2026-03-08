@@ -318,6 +318,15 @@ const ProceduresScreen = () => {
     setHospitals(prev => [...prev, name]);
   };
 
+  const handleBackNavigation = () => {
+    if (window.history.length > 1) {
+      navigate(-1);
+      return;
+    }
+
+    navigate('/');
+  };
+
   const handleSave = () => {
     console.log('Save procedure', { formName, formDate, formParticipation, formPatient, formHospital, formSupervisor, formIndication, formNotes });
     resetForm();
