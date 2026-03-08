@@ -396,40 +396,110 @@ const CaseDetailScreen = () => {
           onEdit={() => toggleEdit('investigations')}
           isEditing={editingSections.includes('investigations')}
         >
-          <DisplayField label="Investigation Name" value={mockCase.investigationName} />
-          <div className="grid grid-cols-2 gap-3">
-            <DisplayField label="Type" value={mockCase.investigationType} />
-            <DisplayField label="Date" value={mockCase.investigationDate} />
-          </div>
-          <DisplayField label="Result (Text)" value={mockCase.investigationResult} isMultiLine />
-          {/* UI LOGIC — Investigations Image Thumbnails
-              Show the thumbnails container ONLY if the
-              investigation has attached images.
-              If investigation.images.length === 0
-              → hide the thumbnails container completely
-              If investigation.images.length > 0
-              → show thumbnails container with all images
-              This is conditional rendering (UI only).
-              No backend call needed — images array comes
-              from the case data already loaded on this screen.
+          {/* UI LOGIC — Investigation Cards
+              Render one card per investigation record.
+              Each card is independently expandable.
+              All cards collapsed by default.
+              ✏️ icon appears only when card is expanded.
+              Image thumbnails hidden if no images attached.
               END UI LOGIC */}
-          {mockCase.investigationImages.length > 0 && (
-            <div className="space-y-1.5">
-              <span style={{ color: '#6B7C93', fontSize: '12px', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.05em' }}>
-                Attached Images
-              </span>
-              <div className="flex gap-2 overflow-x-auto no-scrollbar">
-                {mockCase.investigationImages.map((_, i) => (
-                  <div key={i} style={{
-                    width: '72px', height: '72px', borderRadius: '10px',
-                    background: '#F1F5F9', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0,
-                  }}>
-                    <Image size={24} className="text-muted-foreground" />
+          {/* BACKEND LOGIC — Investigations Data
+              Fetch all investigations where
+              investigation.case_id = current case ID
+              Order by investigation.date DESC
+              Each card maps to one investigation record.
+              END BACKEND LOGIC */}
+          {mockCase.investigations.map((inv) => {
+            const isCardExpanded = expandedSubs.includes(`inv-${inv.id}`);
+            const typeIcon = inv.type === 'Lab Result' ? '🧪' : inv.type === 'Imaging' ? '🩻' : '📄';
+            return (
+              <div key={inv.id} style={{
+                background: '#FFFFFF', borderRadius: '14px', border: '1px solid #DDE3EA',
+                padding: '12px 16px', marginBottom: '10px',
+                boxShadow: '0px 1px 4px rgba(0,0,0,0.06)',
+              }}>
+                {/* Card header */}
+                <div className="flex items-center justify-between">
+                  <span style={{ fontSize: '14px', fontWeight: 700, color: '#1A2332' }}>{inv.name}</span>
+                  <div className="flex items-center gap-1.5">
+                    <span style={{ fontSize: '12px', color: '#6B7C93', fontWeight: 600 }}>{inv.type === 'Lab Result' ? 'Lab' : inv.type}</span>
+                    <span style={{ fontSize: '16px' }}>{typeIcon}</span>
                   </div>
-                ))}
+                </div>
+                <div className="flex items-center justify-between mt-1">
+                  <span style={{ fontSize: '12px', color: '#6B7C93' }}>{inv.date}</span>
+                  {isCardExpanded && (
+                    <button onClick={() => toggleEdit(`inv-${inv.id}`)} className="p-1 rounded-full hover:bg-muted/50">
+                      <Pencil size={14} style={{ color: '#2563EB' }} />
+                    </button>
+                  )}
+                </div>
+
+                {/* Divider */}
+                <div style={{ borderTop: '1px solid #DDE3EA', margin: '8px 0' }} />
+
+                {/* Result preview / full */}
+                {!isCardExpanded ? (
+                  <button onClick={() => toggleSub(`inv-${inv.id}`)} className="w-full flex items-center justify-between">
+                    <span style={{ fontSize: '13px', color: '#1A2332', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', flex: 1, textAlign: 'left' }}>
+                      {inv.result || '—'}
+                    </span>
+                    <ChevronDown size={14} className="text-muted-foreground ml-2 flex-shrink-0" />
+                  </button>
+                ) : (
+                  <div className="space-y-3">
+                    <div className="space-y-1.5">
+                      <span style={{ color: '#6B7C93', fontSize: '12px', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.05em' }}>
+                        Result
+                      </span>
+                      <div style={{
+                        background: '#F8FAFC', border: '1.5px solid #DDE3EA', borderRadius: '12px',
+                        padding: '12px 16px', color: '#1A2332', fontSize: '15px', lineHeight: '1.5', minHeight: '60px',
+                      }}>
+                        {inv.result || '—'}
+                      </div>
+                    </div>
+
+                    {/* UI LOGIC — Investigations Image Thumbnails
+                        Show thumbnails ONLY if investigation has attached images.
+                        If investigation.images.length === 0 → hide completely
+                        If investigation.images.length > 0 → show all images
+                        END UI LOGIC */}
+                    {inv.images.length > 0 && (
+                      <div className="space-y-1.5">
+                        <span style={{ color: '#6B7C93', fontSize: '12px', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.05em' }}>
+                          Attached Images
+                        </span>
+                        <div className="flex gap-2 overflow-x-auto no-scrollbar">
+                          {inv.images.slice(0, 3).map((_, i) => (
+                            <div key={i} style={{
+                              width: '72px', height: '72px', borderRadius: '10px',
+                              background: '#F1F5F9', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0,
+                            }}>
+                              <Image size={24} className="text-muted-foreground" />
+                            </div>
+                          ))}
+                          {inv.images.length > 3 && (
+                            <div style={{
+                              width: '72px', height: '72px', borderRadius: '10px',
+                              background: '#F1F5F9', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0,
+                              fontSize: '13px', fontWeight: 700, color: '#6B7C93',
+                            }}>
+                              +{inv.images.length - 3}
+                            </div>
+                          )}
+                        </div>
+                      </div>
+                    )}
+
+                    <button onClick={() => toggleSub(`inv-${inv.id}`)} className="w-full flex justify-end">
+                      <ChevronUp size={14} className="text-muted-foreground" />
+                    </button>
+                  </div>
+                )}
               </div>
-            </div>
-          )}
+            );
+          })}
         </AccordionSection>
 
         {/* SECTION 5 — Management */}
