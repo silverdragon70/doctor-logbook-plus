@@ -287,6 +287,23 @@ const CoursesScreen = () => {
       >
         <Plus size={26} />
       </button>
+
+      {/* Export Sheet */}
+      <ExportSheet
+        open={showExport}
+        onOpenChange={setShowExport}
+        title="Courses"
+        data={courses.map(c => ({ ...c, certificate: c.hasCertificate ? (c.certificateName || 'Yes') : 'No' }))}
+        dateKey="date"
+        columns={[
+          { header: 'Course Name', key: 'name' },
+          { header: 'Date', key: 'date' },
+          { header: 'Provider', key: 'provider' },
+          { header: 'Duration', key: 'duration' },
+          { header: 'Certificate', key: 'certificate' },
+          { header: 'Notes', key: 'notes' },
+        ]}
+      />
     </>
   );
 };
