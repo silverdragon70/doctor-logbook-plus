@@ -73,6 +73,7 @@ const SettingsScreen = () => {
   const [confirmDialogs, setConfirmDialogs] = useState(true);
   const [autoSave, setAutoSave] = useState(true);
   const [exportOpen, setExportOpen] = useState(false);
+  const [backupLocation, setBackupLocation] = useState<'local' | 'gdrive'>('local');
 
   /* backup */
   const [isBackingUp, setIsBackingUp] = useState(false);
@@ -172,35 +173,8 @@ const SettingsScreen = () => {
           </div>
         )}
 
-        {/* Storage Options */}
-        <div className="space-y-2">
-          <h4 className="text-[11px] font-bold uppercase tracking-wider px-1" style={{ color: '#6B7C93' }}>Storage Options</h4>
-          <div className="grid grid-cols-2 gap-3">
-            <div className="p-4 rounded-2xl text-center" style={{ background: '#fff', boxShadow: '0px 1px 4px rgba(0,0,0,0.06)' }}>
-              <HardDrive size={20} className="text-primary mx-auto mb-2" />
-              <div className="text-[12px] font-bold" style={{ color: '#1A2332' }}>Local</div>
-              <div className="text-[10px]" style={{ color: '#6B7C93' }}>Device storage</div>
-            </div>
-            <div className="p-4 rounded-2xl text-center" style={{ background: '#fff', boxShadow: '0px 1px 4px rgba(0,0,0,0.06)' }}>
-              <Cloud size={20} className="text-primary mx-auto mb-2" />
-              <div className="text-[12px] font-bold" style={{ color: '#1A2332' }}>Google Drive</div>
-              <div className="text-[10px]" style={{ color: '#6B7C93' }}>Connected</div>
-            </div>
-          </div>
-        </div>
-
-
-        {/* ─── 6. SECURITY ─── */}
-        <Section title="Security">
-          <Row icon={Lock} iconColor="#EF4444" label="App PIN Lock" subtitle="Require PIN on open" right={sw(pinLock, setPinLock)} />
-          <Row icon={Shield} iconColor="#EF4444" label="Biometric Authentication" subtitle="Fingerprint / Face ID" right={sw(biometric, setBiometric)} />
-          <Row icon={Clock} iconColor="#EF4444" label="Auto-Lock Timeout" subtitle="5 min" right={<Chevron />} />
-          <Row icon={KeyRound} iconColor="#EF4444" label="Change Encryption Password" subtitle="AES-256 SQLCipher" right={<Chevron />} noBorder />
-        </Section>
-
-        {/* ─── 7. DATA & STORAGE ─── */}
-        <Section title="Data & Storage">
-          <Row icon={Download} label="Export Options" subtitle="PDF · Plain Text" right={<Chevron />} onClick={() => setExportOpen(true)} />
+        {/* ─── STORAGE & EXPORTING ─── */}
+        <Section title="Storage & Exporting">
           <div className="px-4 py-3 flex items-center gap-3" style={{ borderBottom: '1px solid #F0F4F8' }}>
             <HardDriveDownload size={20} className="text-primary flex-shrink-0" />
             <div className="flex-1">
@@ -211,7 +185,36 @@ const SettingsScreen = () => {
               </div>
             </div>
           </div>
-          <Row icon={Image} label="Image Handling" subtitle="Lazy Load" right={<Chevron />} noBorder />
+          <Row icon={Image} label="Image Handling" subtitle="Lazy Load" right={<Chevron />} />
+          <div className="px-4 py-3 flex items-center gap-3" style={{ borderBottom: '1px solid #F0F4F8' }}>
+            <Save size={20} className="text-primary flex-shrink-0" />
+            <div className="flex-1">
+              <div className="text-[15px] font-medium mb-2" style={{ color: '#1A2332' }}>Default Backup Location</div>
+              <div className="grid grid-cols-2 gap-2">
+                <button
+                  onClick={() => setBackupLocation('local')}
+                  className="flex items-center justify-center gap-1.5 py-2 rounded-xl text-[12px] font-bold transition-colors"
+                  style={{
+                    background: backupLocation === 'local' ? 'hsl(213,78%,48%)' : '#F0F4F8',
+                    color: backupLocation === 'local' ? '#fff' : '#1A2332',
+                  }}
+                >
+                  <HardDrive size={14} /> Local
+                </button>
+                <button
+                  onClick={() => setBackupLocation('gdrive')}
+                  className="flex items-center justify-center gap-1.5 py-2 rounded-xl text-[12px] font-bold transition-colors"
+                  style={{
+                    background: backupLocation === 'gdrive' ? 'hsl(213,78%,48%)' : '#F0F4F8',
+                    color: backupLocation === 'gdrive' ? '#fff' : '#1A2332',
+                  }}
+                >
+                  <Cloud size={14} /> G-Drive
+                </button>
+              </div>
+            </div>
+          </div>
+          <Row icon={Upload} label="Export Data" subtitle="Export your records" right={<Chevron />} onClick={() => setExportOpen(true)} noBorder />
         </Section>
 
         {/* ─── 8. BEHAVIOR ─── */}
