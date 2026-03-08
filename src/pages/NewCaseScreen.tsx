@@ -68,6 +68,7 @@ const NewCaseScreen = () => {
   const [specialty, setSpecialty] = useState('');
   const [provisionalDiagnosis, setProvisionalDiagnosis] = useState('');
   const [chiefComplaint, setChiefComplaint] = useState('');
+  const [finalDiagnosis, setFinalDiagnosis] = useState('');
   const [presentHistory, setPresentHistory] = useState('');
   const [pastMedicalHistory, setPastMedicalHistory] = useState('');
   const [allergies, setAllergies] = useState('');
@@ -342,6 +343,18 @@ const NewCaseScreen = () => {
               value={provisionalDiagnosis}
               onChange={(e) => setProvisionalDiagnosis(e.target.value)}
               placeholder="Enter working diagnosis..."
+              rows={3}
+              className={cn(inputClass, 'h-auto py-3 resize-none')}
+            />
+          </div>
+
+          {/* Final Diagnosis */}
+          <div className="space-y-1.5">
+            <label className={labelClass} style={{ color: '#6B7C93' }}>Final Diagnosis</label>
+            <textarea
+              value={finalDiagnosis}
+              onChange={(e) => setFinalDiagnosis(e.target.value)}
+              placeholder="Enter final diagnosis..."
               rows={3}
               className={cn(inputClass, 'h-auto py-3 resize-none')}
             />
