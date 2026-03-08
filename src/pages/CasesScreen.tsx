@@ -101,19 +101,18 @@ const StatsTab = () => {
   const filters: TimeFilter[] = ['All', 'This Month', '3M', '6M', 'Year'];
 
   return (
-    <div className="space-y-4 py-4 animate-fade-in">
-      {/* Time Filter Pills */}
-      <div className="flex gap-2 overflow-x-auto no-scrollbar pb-1">
+    <div className="space-y-8 py-4 animate-fade-in">
+      {/* Time Filter - text-only style */}
+      <div className="flex gap-6 overflow-x-auto no-scrollbar">
         {filters.map((f) => (
           <button
             key={f}
             onClick={() => setTimeFilter(f)}
-            className={`px-4 py-2 rounded-full text-[13px] font-semibold whitespace-nowrap transition-all ${
+            className={`pb-2 text-[13px] font-semibold whitespace-nowrap transition-all border-b-2 ${
               timeFilter === f
-                ? 'text-white'
-                : 'bg-white border border-[hsl(210,14%,83%)] text-[hsl(213,18%,50%)]'
+                ? 'text-primary border-primary'
+                : 'text-[hsl(215,17%,62%)] border-transparent'
             }`}
-            style={timeFilter === f ? { backgroundColor: '#2563EB' } : {}}
           >
             {f}
           </button>
@@ -121,46 +120,45 @@ const StatsTab = () => {
       </div>
 
       {/* Section 1: Admissions per Month */}
-      <div className="bg-white rounded-[18px] p-4" style={{ boxShadow: '0px 2px 8px rgba(0,0,0,0.06)' }}>
-        <h3 className="text-[16px] font-bold mb-4" style={{ color: '#1A2332' }}>Admissions per Month</h3>
+      <div>
+        <h3 className="text-[16px] font-bold text-foreground mb-4">Admissions per Month</h3>
         <div className="overflow-x-auto no-scrollbar -mx-2">
           <div style={{ minWidth: 500, height: 200 }}>
             <ResponsiveContainer width="100%" height="100%">
               <ComposedChart data={mockAdmissionsData} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
-                <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="hsl(210,14%,89%)" />
-                <XAxis dataKey="month" tick={{ fontSize: 11, fill: '#6B7C93' }} axisLine={false} tickLine={false} />
-                <YAxis tick={{ fontSize: 11, fill: '#6B7C93' }} axisLine={false} tickLine={false} />
-                <Tooltip
-                  contentStyle={{ borderRadius: 12, border: '1px solid #DDE3EA', fontSize: 12 }}
-                />
-                <Bar dataKey="admissions" fill="#2563EB" radius={[4, 4, 0, 0]} barSize={20} />
-                <Line type="monotone" dataKey="trend" stroke="#0D9488" strokeWidth={2} dot={false} />
+                <XAxis dataKey="month" tick={{ fontSize: 11, fill: 'hsl(215,17%,62%)' }} axisLine={{ stroke: 'hsl(210,14%,93%)' }} tickLine={false} />
+                <YAxis tick={{ fontSize: 11, fill: 'hsl(215,17%,62%)' }} axisLine={false} tickLine={false} />
+                <Tooltip contentStyle={{ borderRadius: 12, border: '1px solid hsl(210,14%,89%)', fontSize: 12, boxShadow: 'none' }} />
+                <Bar dataKey="admissions" fill="hsl(221,83%,53%)" fillOpacity={0.6} radius={[4, 4, 0, 0]} barSize={20} />
+                <Line type="monotone" dataKey="trend" stroke="hsl(168,62%,30%)" strokeWidth={1.5} dot={false} />
               </ComposedChart>
             </ResponsiveContainer>
           </div>
         </div>
       </div>
 
+      {/* Separator */}
+      <div className="h-px" style={{ backgroundColor: 'hsl(210,24%,95%)' }} />
+
       {/* Section 2: Top Diagnoses */}
-      <div className="bg-white rounded-[18px] p-4" style={{ boxShadow: '0px 2px 8px rgba(0,0,0,0.06)' }}>
-        <h3 className="text-[16px] font-bold mb-4" style={{ color: '#1A2332' }}>Top Diagnoses</h3>
+      <div>
+        <h3 className="text-[16px] font-bold text-foreground mb-4">Top Diagnoses</h3>
         <div className="overflow-x-auto no-scrollbar -mx-2">
           <div style={{ minWidth: 350, height: 200 }}>
             <ResponsiveContainer width="100%" height="100%">
               <BarChart data={mockDiagnosesData} margin={{ top: 20, right: 10, left: -20, bottom: 0 }}>
-                <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="hsl(210,14%,89%)" />
                 <XAxis
                   dataKey="name"
-                  tick={{ fontSize: 10, fill: '#6B7C93' }}
-                  axisLine={false}
+                  tick={{ fontSize: 11, fill: 'hsl(215,17%,62%)' }}
+                  axisLine={{ stroke: 'hsl(210,14%,93%)' }}
                   tickLine={false}
                   interval={0}
                   tickFormatter={(v: string) => v.length > 10 ? v.slice(0, 9) + '…' : v}
                 />
-                <YAxis tick={{ fontSize: 11, fill: '#6B7C93' }} axisLine={false} tickLine={false} />
-                <Tooltip contentStyle={{ borderRadius: 12, border: '1px solid #DDE3EA', fontSize: 12 }} />
-                <Bar dataKey="count" fill="#2563EB" radius={[4, 4, 0, 0]} barSize={28}>
-                  <LabelList dataKey="count" position="top" style={{ fontSize: 11, fontWeight: 700, fill: '#1A2332' }} />
+                <YAxis tick={{ fontSize: 11, fill: 'hsl(215,17%,62%)' }} axisLine={false} tickLine={false} />
+                <Tooltip contentStyle={{ borderRadius: 12, border: '1px solid hsl(210,14%,89%)', fontSize: 12, boxShadow: 'none' }} />
+                <Bar dataKey="count" fill="hsl(221,83%,53%)" radius={[4, 4, 0, 0]} barSize={24}>
+                  <LabelList dataKey="count" position="top" style={{ fontSize: 12, fontWeight: 700, fill: 'hsl(213,32%,15%)' }} />
                 </Bar>
               </BarChart>
             </ResponsiveContainer>
@@ -168,23 +166,32 @@ const StatsTab = () => {
         </div>
       </div>
 
+      {/* Separator */}
+      <div className="h-px" style={{ backgroundColor: 'hsl(210,24%,95%)' }} />
+
       {/* Section 3: Procedures Stats */}
-      <div className="bg-white rounded-[18px] p-4" style={{ boxShadow: '0px 2px 8px rgba(0,0,0,0.06)' }}>
-        <h3 className="text-[16px] font-bold mb-4" style={{ color: '#1A2332' }}>Procedures</h3>
-        <div className="grid grid-cols-2 gap-3">
+      <div>
+        <h3 className="text-[16px] font-bold text-foreground mb-4">Procedures</h3>
+        <div className="grid grid-cols-2 gap-y-6 gap-x-4">
           {[
             { value: mockProcedureStats.total, label: 'TOTAL' },
             { value: mockProcedureStats.performed, label: 'PERFORMED' },
+          ].map((item) => (
+            <div key={item.label} className="flex flex-col items-center justify-center py-2">
+              <span className="text-[32px] font-bold text-primary">{item.value}</span>
+              <span className="text-[11px] font-bold uppercase tracking-wider mt-1 text-[hsl(215,17%,62%)]">{item.label}</span>
+            </div>
+          ))}
+        </div>
+        <div className="h-px my-2" style={{ backgroundColor: 'hsl(210,24%,95%)' }} />
+        <div className="grid grid-cols-2 gap-y-6 gap-x-4">
+          {[
             { value: mockProcedureStats.assisted, label: 'ASSISTED' },
             { value: mockProcedureStats.observed, label: 'OBSERVED' },
           ].map((item) => (
-            <div
-              key={item.label}
-              className="rounded-[14px] p-4 flex flex-col items-center justify-center"
-              style={{ backgroundColor: '#F0F4F8' }}
-            >
-              <span className="text-[28px] font-bold" style={{ color: '#2563EB' }}>{item.value}</span>
-              <span className="text-[11px] font-bold uppercase tracking-wider mt-1" style={{ color: '#6B7C93' }}>{item.label}</span>
+            <div key={item.label} className="flex flex-col items-center justify-center py-2">
+              <span className="text-[32px] font-bold text-primary">{item.value}</span>
+              <span className="text-[11px] font-bold uppercase tracking-wider mt-1 text-[hsl(215,17%,62%)]">{item.label}</span>
             </div>
           ))}
         </div>
