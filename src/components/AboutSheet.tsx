@@ -57,10 +57,10 @@ const AboutSheet = ({ open, onOpenChange }: AboutSheetProps) => {
           {/* Logo */}
           <div className="flex items-center gap-3 mb-4">
             <div className="w-12 h-12 bg-primary rounded-xl flex items-center justify-center shadow-brand">
-              <span className="text-primary-foreground font-bold text-xl">P</span>
+              <span className="text-primary-foreground font-bold text-xl">M</span>
             </div>
             <div>
-              <div className="text-[16px] font-bold" style={{ color: '#1A2332' }}>PediLog</div>
+              <div className="text-[16px] font-bold" style={{ color: '#1A2332' }}>Medora</div>
               <div className="text-[12px]" style={{ color: '#6B7C93' }}>Medical Logbook</div>
             </div>
           </div>
