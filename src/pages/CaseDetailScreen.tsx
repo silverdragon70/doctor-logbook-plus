@@ -479,7 +479,7 @@ const CaseDetailScreen = () => {
                               <Image size={24} className="text-muted-foreground" />
                             </div>
                           ))}
-                          {inv.images.length > 3 && (
+                          {(inv.images || []).length > 3 && (
                             <div style={{
                               width: '72px', height: '72px', borderRadius: '10px',
                               background: '#F1F5F9', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0,
