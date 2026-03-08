@@ -810,10 +810,15 @@ const CaseDetailScreen = () => {
         </div>
       )}
 
-      {/* Bottom Sheets */}
+      {/* Bottom Sheets — Add */}
       <AddInvestigationSheet open={showAddInvestigation} onClose={() => setShowAddInvestigation(false)} onSave={(data) => console.log('save investigation', data)} />
       <AddManagementSheet open={showAddManagement} onClose={() => setShowAddManagement(false)} onSave={(data) => console.log('save management', data)} />
       <AddProgressNoteSheet open={showAddProgress} onClose={() => setShowAddProgress(false)} onSave={(data) => console.log('save progress', data)} />
+
+      {/* Bottom Sheets — Edit (pre-filled) */}
+      <AddInvestigationSheet open={!!editInvestigation} onClose={() => setEditInvestigation(null)} onSave={(data) => { console.log('update investigation', data); setEditInvestigation(null); }} initialData={editInvestigation} />
+      <AddManagementSheet open={!!editManagement} onClose={() => setEditManagement(null)} onSave={(data) => { console.log('update management', data); setEditManagement(null); }} initialData={editManagement} />
+      <AddProgressNoteSheet open={!!editProgress} onClose={() => setEditProgress(null)} onSave={(data) => { console.log('update progress', data); setEditProgress(null); }} initialData={editProgress} />
     </div>
   );
 };
