@@ -556,7 +556,7 @@ const CaseDetailScreen = () => {
                 {isCardExpanded && (
                   <>
                     <div style={{ borderTop: '1px solid #DDE3EA', margin: '8px 0' }} />
-                    <div className="space-y-3">
+                    <div className="space-y-3" onClick={(e) => e.stopPropagation()}>
                       {entry.type === 'Medications' && 'medications' in entry && (
                         <>
                           <div className="space-y-1.5">
