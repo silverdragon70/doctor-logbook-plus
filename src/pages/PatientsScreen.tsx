@@ -70,11 +70,12 @@ const matchesDateAdded = (dateStr: string, key: string) => {
   }
 };
 
-const FilterChip = ({ label, options, selected, onSelect }: {
+const FilterChip = ({ label, options, selected, onSelect, align = 'left' }: {
   label: string;
   options: { key: string; label: string }[];
   selected: string | null;
   onSelect: (key: string) => void;
+  align?: 'left' | 'right';
 }) => {
   const [open, setOpen] = useState(false);
   const ref = useRef<HTMLDivElement>(null);
@@ -104,7 +105,10 @@ const FilterChip = ({ label, options, selected, onSelect }: {
         <ChevronDown size={12} className={`transition-transform ${open ? 'rotate-180' : ''}`} />
       </button>
       {open && (
-        <div className="absolute top-full mt-1.5 w-[200px] bg-card border border-border rounded-xl overflow-hidden" style={{ zIndex: 9999, boxShadow: '0 8px 30px rgba(0,0,0,0.12)', left: 0, maxWidth: 'calc(100vw - 40px)' }}>
+        <div
+          className={`absolute top-full mt-1.5 w-[200px] bg-card border border-border rounded-xl overflow-hidden ${align === 'right' ? 'right-0' : 'left-0'}`}
+          style={{ zIndex: 9999, boxShadow: '0 8px 30px rgba(0,0,0,0.12)' }}
+        >
           {options.map((o) => (
             <button
               key={o.key}
@@ -167,13 +171,14 @@ const PatientsScreen = () => {
       {/* Filter Chips */}
       <div className="flex items-center gap-2">
         <div className="flex gap-2 pb-1 flex-1" style={{ scrollbarWidth: 'none' }}>
-          {filterOptions.map((group) => (
+          {filterOptions.map((group, index) => (
             <FilterChip
               key={group.category}
               label={group.label}
               options={group.values}
               selected={activeFilters[group.category] || null}
               onSelect={(key) => toggleFilter(group.category, key)}
+              align={index === filterOptions.length - 1 ? 'right' : 'left'}
             />
           ))}
         </div>
