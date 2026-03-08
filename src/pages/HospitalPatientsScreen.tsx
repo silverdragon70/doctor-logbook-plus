@@ -72,13 +72,11 @@ const filterOptions: { category: FilterCategory; label: string; values: { key: s
 ];
 
 const matchesAgeGroup = (ageYears: number, key: string) => {
-  const months = ageYears * 12;
   switch (key) {
-    case 'neonate': return months >= 0 && months <= 1;
-    case 'infant': return months > 1 && months <= 12;
-    case 'toddler': return ageYears >= 1 && ageYears < 3;
-    case 'child': return ageYears >= 3 && ageYears < 12;
-    case 'adolescent': return ageYears >= 12 && ageYears <= 18;
+    case '0-2': return ageYears >= 0 && ageYears < 2;
+    case '2-5': return ageYears >= 2 && ageYears < 5;
+    case '5-12': return ageYears >= 5 && ageYears < 12;
+    case '12-18': return ageYears >= 12 && ageYears <= 18;
     default: return true;
   }
 };
