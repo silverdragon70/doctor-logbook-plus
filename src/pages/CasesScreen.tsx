@@ -170,6 +170,19 @@ const CasesScreen = () => {
                     </p>
                   </div>
                 </div>
+                {/* BACKEND LOGIC — Department Badge
+                   The department/specialty badge displayed on each
+                   patient card must be dynamic, not hardcoded.
+
+                   For each patient in Recent Cases:
+                   1. Find their most recent case by admission date
+                   2. Read the specialty/department field
+                      directly from that case record
+                   3. Display it as the badge
+
+                   Source: case.specialty field in the database
+                   No mapping needed — use the value as-is
+                   END BACKEND LOGIC */}
                 <div className={`px-2.5 py-1 rounded-full text-[10px] font-bold tracking-tight uppercase ${c.tagColor}`}>
                   {c.department}
                 </div>
