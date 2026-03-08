@@ -17,6 +17,7 @@ import MediaGalleryScreen from "./pages/MediaGalleryScreen";
 import PatientDetailScreen from "./pages/PatientDetailScreen";
 import NotFound from "./pages/NotFound";
 import GroupPearlScreen from "./pages/GroupPearlScreen";
+import ProceduresScreen from "./pages/ProceduresScreen";
 
 const queryClient = new QueryClient();
 
