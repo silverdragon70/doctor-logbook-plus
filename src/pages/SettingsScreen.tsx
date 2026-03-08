@@ -16,6 +16,7 @@ import GoogleAccountSheet from '@/components/GoogleAccountSheet';
 import ProgressSheet, { OperationType } from '@/components/ProgressSheet';
 import SyncProgressSheet from '@/components/SyncProgressSheet';
 import RestoreBackupSheet from '@/components/RestoreBackupSheet';
+import ImageHandlingSheet from '@/components/ImageHandlingSheet';
 import { useNavigate } from 'react-router-dom';
 import {
   ArrowLeft, Palette, Moon, Type, Globe, CalendarDays,
@@ -115,6 +116,9 @@ const SettingsScreen = () => {
     setProgressOpen(true);
   };
   const [restoreSheetOpen, setRestoreSheetOpen] = useState(false);
+  const [imageHandlingOpen, setImageHandlingOpen] = useState(false);
+  const [imageQuality, setImageQuality] = useState<'compress' | 'original'>('original');
+  const [imageMaxSize, setImageMaxSize] = useState<'1' | '5' | '10' | 'none'>('5');
   const [backupSheetOpen, setBackupSheetOpen] = useState(false);
   const [lastBackupInfo, setLastBackupInfo] = useState<{ date: string; size: string; destination: 'local' | 'gdrive' } | null>({ date: '2025-01-15 · 08:30', size: '245 MB', destination: 'local' });
   const [aboutOpen, setAboutOpen] = useState(false);
@@ -207,7 +211,7 @@ const SettingsScreen = () => {
               </div>
             </div>
           </div>
-          <Row icon={Image} label="Image Handling" subtitle="Lazy Load" right={<Chevron />} />
+          <Row icon={Image} label="Image Handling" subtitle={imageQuality === 'compress' ? 'Auto Compress' : 'Lazy Load'} right={<Chevron />} onClick={() => setImageHandlingOpen(true)} />
           {/* Last Backup */}
           <div className="px-4 py-3 flex items-center gap-3" style={{ borderBottom: '1px solid #F0F4F8' }}>
             <Clock size={20} className="text-primary flex-shrink-0" />
@@ -373,6 +377,7 @@ const SettingsScreen = () => {
       <ProgressSheet open={progressOpen} onOpenChange={setProgressOpen} type={progressType} detail={progressDetail} />
       <SyncProgressSheet open={syncProgressOpen} onOpenChange={setSyncProgressOpen} email={googleAccounts.find(a => a.active)?.email || ''} onComplete={(ts) => setLastSyncedText(ts)} />
       <RestoreBackupSheet open={restoreSheetOpen} onOpenChange={setRestoreSheetOpen} onRestore={() => startProgress('restore', 'All records restored')} />
+      <ImageHandlingSheet open={imageHandlingOpen} onOpenChange={setImageHandlingOpen} onApply={(q, s) => { setImageQuality(q); setImageMaxSize(s); }} />
     </div>
   );
 };
