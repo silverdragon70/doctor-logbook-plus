@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import SettingsExportSheet from '@/components/SettingsExportSheet';
 import CreateBackupSheet from '@/components/CreateBackupSheet';
+import AboutSheet from '@/components/AboutSheet';
 import { useNavigate } from 'react-router-dom';
 import {
   ArrowLeft, Palette, Moon, Type, Globe, CalendarDays,
@@ -76,6 +77,7 @@ const SettingsScreen = () => {
   const [exportOpen, setExportOpen] = useState(false);
   const [backupSheetOpen, setBackupSheetOpen] = useState(false);
   const [lastBackupInfo, setLastBackupInfo] = useState<{ date: string; size: string; destination: 'local' | 'gdrive' } | null>({ date: '2025-01-15 · 08:30', size: '245 MB', destination: 'local' });
+  const [aboutOpen, setAboutOpen] = useState(false);
 
 
   const sw = (checked: boolean, onChange: (v: boolean) => void) => (
@@ -238,31 +240,19 @@ const SettingsScreen = () => {
 
         {/* ─── 10. ABOUT ─── */}
         <Section title="About">
-          <div className="p-4 space-y-3">
-            <div className="flex items-center gap-3">
-              <div className="w-10 h-10 bg-primary rounded-xl flex items-center justify-center shadow-brand">
-                <span className="text-primary-foreground font-bold text-lg">P</span>
-              </div>
-              <div>
-                <div className="text-[14px] font-bold" style={{ color: '#1A2332' }}>PediLog</div>
-                <div className="text-[11px]" style={{ color: '#6B7C93' }}>Medical Logbook</div>
-              </div>
+          <button
+            onClick={() => setAboutOpen(true)}
+            className="w-full flex items-center gap-3 p-4 text-left transition-colors hover:bg-muted/40"
+          >
+            <div className="w-10 h-10 bg-primary rounded-xl flex items-center justify-center shadow-brand">
+              <span className="text-primary-foreground font-bold text-lg">P</span>
             </div>
-            <div className="space-y-1 pt-2" style={{ borderTop: '1px solid #F0F4F8' }}>
-              <div className="flex justify-between text-[11px]">
-                <span style={{ color: '#6B7C93' }}>App Version</span>
-                <span className="font-medium" style={{ color: '#1A2332' }}>2.1.0</span>
-              </div>
-              <div className="flex justify-between text-[11px]">
-                <span style={{ color: '#6B7C93' }}>Schema Version</span>
-                <span className="font-medium" style={{ color: '#1A2332' }}>3</span>
-              </div>
-              <div className="flex justify-between text-[11px]">
-                <span style={{ color: '#6B7C93' }}>Encryption</span>
-                <span className="font-medium flex items-center gap-1" style={{ color: '#1A2332' }}><Shield size={10} /> AES-256</span>
-              </div>
+            <div className="flex-1">
+              <div className="text-[14px] font-bold" style={{ color: '#1A2332' }}>PediLog</div>
+              <div className="text-[11px]" style={{ color: '#6B7C93' }}>Medical Logbook</div>
             </div>
-          </div>
+            <Chevron />
+          </button>
         </Section>
 
         {/* Footer */}
@@ -285,6 +275,7 @@ const SettingsScreen = () => {
           });
         }}
       />
+      <AboutSheet open={aboutOpen} onOpenChange={setAboutOpen} />
     </div>
   );
 };
