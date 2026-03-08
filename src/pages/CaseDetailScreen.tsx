@@ -31,18 +31,21 @@ const mockCase = {
     { id: '2', name: 'Chest X-Ray', type: 'Imaging' as const, date: '06/03/2025', result: 'Bilateral infiltrates noted in lower lobes. No pleural effusion. Heart size normal.', images: [] },
     { id: '3', name: 'Echo', type: 'Imaging' as const, date: '07/03/2025', result: 'Normal cardiac function. EF 65%. No structural abnormalities detected.', images: ['img3.jpg', 'img4.jpg', 'img5.jpg', 'img6.jpg', 'img7.jpg'] },
   ],
-  medications: ['Cefotaxime 1g IV q8h', 'Salbutamol nebulization q6h', 'Oral prednisolone 1mg/kg x 3 days'],
-  medicationChartImage: '',
-  respiratorySupport: 'Nasal O₂',
-  respiratoryDetails: '2 L/min',
-  feedingType: 'Nasogastric',
-  feedingDetails: '60 mL/hr, formula type...',
-  progressDate: '05 / 03 / 2025',
-  assessment: '',
-  vitals: {
-    hr: '128', spo2: '94', temp: '38.6', rr: '46',
-    bp: '88/55', weight: '13.2', dateTime: '05/03/2025  07:00 AM',
-  },
+  managementEntries: [
+    { id: 'm1', type: 'Medications' as const, date: '05/03/2025', medications: ['Cefotaxime 1g IV q8h', 'Azithromycin 150mg PO OD', 'Salbutamol nebulization q6h'], chartImage: '' },
+    { id: 'm2', type: 'Respiratory Support' as const, date: '05/03/2025', mode: 'Nasal O₂', details: '2 L/min' },
+    { id: 'm3', type: 'Feeding' as const, date: '06/03/2025', mode: 'Nasogastric', details: '60 mL/hr, formula type...' },
+  ],
+  progressNotes: [
+    {
+      id: 'p1', date: '05/03/2025', assessment: 'Patient showing improvement. Fever subsiding. Cough less frequent.',
+      vitals: { hr: '128', spo2: '94', temp: '38.6', rr: '46', bp: '88/55', weight: '13.2', dateTime: '05/03/2025  07:00 AM' },
+    },
+    {
+      id: 'p2', date: '06/03/2025', assessment: 'Continued improvement. Tolerating feeds well. SpO2 stable on room air.',
+      vitals: { hr: '118', spo2: '97', temp: '37.2', rr: '32', bp: '90/58', weight: '13.2', dateTime: '06/03/2025  08:30 AM' },
+    },
+  ],
   mediaCount: 2,
 };
 
