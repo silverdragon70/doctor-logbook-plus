@@ -440,9 +440,7 @@ const GroupPearlScreen = () => {
               </div>
             </div>
           )}
-        </main>
       </div>
-    </div>
   );
 };
 
