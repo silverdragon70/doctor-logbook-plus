@@ -436,8 +436,10 @@ const NewCaseScreen = () => {
             )}
           </div>
         </CollapsibleSection>
+        </div>
 
         {/* ═══ Initial Classification ═══ */}
+        <div ref={sectionRefs.classification}>
         <CollapsibleSection
           title="Classification"
           icon={<Stethoscope size={18} className="text-primary" />}
