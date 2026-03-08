@@ -285,9 +285,9 @@ const GroupPearlScreen = () => {
               {screenState === 'loading' ? (
                 <Loader2 className="animate-spin mr-2" size={16} />
               ) : (
-                <span className="mr-1.5">💡</span>
+                <span className="mr-1.5">💎</span>
               )}
-              {screenState === 'loading' ? 'Analyzing...' : 'Generate Group Pearl'}
+              {screenState === 'loading' ? 'Analyzing...' : 'Generate Clinical Pearls'}
             </Button>
           </div>
 
