@@ -815,7 +815,9 @@ const NewCaseScreen = () => {
             </button>
           </div>
         </div>
+        </div>
       </div>
+    </div>
     </div>
   );
 };
