@@ -279,4 +279,4 @@ const CoursesScreen = () => {
   );
 };
 
-export default LecturesScreen;
+export default CoursesScreen;
