@@ -442,7 +442,7 @@ const CaseDetailScreen = () => {
                   <div className="flex items-center gap-1">
                     {isCardExpanded && (
                       <>
-                        <button onClick={(e) => { e.stopPropagation(); toggleEdit(`inv-${inv.id}`); }} className="p-1 rounded-full hover:bg-muted/50">
+                        <button onClick={(e) => { e.stopPropagation(); setEditInvestigation({ name: inv.name, type: inv.type, date: inv.date, result: inv.result }); }} className="p-1 rounded-full hover:bg-muted/50">
                           <Pencil size={14} style={{ color: '#2563EB' }} />
                         </button>
                         <button onClick={(e) => { e.stopPropagation(); setDeleteTarget(`inv-${inv.id}`); }} className="p-1 rounded-full hover:bg-muted/50">
