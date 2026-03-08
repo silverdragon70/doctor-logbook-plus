@@ -162,7 +162,7 @@ const NewCaseScreen = () => {
     { key: 'classification', label: 'Class' },
     { key: 'history', label: 'History' },
     { key: 'investigations', label: 'Inv' },
-    { key: 'management', label: 'Mgmt' },
+    { key: 'management', label: 'Management' },
     { key: 'progressNote', label: 'Progress' },
     { key: 'attachImages', label: 'Notes' },
   ];
