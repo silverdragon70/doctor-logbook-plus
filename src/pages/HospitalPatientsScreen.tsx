@@ -393,9 +393,9 @@ const HospitalPatientsScreen = () => {
                 { value: mockHospital.activePatients, label: 'ACTIVE' },
                 { value: mockHospital.dischargedPatients, label: 'DISCHARGED' },
               ].map((stat) => (
-                <div key={stat.label} className="bg-muted/40 rounded-[14px] p-4 flex flex-col items-center justify-center">
-                  <span className="text-[22px] font-bold text-primary">{stat.value}</span>
-                  <span className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground mt-1">{stat.label}</span>
+                <div key={stat.label} className="rounded-[10px] px-3 py-2 flex flex-col items-center justify-center" style={{ backgroundColor: '#F8FAFC' }}>
+                  <span className="text-[16px] font-bold" style={{ color: '#2563EB' }}>{stat.value}</span>
+                  <span className="text-[10px] font-bold uppercase tracking-wider mt-0.5" style={{ color: '#94A3B8' }}>{stat.label}</span>
                 </div>
               ))}
             </div>
