@@ -2,6 +2,9 @@ import React, { useState } from 'react';
 import SettingsExportSheet from '@/components/SettingsExportSheet';
 import CreateBackupSheet from '@/components/CreateBackupSheet';
 import AboutSheet from '@/components/AboutSheet';
+import ThemeColorSheet from '@/components/ThemeColorSheet';
+import FontSizeSheet from '@/components/FontSizeSheet';
+import DateFormatSheet from '@/components/DateFormatSheet';
 import { useNavigate } from 'react-router-dom';
 import {
   ArrowLeft, Palette, Moon, Type, Globe, CalendarDays,
