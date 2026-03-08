@@ -21,6 +21,7 @@ import ProceduresScreen from "./pages/ProceduresScreen";
 import LecturesScreen from "./pages/LecturesScreen";
 import CoursesScreen from "./pages/CoursesScreen";
 import EditPatientScreen from "./pages/EditPatientScreen";
+import HospitalPatientsScreen from "./pages/HospitalPatientsScreen";
 
 const queryClient = new QueryClient();
 
@@ -47,6 +48,7 @@ const App = () => (
           <Route path="/patient/:id" element={<PatientDetailScreen />} />
           <Route path="/patient/:id/edit" element={<EditPatientScreen />} />
           <Route path="/hospital/new" element={<AddHospitalScreen />} />
+          <Route path="/hospital/:id" element={<HospitalPatientsScreen />} />
           <Route path="/settings" element={<SettingsScreen />} />
           <Route path="*" element={<NotFound />} />
         </Routes>
