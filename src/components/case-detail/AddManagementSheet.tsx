@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { X, Upload } from 'lucide-react';
 
 const inputStyle: React.CSSProperties = {
@@ -17,15 +17,34 @@ interface Props {
   open: boolean;
   onClose: () => void;
   onSave: (data: any) => void;
+  initialData?: { type?: string; medications?: string; mode?: string; details?: string } | null;
 }
 
-const AddManagementSheet = ({ open, onClose, onSave }: Props) => {
+const AddManagementSheet = ({ open, onClose, onSave, initialData }: Props) => {
   const [selectedType, setSelectedType] = useState<string | null>(null);
   const [medications, setMedications] = useState('');
   const [respMode, setRespMode] = useState('');
   const [respDetails, setRespDetails] = useState('');
   const [feedMode, setFeedMode] = useState('');
   const [feedDetails, setFeedDetails] = useState('');
+  const isEdit = !!initialData;
+
+  useEffect(() => {
+    if (initialData) {
+      setSelectedType(initialData.type || null);
+      if (initialData.type === 'Medications') {
+        setMedications(initialData.medications || '');
+      } else if (initialData.type === 'Respiratory Support') {
+        setRespMode(initialData.mode || '');
+        setRespDetails(initialData.details || '');
+      } else if (initialData.type === 'Feeding') {
+        setFeedMode(initialData.mode || '');
+        setFeedDetails(initialData.details || '');
+      }
+    } else {
+      setSelectedType(null); setMedications(''); setRespMode(''); setRespDetails(''); setFeedMode(''); setFeedDetails('');
+    }
+  }, [initialData, open]);
 
   if (!open) return null;
 
@@ -40,6 +59,10 @@ const AddManagementSheet = ({ open, onClose, onSave }: Props) => {
     setSelectedType(null); setMedications(''); setRespMode(''); setRespDetails(''); setFeedMode(''); setFeedDetails('');
     onClose();
   };
+
+  const title = isEdit
+    ? `Edit ${selectedType || 'Management'}`
+    : 'Add Management';
 
   const PillGrid = ({ options, selected, onSelect }: { options: string[]; selected: string; onSelect: (v: string) => void }) => (
     <div className="flex flex-wrap gap-2">
@@ -65,7 +88,7 @@ const AddManagementSheet = ({ open, onClose, onSave }: Props) => {
           <div style={{ width: '40px', height: '4px', borderRadius: '2px', background: '#D1D5DB' }} />
         </div>
         <div className="flex items-center justify-between px-5 pb-3">
-          <span style={{ fontSize: '16px', fontWeight: 700, color: '#1A2332' }}>Add Management</span>
+          <span style={{ fontSize: '16px', fontWeight: 700, color: '#1A2332' }}>{title}</span>
           <button onClick={resetAndClose} className="p-2 rounded-full hover:bg-muted/50">
             <X size={20} style={{ color: '#6B7C93' }} />
           </button>
@@ -91,9 +114,11 @@ const AddManagementSheet = ({ open, onClose, onSave }: Props) => {
             </>
           ) : (
             <>
-              <button onClick={() => setSelectedType(null)} style={{ fontSize: '13px', color: '#2563EB', fontWeight: 600 }}>
-                ← Back to types
-              </button>
+              {!isEdit && (
+                <button onClick={() => setSelectedType(null)} style={{ fontSize: '13px', color: '#2563EB', fontWeight: 600 }}>
+                  ← Back to types
+                </button>
+              )}
 
               {selectedType === 'Medications' && (
                 <>
@@ -135,7 +160,7 @@ const AddManagementSheet = ({ open, onClose, onSave }: Props) => {
 
               <button onClick={handleSave}
                 style={{ width: '100%', height: '52px', borderRadius: '12px', background: '#2563EB', color: '#FFFFFF', fontSize: '16px', fontWeight: 700, border: 'none' }}>
-                Save
+                {isEdit ? 'Save Changes' : 'Save'}
               </button>
             </>
           )}

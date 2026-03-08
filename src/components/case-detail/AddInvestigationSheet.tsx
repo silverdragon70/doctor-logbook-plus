@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { X, Upload } from 'lucide-react';
 
 const inputStyle: React.CSSProperties = {
@@ -15,19 +15,31 @@ interface Props {
   open: boolean;
   onClose: () => void;
   onSave: (data: any) => void;
+  initialData?: { name?: string; type?: string; date?: string; result?: string } | null;
 }
 
-const AddInvestigationSheet = ({ open, onClose, onSave }: Props) => {
+const AddInvestigationSheet = ({ open, onClose, onSave, initialData }: Props) => {
   const [name, setName] = useState('');
   const [type, setType] = useState('Lab Result');
   const [date, setDate] = useState('');
   const [result, setResult] = useState('');
+  const isEdit = !!initialData;
+
+  useEffect(() => {
+    if (initialData) {
+      setName(initialData.name || '');
+      setType(initialData.type || 'Lab Result');
+      setDate(initialData.date || '');
+      setResult(initialData.result || '');
+    } else {
+      setName(''); setType('Lab Result'); setDate(''); setResult('');
+    }
+  }, [initialData, open]);
 
   if (!open) return null;
 
   const handleSave = () => {
     onSave({ name, type, date, result });
-    setName(''); setType('Lab Result'); setDate(''); setResult('');
     onClose();
   };
 
@@ -36,19 +48,18 @@ const AddInvestigationSheet = ({ open, onClose, onSave }: Props) => {
       <div className="absolute inset-0 bg-black/40" onClick={onClose} />
       <div className="absolute bottom-0 left-0 right-0 bg-white animate-in slide-in-from-bottom duration-300"
         style={{ borderRadius: '24px 24px 0 0', maxHeight: '85vh', overflow: 'auto' }}>
-        {/* Drag handle */}
         <div className="flex justify-center pt-3 pb-1">
           <div style={{ width: '40px', height: '4px', borderRadius: '2px', background: '#D1D5DB' }} />
         </div>
-        {/* Header */}
         <div className="flex items-center justify-between px-5 pb-3">
-          <span style={{ fontSize: '16px', fontWeight: 700, color: '#1A2332' }}>Add Investigation</span>
+          <span style={{ fontSize: '16px', fontWeight: 700, color: '#1A2332' }}>
+            {isEdit ? 'Edit Investigation' : 'Add Investigation'}
+          </span>
           <button onClick={onClose} className="p-2 rounded-full hover:bg-muted/50">
             <X size={20} style={{ color: '#6B7C93' }} />
           </button>
         </div>
         <div style={{ borderTop: '1px solid #DDE3EA' }} />
-        {/* Form */}
         <div className="px-5 py-4 space-y-4">
           <div className="space-y-1.5">
             <span style={labelStyle}>Investigation Name</span>
@@ -78,11 +89,11 @@ const AddInvestigationSheet = ({ open, onClose, onSave }: Props) => {
           </div>
           <button className="w-full flex items-center justify-center gap-2 hover:opacity-90 transition-opacity"
             style={{ ...inputStyle, border: '1.5px dashed #DDE3EA', color: '#6B7C93', fontWeight: 600 }}>
-            <Upload size={16} /> Attach image (optional)
+            <Upload size={16} /> {isEdit ? 'Attached image' : 'Attach image (optional)'}
           </button>
           <button onClick={handleSave}
             style={{ width: '100%', height: '52px', borderRadius: '12px', background: '#2563EB', color: '#FFFFFF', fontSize: '16px', fontWeight: 700, border: 'none' }}>
-            Save
+            {isEdit ? 'Save Changes' : 'Save'}
           </button>
         </div>
       </div>

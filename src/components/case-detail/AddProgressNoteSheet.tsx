@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { X } from 'lucide-react';
 
 const inputStyle: React.CSSProperties = {
@@ -14,9 +14,13 @@ interface Props {
   open: boolean;
   onClose: () => void;
   onSave: (data: any) => void;
+  initialData?: {
+    date?: string; assessment?: string;
+    vitals?: { hr?: string; spo2?: string; temp?: string; rr?: string; bp?: string; weight?: string };
+  } | null;
 }
 
-const AddProgressNoteSheet = ({ open, onClose, onSave }: Props) => {
+const AddProgressNoteSheet = ({ open, onClose, onSave, initialData }: Props) => {
   const [date, setDate] = useState('');
   const [assessment, setAssessment] = useState('');
   const [hr, setHr] = useState('');
@@ -25,12 +29,27 @@ const AddProgressNoteSheet = ({ open, onClose, onSave }: Props) => {
   const [rr, setRr] = useState('');
   const [bp, setBp] = useState('');
   const [weight, setWeight] = useState('');
+  const isEdit = !!initialData;
+
+  useEffect(() => {
+    if (initialData) {
+      setDate(initialData.date || '');
+      setAssessment(initialData.assessment || '');
+      setHr(initialData.vitals?.hr || '');
+      setSpo2(initialData.vitals?.spo2 || '');
+      setTemp(initialData.vitals?.temp || '');
+      setRr(initialData.vitals?.rr || '');
+      setBp(initialData.vitals?.bp || '');
+      setWeight(initialData.vitals?.weight || '');
+    } else {
+      setDate(''); setAssessment(''); setHr(''); setSpo2(''); setTemp(''); setRr(''); setBp(''); setWeight('');
+    }
+  }, [initialData, open]);
 
   if (!open) return null;
 
   const handleSave = () => {
     onSave({ date, assessment, vitals: { hr, spo2, temp, rr, bp, weight } });
-    setDate(''); setAssessment(''); setHr(''); setSpo2(''); setTemp(''); setRr(''); setBp(''); setWeight('');
     onClose();
   };
 
@@ -43,7 +62,9 @@ const AddProgressNoteSheet = ({ open, onClose, onSave }: Props) => {
           <div style={{ width: '40px', height: '4px', borderRadius: '2px', background: '#D1D5DB' }} />
         </div>
         <div className="flex items-center justify-between px-5 pb-3">
-          <span style={{ fontSize: '16px', fontWeight: 700, color: '#1A2332' }}>Add Progress Note</span>
+          <span style={{ fontSize: '16px', fontWeight: 700, color: '#1A2332' }}>
+            {isEdit ? 'Edit Progress Note' : 'Add Progress Note'}
+          </span>
           <button onClick={onClose} className="p-2 rounded-full hover:bg-muted/50">
             <X size={20} style={{ color: '#6B7C93' }} />
           </button>
@@ -63,7 +84,6 @@ const AddProgressNoteSheet = ({ open, onClose, onSave }: Props) => {
               style={{ ...inputStyle, resize: 'none' }} className="focus:!border-[#2563EB]" />
           </div>
 
-          {/* Vital Signs divider */}
           <div className="flex items-center gap-3 py-1">
             <div style={{ flex: 1, borderTop: '1px solid #DDE3EA' }} />
             <span style={{ fontSize: '13px', fontWeight: 700, color: '#6B7C93' }}>Vital Signs</span>
@@ -105,7 +125,7 @@ const AddProgressNoteSheet = ({ open, onClose, onSave }: Props) => {
 
           <button onClick={handleSave}
             style={{ width: '100%', height: '52px', borderRadius: '12px', background: '#2563EB', color: '#FFFFFF', fontSize: '16px', fontWeight: 700, border: 'none' }}>
-            Save
+            {isEdit ? 'Save Changes' : 'Save'}
           </button>
         </div>
       </div>
