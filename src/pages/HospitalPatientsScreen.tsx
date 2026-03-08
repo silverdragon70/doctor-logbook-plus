@@ -508,22 +508,44 @@ const HospitalPatientsScreen = () => {
         </div>
 
         {/* Filter Pills */}
-        <div className="flex items-center gap-2">
-          <div className="flex gap-2 flex-1 overflow-x-auto no-scrollbar">
-            {filterOptions.map((group, index) => (
-              <FilterChip
-                key={group.category}
-                label={group.label}
-                options={group.values}
-                selected={activeFilters[group.category] || null}
-                onSelect={(key) => toggleFilter(group.category, key)}
-                align={index === filterOptions.length - 1 ? 'right' : 'left'}
-              />
-            ))}
+        <div className="flex items-center gap-2 overflow-x-auto no-scrollbar">
+          {filterOptions.map((group, index) => (
+            <FilterChip
+              key={group.category}
+              label={group.label}
+              options={group.values}
+              selected={activeFilters[group.category] || null}
+              onSelect={(key) => toggleFilter(group.category, key)}
+              align={index >= filterOptions.length - 1 ? 'right' : 'left'}
+            />
+          ))}
+          {/* Date Range pill → opens bottom sheet */}
+          <div className="shrink-0">
+            <button
+              onClick={() => setDateRangeOpen(true)}
+              className="flex items-center gap-1.5 px-3 rounded-full text-[12px] font-semibold transition-all whitespace-nowrap"
+              style={{
+                height: 36,
+                backgroundColor: activeFilters.dateRange ? '#EFF6FF' : 'transparent',
+                border: activeFilters.dateRange ? '1.5px solid #2563EB' : '1.5px solid hsl(214,20%,85%)',
+                color: activeFilters.dateRange ? '#2563EB' : 'hsl(215,16%,47%)',
+                fontWeight: activeFilters.dateRange ? 700 : 600,
+              }}
+            >
+              {activeFilters.dateRange
+                ? activeFilters.dateRange === 'month' ? 'This Month'
+                  : activeFilters.dateRange === '3months' ? '3M'
+                  : activeFilters.dateRange === '6months' ? '6M'
+                  : activeFilters.dateRange === 'year' ? 'This Year'
+                  : activeFilters.dateRange === 'custom' ? 'Custom'
+                  : 'Date Range'
+                : 'Date Range'}
+              <ChevronDown size={13} />
+            </button>
           </div>
           {hasActiveFilters && (
-            <button onClick={clearAll} className="shrink-0 text-[11px] text-primary font-semibold">
-              Clear All
+            <button onClick={clearAll} className="shrink-0 text-[11px] font-semibold" style={{ color: '#2563EB' }}>
+              Clear
             </button>
           )}
         </div>
