@@ -717,6 +717,38 @@ Features certificate upload (JPEG, PNG, PDF) via file input.
 **API Contract**:
 - `POST /ai/group-pearl` → `{ diagnosis, timePeriod, outcome, fromDate?, toDate? }`
 - Response: `{ summary, patterns[], comparison, pearl, diseaseReview }`
+### 5.10b CasePearlScreen
+- **File**: `src/pages/CasePearlScreen.tsx`
+- **Route**: `/case/:id/pearl`
+- **Screen type**: Standalone (no AppShell)
+- **Header**: Sub-header with back arrow ← and title "Case Pearl"
+- **Bottom nav**: No
+
+**Navigation entry**: CaseDetailScreen → tap lightbulb icon (💡)
+**Data passed**: Full case object (de-identified) via route state
+
+#### UI Elements
+
+**Loading State**
+- Spinner animation while AI processes
+- Text: "Analyzing case..."
+
+**Error State**
+- Error message card
+- "Try Again" button
+- Retry triggers re-send to AI provider
+
+**Results State**
+- Clinical Summary card
+- Key Findings card (bulleted list)
+- Recommendations card
+- Disease Review card (if applicable)
+- Language: controlled by aiLanguage setting
+
+**API Contract**:
+- `POST /ai/case-pearl`
+- Request: `{ caseId, caseData: DeIdentifiedCase }`
+- Response: `{ summary, keyFindings: string[], recommendations: string[], diseaseReview?: string }`
 
 ### 5.11 SearchScreen
 - **File**: `src/pages/SearchScreen.tsx`
@@ -1012,6 +1044,44 @@ interface GoogleAccount {
 }
 ```
 
+### DeIdentifiedCase
+```typescript
+interface DeIdentifiedCase {
+  token: string;                // e.g. "Patient A" — replaces real name
+  age: number;                  // Real age kept (clinical relevance)
+  gender: 'male' | 'female';   // Kept
+  specialty: string;            // Kept
+  provisionalDiagnosis: string; // Kept
+  chiefComplaint: string;       // Kept
+  presentHistory: string;       // Kept
+  pastMedicalHistory: string;   // Kept
+  allergies: string;            // Kept
+  currentMedications: string;   // Kept
+  investigations: {
+    name: string;
+    type: string;
+    result: string;
+    relativeDate: string;       // date replaced: "Day 1", "Day 3"
+  }[];
+  management: {
+    type: string;
+    medications?: string[];
+    mode?: string;
+    details?: string;
+    relativeDate: string;
+  }[];
+  progressNotes: {
+    assessment: string;
+    vitals: VitalSigns;
+    relativeDate: string;
+  }[];
+  status: 'active' | 'discharged';
+  dischargeOutcome?: string;
+  // FIELDS REMOVED BEFORE SENDING TO AI:
+  // name, fileNumber, hospital, exact dates, patientId
+}
+```
+
 ---
 
 ## 7. API Contract
@@ -1102,9 +1172,11 @@ interface GoogleAccount {
 |---|---|
 | Method | DELETE |
 | Path | `/cases/:id` |
-| Purpose | Delete case |
+| Purpose | Delete case and all related records |
 | Response 200 | `{ success: true }` |
-| Triggered By | Delete Case AlertDialog |
+| Response 404 | `{ error: 'Case not found' }` |
+| Cascade | Deletes investigations, management, progress_notes, vitals, media |
+| Triggered By | CaseDetailScreen delete confirmation dialog |
 
 ### Investigations
 
@@ -1193,6 +1265,8 @@ interface GoogleAccount {
 | Request Body | Same as POST |
 
 #### DELETE /procedures/:id
+| Response 200 | `{ success: true }` |
+
 
 ### Lectures
 
@@ -1204,6 +1278,7 @@ interface GoogleAccount {
 
 #### PUT /lectures/:id
 #### DELETE /lectures/:id
+| Response 200 | `{ success: true }` |
 
 ### Courses
 
@@ -1215,6 +1290,7 @@ interface GoogleAccount {
 
 #### PUT /courses/:id
 #### DELETE /courses/:id
+| Response 200 | `{ success: true }` |
 
 ### Hospitals
 
@@ -1231,6 +1307,30 @@ interface GoogleAccount {
 | Request Body | Same as POST |
 
 #### DELETE /hospitals/:id
+| Property | Detail |
+|---|---|
+| Method | DELETE |
+| Path | `/hospitals/:id` |
+| Purpose | Remove hospital from list |
+| Response 200 | `{ success: true }` |
+| Note | Does NOT delete patient cases. Cases retain hospital name as text. |
+| Triggered By | ManageHospitalsSheet delete confirmation |
+
+#### DELETE /media/:id
+| Response 200 | `{ success: true }` |
+| Side Effect | Delete image file from local storage path |
+
+#### POST /ai/case-pearl
+| Property | Detail |
+|---|---|
+| Method | POST |
+| Path | `/ai/case-pearl` |
+| Purpose | Generate clinical pearl for single case |
+| Request Body | `{ caseId: string, caseData: DeIdentifiedCase }` |
+| Response 200 | `{ summary: string, keyFindings: string[], recommendations: string[], diseaseReview?: string }` |
+| Response 400 | `{ error: 'Missing case data' }` |
+| Response 500 | `{ error: 'AI provider error', message: string }` |
+| Triggered By | CasePearlScreen on mount |
 
 ### Search
 
@@ -1586,6 +1686,36 @@ CREATE INDEX idx_courses_date ON courses(date);
 - All write operations → SQLite first → enqueue to sync_queue
 - Background process dequeues and syncs when online
 - Conflict resolution: last-write-wins with timestamp comparison
+
+### ⚠️ Important Note for Backend Developer
+
+The current UI prototype runs entirely on **mock/local state data**.
+React Query is initialized but no actual queries or mutations
+are connected to a real data source.
+
+When implementing the backend:
+
+1. Replace all mock data arrays with React Query hooks
+2. Connect each hook to the local SQLite service layer
+3. Follow the query key conventions in Section 16
+4. Do NOT modify any UI component, screen, or styling
+5. Only modify or create files in:
+   - `/src/hooks/`
+   - `/src/services/`
+   - `/backend/`
+
+Example migration pattern:
+
+```javascript
+// BEFORE (mock data)
+const cases = mockCases.filter(...)
+
+// AFTER (React Query + SQLite)
+const { data: cases } = useQuery({
+  queryKey: ['patients', patientId, 'cases'],
+  queryFn: () => caseService.getByPatientId(patientId)
+})
+```
 
 ---
 
@@ -1970,6 +2100,20 @@ Comprehensive legal disclaimers in AboutSheet covering:
 | GoogleAccount | No account | No accounts connected | "Not connected" state | Show "Connect Google Account" button |
 | API Key | No key set | API key empty | "Not set" subtitle | Show placeholder text |
 | Hospital delete | Confirmation | User deletes hospital | AlertDialog noting cases NOT deleted | Explicit confirmation required |
+| Storage | Device full | Backup or image upload when storage full | Error state in ProgressSheet | Show message: "Not enough storage space. Free up space and try again." |
+| Image Upload | File too large | Image exceeds imageMaxSize setting | Inline error below image picker | "Image too large. Maximum allowed: X MB" |
+| Image Upload | Invalid format | Non-image file selected | Inline error | "Unsupported format. Use JPEG or PNG." |
+| Restore | Corrupted file | .medora file fails validation | Error state in RestoreBackupSheet | "Invalid or corrupted backup file." + "Try Again" |
+| Restore | Wrong app version | Backup from incompatible version | Warning dialog | "This backup was created with a newer version of Medora." |
+| AI | Quota exceeded | API rate limit hit | Error card in AI screen | "AI quota exceeded. Check your API plan." |
+| AI | Invalid API key | Bad key in settings | Error card | "Invalid API key. Go to Settings → AI Integration to update." |
+| AI | Timeout | Request takes too long | Error state with retry | "Request timed out. Try again." |
+| AI | No cases found | Insights with 0 active cases | Empty state in Insights tab | "No active cases to analyze." |
+| Google Drive | Token expired | OAuth token no longer valid | Alert in sync sheet | "Session expired. Reconnect your Google account." |
+| Google Drive | Upload failed | Network drop during sync | Error state with retry | "Upload failed. Check your connection and try again." |
+| Google Drive | Not connected | Sync triggered with no account | Error state | "No Google account connected. Go to Settings to connect." |
+| Settings | No hospitals | Default hospital sheet empty | Empty state | "No hospitals added yet." with link to Manage Hospitals |
+| Settings | API key empty | AI feature triggered with no key | Error card | "No API key set. Go to Settings → AI Integration." |
 | 404 | Invalid route | User navigates to nonexistent route | 404 page | "Return to Home" link |
 
 ---
