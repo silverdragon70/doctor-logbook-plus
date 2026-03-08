@@ -350,7 +350,7 @@ const NewCaseScreen = () => {
 
         {/* ═══ Initial Classification ═══ */}
         <CollapsibleSection
-          title="Initial Classification"
+          title="Classification"
           icon={<Stethoscope size={18} className="text-primary" />}
           isExpanded={expandedSections.classification}
           onToggle={() => toggleSection('classification')}
