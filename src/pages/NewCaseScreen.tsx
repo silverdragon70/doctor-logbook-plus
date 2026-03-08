@@ -128,9 +128,30 @@ const NewCaseScreen = () => {
       </header>
 
       <div className="px-5 py-5 space-y-5 pb-10">
-        {/* Patient Selection Toggle */}
-        <div className="space-y-3">
-          <div className="p-1 bg-muted rounded-xl flex gap-1">
+        {/* Patient Information — Collapsible */}
+        <div className="bg-card border border-border rounded-[18px] overflow-hidden">
+          <button
+            onClick={() => toggleSection('patient')}
+            className="w-full px-4 py-4 flex items-center justify-between"
+          >
+            <div className="flex items-center gap-2.5">
+              <ClipboardList size={18} className="text-primary" />
+              <span className="text-[16px] font-bold" style={{ color: '#1A2332' }}>Patient Information</span>
+            </div>
+            <ChevronDown
+              size={18}
+              style={{ color: '#6B7C93' }}
+              className={cn('transition-transform duration-300', expandedSections.patient && 'rotate-180')}
+            />
+          </button>
+          <div
+            className={cn(
+              'overflow-hidden transition-all duration-300 ease-in-out',
+              expandedSections.patient ? 'max-h-[2000px] opacity-100' : 'max-h-0 opacity-0'
+            )}
+          >
+            <div className="px-4 pb-5 pt-1 border-t border-border space-y-3">
+        <div className="p-1 bg-muted rounded-xl flex gap-1">
             <button
               onClick={() => setPatientMode('new')}
               className={`flex-1 py-2 text-[13px] font-semibold rounded-lg transition-all ${
