@@ -1,4 +1,4 @@
-import React, { useState, useMemo, useRef, useEffect } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { ArrowLeft, Search, ChevronRight, ChevronDown, Pencil, Trash2, Hospital, Building2, MapPin, Briefcase, CalendarDays, Stethoscope, X } from 'lucide-react';
 import { format } from 'date-fns';
