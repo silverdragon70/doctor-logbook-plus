@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Plus, X, BookOpen, CalendarIcon, Pencil, Trash2 } from 'lucide-react';
 import { format } from 'date-fns';
