@@ -15,12 +15,12 @@ const mockCases = [
 ];
 
 const outcomeBadgeMap: Record<string, { label: string; bg: string; color: string }> = {
-  cured: { label: 'Cured / Recovered', bg: '#DBEAFE', color: '#2563EB' },
-  followup: { label: 'Follow Up Required', bg: '#FEF9C3', color: '#CA8A04' },
-  referred: { label: 'Referred to Specialist', bg: '#EDE9FE', color: '#7C3AED' },
+  cured: { label: 'Cured', bg: '#DBEAFE', color: '#2563EB' },
+  followup: { label: 'Follow Up', bg: '#FEF9C3', color: '#CA8A04' },
+  referred: { label: 'Referred', bg: '#EDE9FE', color: '#7C3AED' },
   transferred: { label: 'Transferred', bg: '#E0F2FE', color: '#0369A1' },
   lama: { label: 'LAMA', bg: '#FEF3C7', color: '#D97706' },
-  chronic: { label: 'Chronic / Ongoing', bg: '#F1F5F9', color: '#475569' },
+  chronic: { label: 'Chronic', bg: '#F1F5F9', color: '#475569' },
   homecare: { label: 'Home Care', bg: '#ECFDF5', color: '#059669' },
   died: { label: 'Died', bg: '#FEE2E2', color: '#DC2626' },
 };
