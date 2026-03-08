@@ -90,11 +90,6 @@ const SettingsScreen = () => {
     }, 300);
   };
 
-  const backupHistory = [
-    { id: '1', type: 'Full Backup', date: '2025-01-15 · 08:30', size: '245 MB' },
-    { id: '2', type: 'Data Only', date: '2025-01-14 · 14:20', size: '12 MB' },
-    { id: '3', type: 'Incremental', date: '2025-01-13 · 09:00', size: '5 MB' },
-  ];
 
   const sw = (checked: boolean, onChange: (v: boolean) => void) => (
     <Switch checked={checked} onCheckedChange={onChange} />
