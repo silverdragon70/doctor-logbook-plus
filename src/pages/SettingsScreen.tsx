@@ -333,7 +333,38 @@ const SettingsScreen = () => {
       <AIModelSheet open={aiModelOpen} onOpenChange={setAiModelOpen} value={aiModel} onApply={setAiModel} />
       <AILanguageSheet open={aiLanguageOpen} onOpenChange={setAiLanguageOpen} value={aiLanguage} onApply={setAiLanguage} />
       <SyncFrequencySheet open={syncFreqOpen} onOpenChange={setSyncFreqOpen} value={syncFrequency} onApply={setSyncFrequency} />
-      <GoogleAccountSheet open={googleAccountOpen} onOpenChange={setGoogleAccountOpen} email={googleEmail} onConnect={() => { setGoogleEmail('user@gmail.com'); setSyncEnabled(true); }} onSwitch={() => console.log('switch account')} onDisconnect={() => { setGoogleEmail(''); setSyncEnabled(false); }} />
+      <GoogleAccountSheet
+        open={googleAccountOpen}
+        onOpenChange={setGoogleAccountOpen}
+        accounts={googleAccounts}
+        onConnect={() => {
+          const newId = Date.now().toString();
+          const newEmail = `new${googleAccounts.length + 1}@gmail.com`;
+          if (googleAccounts.length === 0) {
+            setGoogleAccounts([{ id: newId, email: newEmail, active: true }]);
+            setSyncEnabled(true);
+          } else {
+            setGoogleAccounts(prev => [...prev, { id: newId, email: newEmail, active: false }]);
+          }
+        }}
+        onSetActive={(id) => {
+          setGoogleAccounts(prev => prev.map(a => ({ ...a, active: a.id === id })));
+        }}
+        onDisconnectOne={(id) => {
+          setGoogleAccounts(prev => {
+            const filtered = prev.filter(a => a.id !== id);
+            if (filtered.length > 0 && !filtered.some(a => a.active)) {
+              filtered[0].active = true;
+            }
+            if (filtered.length === 0) setSyncEnabled(false);
+            return filtered;
+          });
+        }}
+        onDisconnectAll={() => {
+          setGoogleAccounts([]);
+          setSyncEnabled(false);
+        }}
+      />
       <ProgressSheet open={progressOpen} onOpenChange={setProgressOpen} type={progressType} detail={progressDetail} />
     </div>
   );
