@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState } from 'react'; // v2
 import { useNavigate } from 'react-router-dom';
 import { Loader2, AlertCircle, SearchX, RefreshCw } from 'lucide-react';
 import { Input } from '@/components/ui/input';
