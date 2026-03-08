@@ -505,6 +505,9 @@ const CaseDetailScreen = () => {
           isExpanded={expandedSections.includes('progress')}
           onToggle={() => toggleSection('progress')}
           sectionRef={sectionRefs.progress}
+          onAdd={() => console.log('add progress note')}
+          onEdit={() => toggleEdit('progress')}
+          isEditing={editingSections.includes('progress')}
         >
           <DisplayField label="Date" value={mockCase.progressDate} />
           <DisplayField label="Assessment" value={mockCase.assessment} isMultiLine />
