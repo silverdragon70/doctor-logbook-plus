@@ -903,7 +903,7 @@ const CaseDetailScreen = () => {
                             fontWeight: dischargeOutcome === o.key ? 700 : 400,
                           }}
                         >
-                          <span style={{ fontSize: '14px' }}>{o.icon}</span>
+                          {o.label}
                           {o.label}
                         </button>
                       ))}
