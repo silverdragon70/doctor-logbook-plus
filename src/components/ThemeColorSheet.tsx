@@ -2,12 +2,12 @@ import React, { useState } from 'react';
 import { Drawer, DrawerContent, DrawerHeader, DrawerTitle, DrawerClose } from '@/components/ui/drawer';
 import { X } from 'lucide-react';
 
-const themes = [
+const themes: { id: string; label: string; color: string; subtitle?: string }[] = [
   { id: 'blue', label: 'Medical Blue', color: '#2563EB', subtitle: 'Default' },
   { id: 'green', label: 'Forest Green', color: '#16A34A' },
   { id: 'purple', label: 'Warm Purple', color: '#7C3AED' },
   { id: 'teal', label: 'Teal', color: '#0D9488' },
-] as const;
+];
 
 interface ThemeColorSheetProps {
   open: boolean;
