@@ -27,8 +27,7 @@ const AppShell = () => {
       return (
         location.pathname === '/logbook' ||
         location.pathname.startsWith('/logbook/') ||
-        location.pathname.startsWith('/procedures') ||
-        location.pathname.startsWith('/group-pearl')
+        logbookSubScreens.some((p) => location.pathname.startsWith(p))
       );
     }
 
