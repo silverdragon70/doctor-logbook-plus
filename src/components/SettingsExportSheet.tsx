@@ -32,7 +32,7 @@ const exportCategories = [
 
 const hospitals = ['All Hospitals', 'Cairo University', 'Ain Shams Hospital', 'Kasr El Aini'];
 
-const SettingsExportSheet: React.FC<SettingsExportSheetProps> = ({ open, onOpenChange, gdriveConnected = true }) => {
+const SettingsExportSheet: React.FC<SettingsExportSheetProps> = ({ open, onOpenChange, gdriveConnected = true, onExportStart }) => {
   const [selectedCategories, setSelectedCategories] = useState<string[]>(['cases', 'procedures', 'lectures', 'courses']);
   const [hospital, setHospital] = useState('All Hospitals');
   const [hospitalOpen, setHospitalOpen] = useState(false);
