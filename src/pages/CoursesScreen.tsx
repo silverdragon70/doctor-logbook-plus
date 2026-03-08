@@ -9,6 +9,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from '@/components/ui/alert-dialog';
+import ExportSheet from '@/components/ExportSheet';
 
 interface Course {
   id: string;
@@ -33,6 +34,7 @@ const CoursesScreen = () => {
   const [courses, setCourses] = useState<Course[]>(MOCK_COURSES);
   const [editingId, setEditingId] = useState<string | null>(null);
   const [deleteId, setDeleteId] = useState<string | null>(null);
+  const [showExport, setShowExport] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   // Form state
@@ -197,6 +199,16 @@ const CoursesScreen = () => {
   return (
     <>
       <div className="px-5 py-6 space-y-5 animate-fade-in pb-24">
+        {/* Export Button */}
+        <div className="flex justify-end">
+          <button
+            onClick={() => setShowExport(true)}
+            className="inline-flex items-center gap-1.5 text-[13px] font-medium px-3.5 py-1.5 rounded-full bg-[#EFF6FF] text-[#2563EB] border border-[#2563EB] hover:bg-[#DBEAFE] transition-colors"
+          >
+            <Upload size={14} /> Export
+          </button>
+        </div>
+
         {/* Stats */}
         <div className="grid grid-cols-2 gap-3">
           <div className="rounded-2xl p-4 text-center bg-[#DCFCE7]">
@@ -275,6 +287,23 @@ const CoursesScreen = () => {
       >
         <Plus size={26} />
       </button>
+
+      {/* Export Sheet */}
+      <ExportSheet
+        open={showExport}
+        onOpenChange={setShowExport}
+        title="Courses"
+        data={courses.map(c => ({ ...c, certificate: c.hasCertificate ? (c.certificateName || 'Yes') : 'No' }))}
+        dateKey="date"
+        columns={[
+          { header: 'Course Name', key: 'name' },
+          { header: 'Date', key: 'date' },
+          { header: 'Provider', key: 'provider' },
+          { header: 'Duration', key: 'duration' },
+          { header: 'Certificate', key: 'certificate' },
+          { header: 'Notes', key: 'notes' },
+        ]}
+      />
     </>
   );
 };
