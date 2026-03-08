@@ -1,0 +1,351 @@
+ROLE:
+You are a senior frontend engineer specializing in Capacitor + React + Vite.
+
+PROJECT: Medora — Personal medical logbook app for physicians.
+
+CRITICAL RULES:
+- Do NOT modify any file in /src/pages/ or /src/components/
+- Work ONLY in /src/services/ and /src/hooks/
+- Use @capacitor/filesystem for file operations
+- jspdf and xlsx are already installed in the project
+
+PREREQUISITE: Tasks 1 through 5 must be complete.
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+TASK 6 — BACKUP, RESTORE, EXPORT & GOOGLE DRIVE SYNC
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+PART A — Backup Service
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+Create /src/services/backupService.ts
+
+.medora file format:
+  A ZIP archive (use JSZip — npm install jszip)
+  Renamed to .medora extension
+  Contains:
+    data.json        ← all SQLite data exported as JSON
+    images/          ← all image files as base64 (full/incremental only)
+    metadata.json    ← { appVersion, date, backupType, schemaVersion: '1' }
+
+createBackup(options: {
+  type: 'full' | 'incremental' | 'data'
+  destination: 'local' | 'gdrive'
+  timePeriod?: 'all' | 'custom'
+  fromDate?: string
+  toDate?: string
+  onProgress: (percent: number, message: string) => void
+}): Promise<BackupMetadata>
+
+Steps:
+1. onProgress(5, 'Preparing backup...')
+
+2. onProgress(20, 'Exporting database...')
+   Export all tables as JSON:
+   {
+     patients: [...],
+     hospitals: [...],
+     cases: [...],
+     investigations: [...],
+     investigation_images: [...],
+     management_entries: [...],
+     progress_notes: [...],
+     vitals: [...],
+     procedures: [...],
+     lectures: [...],
+     courses: [...],
+     media: [...],
+     settings: [...]
+   }
+   SELECT all rows WHERE is_deleted = 0 for each table
+   Apply date filter if timePeriod = 'custom'
+
+3. Create JSZip instance
+   zip.file('data.json', JSON.stringify(exportData))
+
+4. If type = 'full' or 'incremental':
+   onProgress(40, 'Packaging images...')
+   For each media record: read base64 from fileSystemService
+   For each investigation_image: read base64
+   zip.folder('images').file(relativePath, base64Data, { base64: true })
+
+5. onProgress(70, 'Creating backup file...')
+   Generate metadata.json
+   zip.file('metadata.json', JSON.stringify({ appVersion: '1.0.0', date: new Date().toISOString(), backupType: type, schemaVersion: '1' }))
+
+6. Generate ZIP as base64:
+   const zipBase64 = await zip.generateAsync({ type: 'base64' })
+   const fileName = `medora_backup_${Date.now()}.medora`
+
+7. onProgress(80, 'Saving...')
+   If destination = 'local':
+     fileSystemService.saveFile({ relativePath: `backups/${fileName}`, base64Data: zipBase64 })
+     Also trigger browser download (for web):
+       const blob = new Blob([Uint8Array from base64], { type: 'application/octet-stream' })
+       Create <a> element → click → download
+
+   If destination = 'gdrive':
+     googleDriveService.uploadFile({
+       fileName, base64Data: zipBase64, mimeType: 'application/octet-stream'
+     })
+
+8. onProgress(95, 'Finalizing...')
+   INSERT INTO backup_history
+   Update settings: last_backup_date, last_backup_type, last_backup_destination, last_backup_size
+
+9. onProgress(100, 'Complete')
+   Return BackupMetadata
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+PART B — Restore Service
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+Create /src/services/restoreService.ts
+
+restore(options: {
+  file: File                    ← .medora file selected by user
+  restoreType: 'full' | 'data'
+  onProgress: (percent: number, message: string) => void
+}): Promise<void>
+
+Steps:
+1. onProgress(5, 'Reading backup file...')
+   Validate file.name ends with '.medora'
+   If invalid → throw new Error('INVALID_BACKUP_FILE')
+
+2. onProgress(15, 'Validating backup...')
+   Use JSZip to read the file
+   Check metadata.json exists + data.json exists
+   Read metadata → check schemaVersion = '1'
+   If incompatible → throw new Error('INCOMPATIBLE_VERSION')
+
+3. onProgress(30, 'Restoring data...')
+   Parse data.json
+   Run inside a SQLite transaction:
+     For each table: DELETE all existing rows, then INSERT restored rows
+     Tables in order: hospitals, patients, cases, investigations,
+       investigation_images, management_entries, progress_notes,
+       vitals, procedures, lectures, courses, media, settings, backup_history
+
+4. If restoreType = 'full' AND images/ folder exists:
+   onProgress(65, 'Restoring images...')
+   For each file in images/ folder:
+     Read base64 data from zip
+     fileSystemService.saveFile({ relativePath, base64Data })
+
+5. onProgress(95, 'Finalizing...')
+   Invalidate all React Query caches:
+     queryClient.clear()
+   Show success
+
+ON ANY ERROR:
+   Rethrow the error so the UI can show it
+   The UI ProgressSheet handles error state display
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+PART C — Export Service
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+Create /src/services/exportService.ts
+
+Uses: jspdf (already installed), xlsx (already installed)
+
+exportData(options: {
+  categories: ('cases' | 'procedures' | 'lectures' | 'courses')[]
+  hospitalId?: string
+  timePeriod: string
+  fromDate?: string
+  toDate?: string
+  format: 'PDF' | 'DOCX' | 'Excel' | 'JSON'
+  onProgress: (percent: number, message: string) => void
+}): Promise<void>
+
+Steps:
+1. onProgress(10, 'Querying records...')
+   Fetch selected data with filters:
+   cases:      caseService.getAll() filtered by hospitalId + date range
+   procedures: procedureService.getAll()
+   lectures:   lectureService.getAll()
+   courses:    courseService.getAll()
+
+2. onProgress(40, 'Generating file...')
+   Based on format:
+
+   JSON:
+     const data = { cases, procedures, lectures, courses }
+     const json = JSON.stringify(data, null, 2)
+     Trigger browser download as medora_export_{date}.json
+
+   Excel (use xlsx):
+     const wb = XLSX.utils.book_new()
+     If cases selected:
+       Map cases to flat rows → XLSX.utils.aoa_to_sheet → book_append_sheet
+     Same for procedures, lectures, courses (each on separate sheet)
+     XLSX.writeFile(wb, 'medora_export_{date}.xlsx')
+     Or for Capacitor: XLSX.write(wb, {type: 'base64'}) → fileSystemService.saveFile
+
+   PDF (use jspdf):
+     import jsPDF from 'jspdf'
+     import autoTable from 'jspdf-autotable'  (already installed)
+     const doc = new jsPDF()
+     doc.text('Medora Export', 14, 15)
+     For each selected category: autoTable with headers + rows
+     doc.save('medora_export_{date}.pdf')
+     Or for Capacitor: doc.output('datauristring') → extract base64 → save
+
+   DOCX: (use docx — npm install docx)
+     Create Document with sections for each category
+     Packer.toBase64String(doc) → fileSystemService.saveFile
+
+3. onProgress(100, 'Complete')
+
+Browser download helper:
+  downloadBlob(base64: string, fileName: string, mimeType: string): void
+    const blob = new Blob([base64ToBinary(base64)], { type: mimeType })
+    const url = URL.createObjectURL(blob)
+    const a = document.createElement('a')
+    a.href = url; a.download = fileName; a.click()
+    URL.revokeObjectURL(url)
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+PART D — Google Drive Service
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+Create /src/services/googleDriveService.ts
+
+Uses: Google Drive REST API v3
+Store tokens in @capacitor/preferences (key: 'gdrive_tokens')
+
+connect(): Promise<GoogleAccount>
+  Open Google OAuth 2.0 popup window:
+    URL: https://accounts.google.com/o/oauth2/v2/auth
+    params:
+      client_id: (read from env VITE_GOOGLE_CLIENT_ID)
+      redirect_uri: window.location.origin + '/oauth/callback'
+      response_type: 'code'
+      scope: 'openid email https://www.googleapis.com/auth/drive.file'
+      access_type: 'offline'
+  Listen for window message with auth code
+  Exchange code for tokens via POST https://oauth2.googleapis.com/token
+  Store: Preferences.set({ key: 'gdrive_token_' + email, value: JSON.stringify({access_token, refresh_token}) })
+  Add to stored accounts list
+  Return GoogleAccount
+
+disconnect(email: string): Promise<void>
+  GET https://oauth2.googleapis.com/revoke?token={access_token}
+  Preferences.remove({ key: 'gdrive_token_' + email })
+  Remove from accounts list
+
+getAccounts(): Promise<GoogleAccount[]>
+  Preferences.get({ key: 'gdrive_accounts' })
+  Parse JSON → return GoogleAccount[]
+
+setActiveAccount(email: string): Promise<void>
+  Update accounts list: set active=true for email, false for others
+  Preferences.set({ key: 'gdrive_accounts', value: JSON.stringify(accounts) })
+
+uploadFile(options: {
+  fileName: string
+  base64Data: string
+  mimeType: string
+}): Promise<string>    ← returns Google Drive file ID
+
+  1. Get active account + token
+  2. If token expired: POST https://oauth2.googleapis.com/token with refresh_token
+  3. Ensure '/Medora' folder exists (create if not):
+     GET https://www.googleapis.com/drive/v3/files?q=name='Medora' and mimeType='...folder'
+     If not found: POST to create folder
+  4. Upload file:
+     POST https://www.googleapis.com/upload/drive/v3/files?uploadType=multipart
+     Multipart body: metadata + file content (base64 decoded)
+  5. Return fileId
+
+sync(onProgress: (percent: number, message: string) => void): Promise<void>
+
+  onProgress(10, 'Connecting to Google Drive...')
+  Get active account + valid token. If none → throw Error('NO_GOOGLE_ACCOUNT')
+
+  onProgress(30, 'Checking for changes...')
+  SELECT * FROM sync_queue WHERE status = 'pending' ORDER BY created_at ASC
+
+  onProgress(50, 'Syncing records...')
+  Process each item (upload as JSON to Google Drive)
+  Mark each as 'completed' in sync_queue
+
+  onProgress(75, 'Syncing images...')
+  Upload any media files not yet synced
+
+  onProgress(90, 'Verifying...')
+  settingsService.set('last_synced_at', new Date().toISOString())
+
+  onProgress(100, 'Complete')
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+PART E — React Query Hooks
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+Create /src/hooks/useBackup.ts
+
+  useLastBackupInfo()
+    → useQuery(['last-backup'])
+    → reads last_backup_date, last_backup_type etc from settings
+
+  useCreateBackup()
+    Returns: { start(options), progress, status, error, reset }
+    status: 'idle' | 'running' | 'done' | 'error'
+    start() calls backupService.createBackup() with onProgress callback
+    Updates progress state as it runs
+
+  useRestoreBackup()
+    Returns: { start(options), progress, status, error }
+    start() calls restoreService.restore()
+    On success: calls queryClient.clear()
+
+Create /src/hooks/useExport.ts
+
+  useExportData()
+    Returns: { start(options), progress, status, error }
+    start() calls exportService.exportData()
+
+Create /src/hooks/useGoogleDrive.ts
+
+  useGoogleAccounts()       → useQuery(['google-accounts'])
+  useConnectGoogle()        → useMutation → invalidate ['google-accounts']
+  useDisconnectGoogle()     → useMutation → invalidate ['google-accounts']
+  useSetActiveAccount()     → useMutation → invalidate ['google-accounts']
+
+  useSyncNow()
+    Returns: { start(), progress, status, error }
+    start() calls googleDriveService.sync()
+    Updates progress state as it runs
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+DELIVERABLES — TASK 6
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+Additional package to install:
+  npm install jszip
+  npm install docx
+
+Files:
+  src/services/backupService.ts
+  src/services/restoreService.ts
+  src/services/exportService.ts
+  src/services/googleDriveService.ts
+  src/hooks/useBackup.ts
+  src/hooks/useExport.ts
+  src/hooks/useGoogleDrive.ts
+
+Confirm:
+  ✅ Full backup creates downloadable .medora file
+  ✅ .medora is valid ZIP with data.json + metadata.json
+  ✅ Restore reads .medora and restores all tables
+  ✅ JSON export downloads correctly
+  ✅ Excel export creates multi-sheet workbook
+  ✅ PDF export generates readable document
+  ✅ Google Drive connect opens OAuth popup
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+DO NOT connect UI to backend yet. That is Task 7.
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
