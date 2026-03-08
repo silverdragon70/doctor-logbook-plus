@@ -1,6 +1,6 @@
 import React from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
-import { ArrowLeft, Edit2, ChevronRight, FileText, Plus } from 'lucide-react';
+import { ArrowLeft, Edit2, FileText, Plus } from 'lucide-react';
 
 const mockPatient = {
   patientId: '1', name: 'Lucas Miller', age: 7, gender: 'male',
@@ -82,35 +82,31 @@ const PatientDetailScreen = () => {
               onClick={() => navigate(`/case/${c.caseId}`)}
               className="p-3 bg-card border border-border rounded-xl active:scale-[0.98] transition-all cursor-pointer hover:shadow-card"
             >
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-3">
-                  <div className="w-9 h-9 bg-accent rounded-lg flex items-center justify-center text-primary">
-                    <FileText size={16} />
-                  </div>
-                  {/* BACKEND LOGIC — Case History Card Data Source
-                     Line 1 (Diagnosis):      case.diagnosis field
-                     Line 2 (Chief Complaint): case.chief_complaint field
-                     Line 3 (Date):           case.admission_date field
-                     All fields come from the same case record in the database
-                     END BACKEND LOGIC */}
-                  <div>
-                    <div className="flex items-center gap-2">
-                      {c.status === 'active' ? (
-                        <span className="text-[10px] font-bold uppercase flex-shrink-0" style={{ borderRadius: 20, padding: '2px 8px', backgroundColor: '#DCFCE7', color: '#16A34A' }}>
-                          Hospitalized
-                        </span>
-                      ) : c.outcome && outcomeBadgeMap[c.outcome] ? (
-                        <span className="text-[10px] font-bold uppercase flex-shrink-0" style={{ borderRadius: 20, padding: '2px 8px', backgroundColor: outcomeBadgeMap[c.outcome].bg, color: outcomeBadgeMap[c.outcome].color }}>
-                          {outcomeBadgeMap[c.outcome].label}
-                        </span>
-                      ) : null}
-                      <h4 className="text-[15px] font-bold" style={{ color: '#1A2332' }}>{c.diagnosis}</h4>
-                    </div>
-                    <p className="text-[13px] mt-1" style={{ color: '#6B7C93' }}>{c.complaint}</p>
-                    <span className="text-[13px]" style={{ color: '#6B7C93' }}>{c.date}</span>
-                  </div>
+              <div className="flex items-center gap-3">
+                <div className="w-9 h-9 bg-accent rounded-lg flex items-center justify-center text-primary flex-shrink-0">
+                  <FileText size={16} />
                 </div>
-                <ChevronRight size={16} className="text-muted-foreground flex-shrink-0" />
+                {/* BACKEND LOGIC — Case History Card Data Source
+                   Line 1 (Diagnosis):      case.diagnosis field
+                   Line 2 (Chief Complaint): case.chief_complaint field
+                   Line 3 (Date):           case.admission_date field
+                   All fields come from the same case record in the database
+                   END BACKEND LOGIC */}
+                <div className="flex-1 min-w-0">
+                  <div className="flex items-center justify-between gap-2">
+                    <h4 className="text-[15px] font-bold truncate" style={{ color: '#1A2332' }}>{c.diagnosis}</h4>
+                    {c.status === 'active' ? (
+                      <span className="text-[11px] font-bold uppercase flex-shrink-0" style={{ borderRadius: 20, padding: '4px 12px', backgroundColor: '#DCFCE7', color: '#16A34A' }}>
+                        Hospitalized
+                      </span>
+                    ) : c.outcome && outcomeBadgeMap[c.outcome] ? (
+                      <span className="text-[11px] font-bold uppercase flex-shrink-0" style={{ borderRadius: 20, padding: '4px 12px', backgroundColor: outcomeBadgeMap[c.outcome].bg, color: outcomeBadgeMap[c.outcome].color }}>
+                        {outcomeBadgeMap[c.outcome].label}
+                      </span>
+                    ) : null}
+                  </div>
+                  <p className="text-[13px] mt-0.5" style={{ color: '#6B7C93' }}>{c.complaint} • {c.date}</p>
+                </div>
               </div>
             </div>
           ))}
