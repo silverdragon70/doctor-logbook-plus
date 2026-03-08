@@ -78,7 +78,7 @@ const AboutSheet = ({ open, onOpenChange }: AboutSheetProps) => {
 
           {/* Privacy & Data Security */}
           <SectionHeader icon={Lock} label="Privacy & Data Security" />
-          <BodyText>All data entered into PediLog is stored locally on the user's device unless the user explicitly chooses to export, sync, or back up the data using optional features.</BodyText>
+          <BodyText>All data entered into Medora is stored locally on the user's device unless the user explicitly chooses to export, sync, or back up the data using optional features.</BodyText>
           <div className="h-3" />
           <BodyText>The developer does not collect, monitor, or store patient data.</BodyText>
           <div className="h-3" />
