@@ -65,6 +65,9 @@ const NewCaseScreen = () => {
   const [fileNumber, setFileNumber] = useState('');
   const [hospital, setHospital] = useState('');
   const [admissionDate, setAdmissionDate] = useState<Date | undefined>(undefined);
+  const [specialty, setSpecialty] = useState('');
+  const [provisionalDiagnosis, setProvisionalDiagnosis] = useState('');
+  const [chiefComplaint, setChiefComplaint] = useState('');
 
   const filteredPatients = useMemo(() => {
     if (!searchQuery.trim()) return [];
