@@ -69,7 +69,7 @@ const SettingsScreen = () => {
   const [encryptedBackup, setEncryptedBackup] = useState(true);
   const [pinLock, setPinLock] = useState(false);
   const [biometric, setBiometric] = useState(true);
-  const [quickEntry, setQuickEntry] = useState(false);
+  
   const [confirmDialogs, setConfirmDialogs] = useState(true);
   const [autoSave, setAutoSave] = useState(true);
   const [exportOpen, setExportOpen] = useState(false);
@@ -219,7 +219,7 @@ const SettingsScreen = () => {
 
         {/* ─── 8. BEHAVIOR ─── */}
         <Section title="Behavior">
-          <Row icon={Zap} label="Quick Entry Mode" subtitle="Minimal fields on new entry" right={sw(quickEntry, setQuickEntry)} />
+          
           <Row icon={MessageSquare} label="Confirmation Dialogs" subtitle="Ask before deleting" right={sw(confirmDialogs, setConfirmDialogs)} />
           <Row icon={Save} label="Auto-Save" subtitle="Save drafts automatically" right={sw(autoSave, setAutoSave)} />
           <Row icon={Eye} label="Default View Mode" subtitle="Display" right={<Chevron />} noBorder />
