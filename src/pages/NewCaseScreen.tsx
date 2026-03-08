@@ -509,9 +509,11 @@ const NewCaseScreen = () => {
             </div>
           </div>
         </CollapsibleSection>
+        </div>
 
 
         {/* ═══ Investigations ═══ */}
+        <div ref={sectionRefs.investigations}>
         <CollapsibleSection
           title="Investigations"
           icon={<span className="text-[18px]">🔬</span>}
