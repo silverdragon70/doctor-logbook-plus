@@ -206,20 +206,35 @@ const PatientsScreen = () => {
           <div
             key={patient.patientId}
             onClick={() => navigate(`/patient/${patient.patientId}`)}
-            className="group flex items-center justify-between p-3 bg-card border border-border rounded-xl active:scale-[0.98] transition-all cursor-pointer hover:shadow-card"
+            className="group p-3 bg-card border border-border rounded-xl active:scale-[0.98] transition-all cursor-pointer hover:shadow-card"
           >
-            <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-xl gradient-avatar flex items-center justify-center text-primary-foreground font-bold text-[14px] shadow-sm">
-                {getInitials(patient.name)}
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 rounded-xl gradient-avatar flex items-center justify-center text-primary-foreground font-bold text-[14px] shadow-sm">
+                  {getInitials(patient.name)}
+                </div>
+                <div>
+                  <h4 className="text-[14px] font-bold text-foreground">{patient.name}</h4>
+                  <p className="text-[11px] text-muted-foreground">
+                    {patient.age >= 1 ? `${Math.floor(patient.age)}y` : `${Math.round(patient.age * 12)}m`} • {patient.gender} • {patient.caseCount} cases
+                  </p>
+                </div>
               </div>
-              <div>
-                <h4 className="text-[14px] font-bold text-foreground">{patient.name}</h4>
-                <p className="text-[11px] text-muted-foreground">
-                  {patient.age >= 1 ? `${Math.floor(patient.age)}y` : `${Math.round(patient.age * 12)}m`} • {patient.gender} • {patient.caseCount} cases
-                </p>
-              </div>
+              <ChevronRight size={18} className="text-muted-foreground group-hover:text-primary transition-colors" />
             </div>
-            <ChevronRight size={18} className="text-muted-foreground group-hover:text-primary transition-colors" />
+            <div className="flex justify-end mt-1">
+              <span
+                className="text-[11px] font-bold"
+                style={{
+                  borderRadius: 20,
+                  padding: '3px 10px',
+                  backgroundColor: patient.status === 'active' ? '#DCFCE7' : '#F1F5F9',
+                  color: patient.status === 'active' ? '#16A34A' : '#64748B',
+                }}
+              >
+                {patient.status === 'active' ? 'Active' : 'Discharged'}
+              </span>
+            </div>
           </div>
         ))}
         {filtered.length === 0 && (
