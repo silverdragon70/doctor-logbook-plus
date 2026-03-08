@@ -111,7 +111,7 @@ const PatientDetailScreen = () => {
           // END BACKEND LOGIC
           navigate('/case/new');
         }}
-        className="fixed bottom-[84px] right-1/2 translate-x-[195px] w-14 h-14 bg-primary rounded-[18px] flex items-center justify-center text-primary-foreground shadow-brand active:scale-90 transition-all z-50 group overflow-hidden"
+        className="fixed bottom-[84px] left-1/2 translate-x-[110px] w-14 h-14 bg-primary rounded-[18px] flex items-center justify-center text-primary-foreground shadow-brand active:scale-90 transition-all z-50 group overflow-hidden"
         aria-label="Add Case"
       >
         <div className="absolute inset-0 bg-primary-foreground/10 group-active:bg-transparent" />
