@@ -13,8 +13,7 @@ const mockPatient = {
   name: 'Lucas Miller',
   dob: new Date('2018-03-12'),
   gender: 'male' as 'male' | 'female',
-  bloodType: 'A+',
-  phone: '+1 555-0123',
+  notes: 'No known allergies. Vaccinations up to date.',
   notes: 'No known allergies. Vaccinations up to date.',
 };
 
