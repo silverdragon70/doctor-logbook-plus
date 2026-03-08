@@ -216,6 +216,7 @@ const CaseDetailScreen = () => {
   const [dischargeNotes, setDischargeNotes] = useState('');
   const [dischargeOutcome, setDischargeOutcome] = useState<string | null>(null);
   const [caseStatus, setCaseStatus] = useState<'active' | 'discharged'>('active');
+  const [outcomeDropdownOpen, setOutcomeDropdownOpen] = useState(false);
 
   const toggleEdit = (key: string) => {
     setEditingSections(prev => prev.includes(key) ? prev.filter(s => s !== key) : [...prev, key]);
