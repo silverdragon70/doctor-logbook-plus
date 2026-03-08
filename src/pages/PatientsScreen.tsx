@@ -104,7 +104,7 @@ const FilterChip = ({ label, options, selected, onSelect }: {
         <ChevronDown size={12} className={`transition-transform ${open ? 'rotate-180' : ''}`} />
       </button>
       {open && (
-        <div className="absolute top-full left-0 mt-1 z-50 min-w-[180px] bg-card border border-border rounded-xl shadow-lg overflow-hidden animate-fade-in">
+        <div className="absolute top-full left-0 mt-1.5 min-w-[200px] bg-card border border-border rounded-xl overflow-hidden" style={{ zIndex: 9999, boxShadow: '0 8px 30px rgba(0,0,0,0.12)' }}>
           {options.map((o) => (
             <button
               key={o.key}
@@ -166,7 +166,7 @@ const PatientsScreen = () => {
 
       {/* Filter Chips */}
       <div className="flex items-center gap-2">
-        <div className="flex overflow-x-auto gap-2 pb-1 flex-1" style={{ scrollbarWidth: 'none' }}>
+        <div className="flex gap-2 pb-1 flex-1" style={{ scrollbarWidth: 'none' }}>
           {filterOptions.map((group) => (
             <FilterChip
               key={group.category}
