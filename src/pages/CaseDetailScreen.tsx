@@ -1,45 +1,58 @@
 import React, { useState, useRef, useEffect, useCallback } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
-import { ArrowLeft, Edit2, Trash2, Camera, Image, ChevronDown, ChevronUp, Save, Upload, Lightbulb } from 'lucide-react';
+import { ArrowLeft, Edit2, Trash2, Camera, Image, ChevronDown, ChevronUp, Upload, Lightbulb } from 'lucide-react';
 import ExportSheet from '@/components/ExportSheet';
 import {
   AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent,
   AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle,
 } from '@/components/ui/alert-dialog';
 
+// Mock data
 const mockCase = {
   caseId: '1',
   patientName: 'Lucas Miller',
   patientAge: 7,
-  patientGender: 'male',
+  patientGender: 'male' as const,
   date: '2025-01-15',
-  complaint: 'Persistent cough for 2 weeks, worsening at night. No fever initially but developed low-grade fever 3 days ago.',
-  history: 'Previously healthy. No known allergies. Vaccinations up to date. No recent travel.',
-  examination: 'Temp 37.8°C, RR 28/min, SpO2 96%. Bilateral wheeze on auscultation. No retractions.',
-  investigations: 'CXR: Bilateral peribronchial thickening. CBC: WBC 11.2, Lymphocytes predominant.',
-  diagnosis: 'Acute bronchitis with possible reactive airway disease',
-  management: 'Salbutamol nebulization q6h. Oral prednisolone 1mg/kg x 3 days. Follow-up in 48 hours.',
-  notes: 'Mother reports improvement with nebulization. Consider allergy testing if symptoms recur.',
+  fileNumber: '24-10842',
+  hospital: 'Cairo Univ.',
+  dob: { day: '15', month: '01', year: '2018' },
+  admissionDate: '15 / 01 / 2025',
+  specialty: 'Respiratory',
+  provisionalDiagnosis: 'Acute bronchitis with possible reactive airway disease',
+  chiefComplaint: 'Persistent cough',
+  historyComplaint: 'Persistent cough for 2 weeks, worsening at night. No fever initially but developed low-grade fever 3 days ago.',
+  presentHistory: '',
+  pastMedicalHistory: '',
+  allergies: '',
+  currentMedications: '',
+  investigationName: '',
+  investigationType: '',
+  investigationDate: '',
+  investigationResult: '',
+  investigationImages: [] as string[],
+  medications: ['Cefotaxime 1g IV q8h', 'Salbutamol nebulization q6h', 'Oral prednisolone 1mg/kg x 3 days'],
+  medicationChartImage: '',
+  respiratorySupport: 'Nasal O₂',
+  respiratoryDetails: '2 L/min',
+  feedingType: 'Nasogastric',
+  feedingDetails: '60 mL/hr, formula type...',
+  progressDate: '05 / 03 / 2025',
+  assessment: '',
+  vitals: {
+    hr: '128', spo2: '94', temp: '38.6', rr: '46',
+    bp: '88/55', weight: '13.2', dateTime: '05/03/2025  07:00 AM',
+  },
   mediaCount: 2,
 };
 
-const sections = [
-  { key: 'complaint', label: 'Chief Complaint', icon: '🩺' },
-  { key: 'history', label: 'History', icon: '📋' },
-  { key: 'examination', label: 'Examination', icon: '🔍' },
-  { key: 'investigations', label: 'Investigations', icon: '🧪' },
-  { key: 'diagnosis', label: 'Diagnosis', icon: '🏥' },
-  { key: 'management', label: 'Management', icon: '💊' },
-  { key: 'notes', label: 'Notes', icon: '📝' },
-] as const;
-
 const navPills = [
-  { key: 'complaint', label: 'Info' },
-  { key: 'diagnosis', label: 'Class' },
+  { key: 'patientInfo', label: 'Info' },
+  { key: 'classification', label: 'Class' },
   { key: 'history', label: 'History' },
   { key: 'investigations', label: 'Inv' },
   { key: 'management', label: 'Management' },
-  { key: 'notes', label: 'Progress' },
+  { key: 'progress', label: 'Progress' },
 ];
 
 const exportColumns = [
@@ -54,39 +67,153 @@ const patientCaseHistory = [
   { id: '4', diagnosis: 'Healthy', date: '2024-06-10', complaint: 'Well-child check' },
 ];
 
-// Multi-line fields get taller display boxes
-const multiLineKeys = ['complaint', 'history', 'examination', 'investigations', 'management', 'notes'];
+// Reusable display field
+const DisplayField = ({ label, value, isMultiLine = false }: { label: string; value: string; isMultiLine?: boolean }) => (
+  <div className="space-y-1.5">
+    <span style={{ color: '#6B7C93', fontSize: '12px', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.05em' }}>
+      {label}
+    </span>
+    <div
+      className={isMultiLine ? 'min-h-[80px]' : ''}
+      style={{
+        background: '#F8FAFC',
+        border: '1.5px solid #DDE3EA',
+        borderRadius: '12px',
+        padding: '12px 16px',
+        color: '#1A2332',
+        fontSize: '15px',
+        lineHeight: '1.5',
+      }}
+    >
+      {value || '—'}
+    </div>
+  </div>
+);
+
+// Accordion section wrapper
+const AccordionSection = ({
+  icon, title, isExpanded, onToggle, children, sectionRef,
+}: {
+  icon: string; title: string; isExpanded: boolean; onToggle: () => void;
+  children: React.ReactNode; sectionRef?: React.RefObject<HTMLDivElement>;
+}) => (
+  <div
+    ref={sectionRef}
+    style={{
+      background: '#FFFFFF',
+      borderRadius: '18px',
+      padding: '0',
+      boxShadow: '0px 2px 8px rgba(0,0,0,0.06)',
+      marginBottom: '16px',
+      overflow: 'hidden',
+    }}
+  >
+    <button
+      onClick={onToggle}
+      className="w-full flex items-center justify-between hover:bg-muted/30 transition-colors"
+      style={{ padding: '16px' }}
+    >
+      <div className="flex items-center gap-2">
+        <span style={{ fontSize: '16px' }}>{icon}</span>
+        <span style={{ fontSize: '14px', fontWeight: 700, color: '#1A2332' }}>{title}</span>
+      </div>
+      <ChevronDown
+        size={18}
+        className="text-muted-foreground transition-transform duration-300"
+        style={{ transform: isExpanded ? 'rotate(180deg)' : 'rotate(0deg)' }}
+      />
+    </button>
+    <div
+      className="transition-all duration-300 ease-in-out overflow-hidden"
+      style={{ maxHeight: isExpanded ? '2000px' : '0', opacity: isExpanded ? 1 : 0 }}
+    >
+      <div style={{ padding: '0 16px 16px 16px' }} className="space-y-3">
+        {children}
+      </div>
+    </div>
+  </div>
+);
+
+// Nested sub-accordion
+const SubAccordion = ({
+  icon, title, isExpanded, onToggle, children,
+}: {
+  icon: string; title: string; isExpanded: boolean; onToggle: () => void; children: React.ReactNode;
+}) => (
+  <div style={{ background: '#F8FAFC', borderRadius: '14px', border: '1px solid #DDE3EA', overflow: 'hidden' }}>
+    <button
+      onClick={onToggle}
+      className="w-full flex items-center justify-between hover:bg-muted/30 transition-colors"
+      style={{ padding: '12px' }}
+    >
+      <div className="flex items-center gap-2">
+        <span style={{ fontSize: '14px' }}>{icon}</span>
+        <span style={{ fontSize: '13px', fontWeight: 700, color: '#1A2332' }}>{title}</span>
+      </div>
+      <ChevronDown
+        size={16}
+        className="text-muted-foreground transition-transform duration-300"
+        style={{ transform: isExpanded ? 'rotate(180deg)' : 'rotate(0deg)' }}
+      />
+    </button>
+    <div
+      className="transition-all duration-300 ease-in-out overflow-hidden"
+      style={{ maxHeight: isExpanded ? '1500px' : '0', opacity: isExpanded ? 1 : 0 }}
+    >
+      <div style={{ padding: '0 12px 12px 12px', borderTop: '1px solid #DDE3EA' }} className="space-y-3 pt-3">
+        {children}
+      </div>
+    </div>
+  </div>
+);
+
+const GenderPill = ({ gender }: { gender: 'male' | 'female' }) => (
+  <div className="flex gap-2">
+    <span
+      style={{
+        display: 'inline-flex', alignItems: 'center', gap: '6px',
+        padding: '8px 16px', borderRadius: '20px', fontSize: '14px', fontWeight: 600,
+        background: gender === 'male' ? '#2563EB' : '#EC4899',
+        color: '#FFFFFF',
+      }}
+    >
+      {gender === 'male' ? '♂' : '♀'} {gender === 'male' ? 'Male' : 'Female'}
+    </span>
+  </div>
+);
 
 const CaseDetailScreen = () => {
   const navigate = useNavigate();
   const { id } = useParams();
-  const [expandedSections, setExpandedSections] = useState<string[]>(['complaint', 'diagnosis', 'management']);
   const [showExport, setShowExport] = useState(false);
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
-  const [activePill, setActivePill] = useState('complaint');
+  const [activePill, setActivePill] = useState('patientInfo');
 
-  // Refs for each section
+  // Expanded states
+  const [expandedSections, setExpandedSections] = useState<string[]>(['patientInfo']);
+  const [expandedSubs, setExpandedSubs] = useState<string[]>([]);
+
+  // Section refs
   const sectionRefs: Record<string, React.RefObject<HTMLDivElement>> = {
-    complaint: useRef<HTMLDivElement>(null),
+    patientInfo: useRef<HTMLDivElement>(null),
+    classification: useRef<HTMLDivElement>(null),
     history: useRef<HTMLDivElement>(null),
-    examination: useRef<HTMLDivElement>(null),
     investigations: useRef<HTMLDivElement>(null),
-    diagnosis: useRef<HTMLDivElement>(null),
     management: useRef<HTMLDivElement>(null),
-    notes: useRef<HTMLDivElement>(null),
+    progress: useRef<HTMLDivElement>(null),
   };
 
   const toggleSection = (key: string) => {
-    setExpandedSections(prev =>
-      prev.includes(key) ? prev.filter(s => s !== key) : [...prev, key]
-    );
+    setExpandedSections(prev => prev.includes(key) ? prev.filter(s => s !== key) : [...prev, key]);
+  };
+
+  const toggleSub = (key: string) => {
+    setExpandedSubs(prev => prev.includes(key) ? prev.filter(s => s !== key) : [...prev, key]);
   };
 
   const handlePillClick = useCallback((key: string) => {
-    // Expand section if collapsed
     setExpandedSections(prev => prev.includes(key) ? prev : [...prev, key]);
     setActivePill(key);
-
     setTimeout(() => {
       const ref = sectionRefs[key];
       if (ref?.current) {
@@ -97,64 +224,32 @@ const CaseDetailScreen = () => {
     }, 100);
   }, []);
 
-  // IntersectionObserver for active pill tracking
   useEffect(() => {
     const observers: IntersectionObserver[] = [];
-    const keys = navPills.map(p => p.key);
-
-    keys.forEach(key => {
+    navPills.forEach(({ key }) => {
       const ref = sectionRefs[key];
       if (ref?.current) {
         const observer = new IntersectionObserver(
-          ([entry]) => {
-            if (entry.isIntersecting) {
-              setActivePill(key);
-            }
-          },
+          ([entry]) => { if (entry.isIntersecting) setActivePill(key); },
           { rootMargin: '-120px 0px -60% 0px', threshold: 0 }
         );
         observer.observe(ref.current);
         observers.push(observer);
       }
     });
-
     return () => observers.forEach(o => o.disconnect());
   }, []);
 
-  const exportData = sections.map(({ key, label }) => ({
-    field: label,
-    value: mockCase[key as keyof typeof mockCase] as string,
-    date: mockCase.date,
-  }));
-
   const handleDelete = () => {
-    console.log('delete case', id);
     setShowDeleteDialog(false);
     navigate(-1);
   };
 
-  const renderDisplayField = (label: string, value: string, isMultiLine: boolean) => (
-    <div className="space-y-1.5">
-      <span
-        className="text-[12px] font-bold uppercase tracking-wide"
-        style={{ color: '#6B7C93' }}
-      >
-        {label}
-      </span>
-      <div
-        className={`rounded-[12px] px-4 py-3 ${isMultiLine ? 'min-h-[80px]' : ''}`}
-        style={{
-          background: '#F8FAFC',
-          border: '1.5px solid #DDE3EA',
-          color: '#1A2332',
-          fontSize: '15px',
-          lineHeight: '1.5',
-        }}
-      >
-        {value || '—'}
-      </div>
-    </div>
-  );
+  const exportData = [
+    { field: 'Patient Name', value: mockCase.patientName, date: mockCase.date },
+    { field: 'Diagnosis', value: mockCase.provisionalDiagnosis, date: mockCase.date },
+    { field: 'Chief Complaint', value: mockCase.chiefComplaint, date: mockCase.date },
+  ];
 
   return (
     <div className="min-h-screen bg-background animate-fade-in">
@@ -165,24 +260,13 @@ const CaseDetailScreen = () => {
         </button>
         <h1 className="text-[16px] font-bold text-foreground">Case Details</h1>
         <div className="flex gap-1">
-          <button
-            onClick={() => setShowExport(true)}
-            className="p-2 rounded-full hover:bg-muted transition-colors"
-            style={{ color: '#2563EB' }}
-          >
+          <button onClick={() => setShowExport(true)} className="p-2 rounded-full hover:bg-muted transition-colors" style={{ color: '#2563EB' }}>
             <Upload size={18} />
           </button>
-          <button
-            onClick={() => navigate(`/case/${id}/pearl`, { state: { caseData: mockCase } })}
-            className="p-2 rounded-full hover:bg-muted transition-colors"
-            style={{ color: '#D97706' }}
-          >
+          <button onClick={() => navigate(`/case/${id}/pearl`, { state: { caseData: mockCase } })} className="p-2 rounded-full hover:bg-muted transition-colors" style={{ color: '#D97706' }}>
             <Lightbulb size={18} />
           </button>
-          <button
-            onClick={() => navigate(`/case/${id}/edit`)}
-            className="p-2 rounded-full hover:bg-muted text-muted-foreground"
-          >
+          <button onClick={() => navigate(`/case/${id}/edit`)} className="p-2 rounded-full hover:bg-muted text-muted-foreground">
             <Edit2 size={18} />
           </button>
           <button onClick={() => setShowDeleteDialog(true)} className="p-2 rounded-full hover:bg-muted text-destructive">
@@ -191,7 +275,7 @@ const CaseDetailScreen = () => {
         </div>
       </header>
 
-      {/* Quick Navigation Bar — between header and content */}
+      {/* Quick Navigation Bar */}
       <div className="sticky top-[52px] z-40 px-4 py-2.5 overflow-x-auto no-scrollbar flex gap-2" style={{ background: '#F0F4F8' }}>
         {navPills.map(({ key, label }) => (
           <button
@@ -199,8 +283,7 @@ const CaseDetailScreen = () => {
             onClick={() => handlePillClick(key)}
             className="flex-shrink-0 text-[13px] font-semibold transition-colors"
             style={{
-              padding: '8px 14px',
-              borderRadius: '20px',
+              padding: '8px 14px', borderRadius: '20px',
               background: activePill === key ? '#2563EB' : '#FFFFFF',
               color: activePill === key ? '#FFFFFF' : '#6B7C93',
               border: activePill === key ? 'none' : '1.5px solid #DDE3EA',
@@ -211,9 +294,9 @@ const CaseDetailScreen = () => {
         ))}
       </div>
 
-      <div className="px-5 py-5 space-y-4 pb-10">
+      <div className="px-5 py-5 pb-10">
         {/* Patient Info Card */}
-        <div className="bg-card border border-border rounded-2xl overflow-hidden shadow-card">
+        <div className="bg-card border border-border rounded-2xl overflow-hidden shadow-card" style={{ marginBottom: '16px' }}>
           <div className="h-1 w-full gradient-brand" />
           <div className="p-4 flex items-center gap-3">
             <div className="w-12 h-12 rounded-xl gradient-avatar flex items-center justify-center text-primary-foreground font-bold text-[16px]">
@@ -229,31 +312,190 @@ const CaseDetailScreen = () => {
           </div>
         </div>
 
-        {/* Clinical Sections — Read Only */}
-        {sections.map(({ key, label, icon }) => {
-          const value = mockCase[key as keyof typeof mockCase] as string;
-          const isExpanded = expandedSections.includes(key);
-          const isMultiLine = multiLineKeys.includes(key);
-          return (
-            <div key={key} ref={sectionRefs[key]} className="bg-card border border-border rounded-xl overflow-hidden shadow-card">
-              <button
-                onClick={() => toggleSection(key)}
-                className="w-full px-4 py-3 flex items-center justify-between hover:bg-muted/50 transition-colors"
-              >
-                <div className="flex items-center gap-2">
-                  <span className="text-[14px]">{icon}</span>
-                  <span className="text-[13px] font-bold text-foreground">{label}</span>
+        {/* SECTION 1 — Patient Information */}
+        <AccordionSection
+          icon="📋" title="Patient Information"
+          isExpanded={expandedSections.includes('patientInfo')}
+          onToggle={() => toggleSection('patientInfo')}
+          sectionRef={sectionRefs.patientInfo}
+        >
+          <DisplayField label="Full Name (English)" value={mockCase.patientName} />
+          <div className="space-y-1.5">
+            <span style={{ color: '#6B7C93', fontSize: '12px', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.05em' }}>
+              Date of Birth
+            </span>
+            <div className="flex gap-2">
+              {[mockCase.dob.day, mockCase.dob.month, mockCase.dob.year].map((v, i) => (
+                <div key={i} style={{
+                  background: '#F8FAFC', border: '1.5px solid #DDE3EA', borderRadius: '12px',
+                  padding: '12px 16px', color: '#1A2332', fontSize: '15px', flex: i === 2 ? 2 : 1, textAlign: 'center',
+                }}>
+                  {v || '—'}
                 </div>
-                {isExpanded ? <ChevronUp size={16} className="text-muted-foreground" /> : <ChevronDown size={16} className="text-muted-foreground" />}
-              </button>
-              {isExpanded && (
-                <div className="px-4 pb-4 border-t border-border pt-3">
-                  {renderDisplayField(label, value, isMultiLine)}
-                </div>
-              )}
+              ))}
             </div>
-          );
-        })}
+          </div>
+          <div className="space-y-1.5">
+            <span style={{ color: '#6B7C93', fontSize: '12px', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.05em' }}>
+              Gender
+            </span>
+            <GenderPill gender={mockCase.patientGender} />
+          </div>
+          <div className="grid grid-cols-2 gap-3">
+            <DisplayField label="File Number" value={mockCase.fileNumber} />
+            <DisplayField label="Hospital" value={mockCase.hospital} />
+          </div>
+          <DisplayField label="Admission Date" value={mockCase.admissionDate} />
+        </AccordionSection>
+
+        {/* SECTION 2 — Initial Classification */}
+        <AccordionSection
+          icon="🩺" title="Initial Classification"
+          isExpanded={expandedSections.includes('classification')}
+          onToggle={() => toggleSection('classification')}
+          sectionRef={sectionRefs.classification}
+        >
+          <DisplayField label="Specialty" value={mockCase.specialty} />
+          <DisplayField label="Provisional Diagnosis" value={mockCase.provisionalDiagnosis} isMultiLine />
+          <DisplayField label="Chief Complaint" value={mockCase.chiefComplaint} />
+        </AccordionSection>
+
+        {/* SECTION 3 — Patient History */}
+        <AccordionSection
+          icon="📄" title="Patient History"
+          isExpanded={expandedSections.includes('history')}
+          onToggle={() => toggleSection('history')}
+          sectionRef={sectionRefs.history}
+        >
+          <DisplayField label="Chief Complaint" value={mockCase.historyComplaint} isMultiLine />
+          <DisplayField label="Present History" value={mockCase.presentHistory} isMultiLine />
+          <DisplayField label="Past Medical History" value={mockCase.pastMedicalHistory} isMultiLine />
+          <DisplayField label="Allergies" value={mockCase.allergies} />
+          <DisplayField label="Current Medications (Pre-Admission)" value={mockCase.currentMedications} isMultiLine />
+        </AccordionSection>
+
+        {/* SECTION 4 — Investigations */}
+        <AccordionSection
+          icon="🔬" title="Investigations"
+          isExpanded={expandedSections.includes('investigations')}
+          onToggle={() => toggleSection('investigations')}
+          sectionRef={sectionRefs.investigations}
+        >
+          <DisplayField label="Investigation Name" value={mockCase.investigationName} />
+          <div className="grid grid-cols-2 gap-3">
+            <DisplayField label="Type" value={mockCase.investigationType} />
+            <DisplayField label="Date" value={mockCase.investigationDate} />
+          </div>
+          <DisplayField label="Result (Text)" value={mockCase.investigationResult} isMultiLine />
+          {mockCase.investigationImages.length > 0 && (
+            <div className="space-y-1.5">
+              <span style={{ color: '#6B7C93', fontSize: '12px', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.05em' }}>
+                Attached Images
+              </span>
+              <div className="flex gap-2 overflow-x-auto no-scrollbar">
+                {mockCase.investigationImages.map((_, i) => (
+                  <div key={i} style={{
+                    width: '72px', height: '72px', borderRadius: '10px',
+                    background: '#F1F5F9', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0,
+                  }}>
+                    <Image size={24} className="text-muted-foreground" />
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+        </AccordionSection>
+
+        {/* SECTION 5 — Management */}
+        <AccordionSection
+          icon="⚕️" title="Management"
+          isExpanded={expandedSections.includes('management')}
+          onToggle={() => toggleSection('management')}
+          sectionRef={sectionRefs.management}
+        >
+          {/* Sub 5A — Medications */}
+          <SubAccordion
+            icon="💊" title="Medications"
+            isExpanded={expandedSubs.includes('medications')}
+            onToggle={() => toggleSub('medications')}
+          >
+            <div className="space-y-1.5">
+              <span style={{ color: '#6B7C93', fontSize: '12px', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.05em' }}>
+                Medications List
+              </span>
+              <div style={{
+                background: '#F8FAFC', border: '1.5px solid #DDE3EA', borderRadius: '12px',
+                padding: '12px 16px', color: '#1A2332', fontSize: '15px', lineHeight: '1.8',
+              }}>
+                {mockCase.medications.length > 0
+                  ? mockCase.medications.map((med, i) => <div key={i}>{i + 1}. {med}</div>)
+                  : '—'}
+              </div>
+            </div>
+          </SubAccordion>
+
+          {/* Sub 5B — Respiratory Support */}
+          <SubAccordion
+            icon="🫁" title="Respiratory Support"
+            isExpanded={expandedSubs.includes('respiratory')}
+            onToggle={() => toggleSub('respiratory')}
+          >
+            <div className="space-y-1.5">
+              <span style={{
+                display: 'inline-flex', padding: '8px 16px', borderRadius: '20px', fontSize: '14px', fontWeight: 600,
+                background: '#2563EB', color: '#FFFFFF',
+              }}>
+                {mockCase.respiratorySupport || '—'}
+              </span>
+            </div>
+            <DisplayField label="Details" value={mockCase.respiratoryDetails} />
+          </SubAccordion>
+
+          {/* Sub 5C — Feeding */}
+          <SubAccordion
+            icon="🍼" title="Feeding"
+            isExpanded={expandedSubs.includes('feeding')}
+            onToggle={() => toggleSub('feeding')}
+          >
+            <div className="space-y-1.5">
+              <span style={{
+                display: 'inline-flex', padding: '8px 16px', borderRadius: '20px', fontSize: '14px', fontWeight: 600,
+                background: '#2563EB', color: '#FFFFFF',
+              }}>
+                {mockCase.feedingType || '—'}
+              </span>
+            </div>
+            <DisplayField label="Feeding Details" value={mockCase.feedingDetails} />
+          </SubAccordion>
+        </AccordionSection>
+
+        {/* SECTION 6 — Progress Note */}
+        <AccordionSection
+          icon="📝" title="Progress Note"
+          isExpanded={expandedSections.includes('progress')}
+          onToggle={() => toggleSection('progress')}
+          sectionRef={sectionRefs.progress}
+        >
+          <DisplayField label="Date" value={mockCase.progressDate} />
+          <DisplayField label="Assessment" value={mockCase.assessment} isMultiLine />
+
+          {/* Nested Vital Signs */}
+          <SubAccordion
+            icon="🫀" title="Vital Signs"
+            isExpanded={expandedSubs.includes('vitals')}
+            onToggle={() => toggleSub('vitals')}
+          >
+            <div className="grid grid-cols-2 gap-3">
+              <DisplayField label="HR (BPM)" value={mockCase.vitals.hr} />
+              <DisplayField label="SPO₂ (%)" value={mockCase.vitals.spo2} />
+              <DisplayField label="TEMP (°C)" value={mockCase.vitals.temp} />
+              <DisplayField label="RR (/MIN)" value={mockCase.vitals.rr} />
+              <DisplayField label="BP (MMHG)" value={mockCase.vitals.bp} />
+              <DisplayField label="WEIGHT (KG)" value={mockCase.vitals.weight} />
+            </div>
+            <DisplayField label="Date & Time" value={mockCase.vitals.dateTime} />
+          </SubAccordion>
+        </AccordionSection>
 
         {/* Media Section */}
         <div className="bg-card border border-border rounded-xl overflow-hidden shadow-card">
@@ -262,10 +504,7 @@ const CaseDetailScreen = () => {
               <span className="text-[14px]">📸</span>
               <span className="text-[13px] font-bold text-foreground">Media ({mockCase.mediaCount})</span>
             </div>
-            <button
-              onClick={() => navigate(`/case/${id}/media`)}
-              className="text-[12px] text-primary font-medium"
-            >
+            <button onClick={() => navigate(`/case/${id}/media`)} className="text-[12px] text-primary font-medium">
               View All
             </button>
           </div>
