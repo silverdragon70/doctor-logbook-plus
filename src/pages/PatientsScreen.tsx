@@ -171,13 +171,14 @@ const PatientsScreen = () => {
       {/* Filter Chips */}
       <div className="flex items-center gap-2">
         <div className="flex gap-2 pb-1 flex-1" style={{ scrollbarWidth: 'none' }}>
-          {filterOptions.map((group) => (
+          {filterOptions.map((group, index) => (
             <FilterChip
               key={group.category}
               label={group.label}
               options={group.values}
               selected={activeFilters[group.category] || null}
               onSelect={(key) => toggleFilter(group.category, key)}
+              align={index === filterOptions.length - 1 ? 'right' : 'left'}
             />
           ))}
         </div>
