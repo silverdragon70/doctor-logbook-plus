@@ -2032,6 +2032,20 @@ Comprehensive legal disclaimers in AboutSheet covering:
 | GoogleAccount | No account | No accounts connected | "Not connected" state | Show "Connect Google Account" button |
 | API Key | No key set | API key empty | "Not set" subtitle | Show placeholder text |
 | Hospital delete | Confirmation | User deletes hospital | AlertDialog noting cases NOT deleted | Explicit confirmation required |
+| Storage | Device full | Backup or image upload when storage full | Error state in ProgressSheet | Show message: "Not enough storage space. Free up space and try again." |
+| Image Upload | File too large | Image exceeds imageMaxSize setting | Inline error below image picker | "Image too large. Maximum allowed: X MB" |
+| Image Upload | Invalid format | Non-image file selected | Inline error | "Unsupported format. Use JPEG or PNG." |
+| Restore | Corrupted file | .medora file fails validation | Error state in RestoreBackupSheet | "Invalid or corrupted backup file." + "Try Again" |
+| Restore | Wrong app version | Backup from incompatible version | Warning dialog | "This backup was created with a newer version of Medora." |
+| AI | Quota exceeded | API rate limit hit | Error card in AI screen | "AI quota exceeded. Check your API plan." |
+| AI | Invalid API key | Bad key in settings | Error card | "Invalid API key. Go to Settings → AI Integration to update." |
+| AI | Timeout | Request takes too long | Error state with retry | "Request timed out. Try again." |
+| AI | No cases found | Insights with 0 active cases | Empty state in Insights tab | "No active cases to analyze." |
+| Google Drive | Token expired | OAuth token no longer valid | Alert in sync sheet | "Session expired. Reconnect your Google account." |
+| Google Drive | Upload failed | Network drop during sync | Error state with retry | "Upload failed. Check your connection and try again." |
+| Google Drive | Not connected | Sync triggered with no account | Error state | "No Google account connected. Go to Settings to connect." |
+| Settings | No hospitals | Default hospital sheet empty | Empty state | "No hospitals added yet." with link to Manage Hospitals |
+| Settings | API key empty | AI feature triggered with no key | Error card | "No API key set. Go to Settings → AI Integration." |
 | 404 | Invalid route | User navigates to nonexistent route | 404 page | "Return to Home" link |
 
 ---
