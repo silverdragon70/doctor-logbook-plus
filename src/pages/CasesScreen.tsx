@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Search, TrendingUp, Users, Activity, Hospital, Stethoscope } from 'lucide-react';
 
@@ -34,10 +34,49 @@ const stats = [
   { label: 'DISCH', value: '12', className: 'text-amber-500' },
 ];
 
+type InsightState = 'ready' | 'loading' | 'done';
+
+const mockInsightResults = [
+  {
+    status: 'red' as const,
+    label: 'Needs Attention',
+    cases: [
+      { name: 'Lucas Miller', summary: 'Persistent cough worsening despite nebulization. SpO2 dropped to 94%. Consider escalating to IV antibiotics and chest CT.', recommendation: 'Urgent review by attending physician' },
+      { name: 'Sophia Chen', summary: 'New-onset arrhythmia with intermittent chest pain. ECG shows prolonged QT interval. Cardiology consult pending.', recommendation: 'Continuous cardiac monitoring required' },
+    ],
+  },
+  {
+    status: 'yellow' as const,
+    label: 'Review Plan',
+    cases: [
+      { name: 'Ethan Wright', summary: 'Fever trending down but fatigue persists. CBC shows improving WBC count. Current antivirals completing day 3.', recommendation: 'Reassess discharge readiness in 24h' },
+    ],
+  },
+  {
+    status: 'green' as const,
+    label: 'Ready for Discharge',
+    cases: [
+      { name: 'Maya Johnson', summary: 'Migraine resolved with treatment protocol. No recurrence in 48h. Tolerating oral medications well.', recommendation: 'Discharge with outpatient follow-up in 1 week' },
+    ],
+  },
+];
+
+const statusColors = {
+  red: { dot: 'bg-red-500', bg: 'bg-red-50 dark:bg-red-950/30', border: 'border-red-200 dark:border-red-900/50', text: 'text-red-700 dark:text-red-400' },
+  yellow: { dot: 'bg-amber-500', bg: 'bg-amber-50 dark:bg-amber-950/30', border: 'border-amber-200 dark:border-amber-900/50', text: 'text-amber-700 dark:text-amber-400' },
+  green: { dot: 'bg-emerald-500', bg: 'bg-emerald-50 dark:bg-emerald-950/30', border: 'border-emerald-200 dark:border-emerald-900/50', text: 'text-emerald-700 dark:text-emerald-400' },
+};
+
 const CasesScreen = () => {
   const [activeTab, setActiveTab] = useState('list');
   const [searchQuery, setSearchQuery] = useState('');
+  const [insightState, setInsightState] = useState<InsightState>('ready');
   const navigate = useNavigate();
+
+  const handleStartAnalysis = () => {
+    setInsightState('loading');
+    setTimeout(() => setInsightState('done'), 3500);
+  };
 
   return (
     <div className="px-5 py-6 space-y-6 animate-fade-in">
@@ -173,14 +212,64 @@ const CasesScreen = () => {
         )}
 
         {activeTab === 'insights' && (
-          <div className="space-y-3 py-4 text-center animate-fade-in">
-            <div className="p-10 flex flex-col items-center opacity-60">
-              <div className="w-16 h-16 bg-muted rounded-full flex items-center justify-center mb-4">
-                <Stethoscope size={32} className="text-muted-foreground" />
+          <div className="space-y-3 py-4 animate-fade-in">
+            {/* State 1: Ready */}
+            {insightState === 'ready' && (
+              <div className="p-10 flex flex-col items-center text-center">
+                <button
+                  onClick={handleStartAnalysis}
+                  className="w-16 h-16 bg-[#2563EB]/10 rounded-full flex items-center justify-center mb-4 active:scale-90 transition-transform cursor-pointer"
+                >
+                  <Stethoscope size={32} className="text-[#2563EB] animate-[pulse_2s_cubic-bezier(0.4,0,0.6,1)_infinite]" />
+                </button>
+                <h5 className="text-[16px] font-bold" style={{ color: '#1A2332' }}>Start Analysis</h5>
+                <p className="text-[13px] mt-1 max-w-[220px]" style={{ color: '#6B7C93' }}>Tap to generate today's clinical summaries</p>
               </div>
-              <h5 className="text-[14px] font-bold text-foreground">AI Analysis in Progress</h5>
-              <p className="text-[11px] text-muted-foreground mt-1 max-w-[200px]">Generating daily clinical summaries for the pediatric ward.</p>
-            </div>
+            )}
+
+            {/* State 2: Loading */}
+            {insightState === 'loading' && (
+              <div className="p-10 flex flex-col items-center text-center opacity-60">
+                <div className="w-16 h-16 bg-muted rounded-full flex items-center justify-center mb-4">
+                  <Stethoscope size={32} className="text-muted-foreground animate-spin" style={{ animationDuration: '3s' }} />
+                </div>
+                <h5 className="text-[16px] font-bold" style={{ color: '#6B7C93' }}>AI Analysis in Progress</h5>
+                <p className="text-[13px] mt-1 max-w-[240px]" style={{ color: '#94A3B8' }}>Generating daily clinical summaries for the pediatric ward.</p>
+                <div className="mt-4 flex gap-1">
+                  {[0, 1, 2].map(i => (
+                    <div key={i} className="w-2 h-2 rounded-full bg-muted-foreground/40 animate-pulse" style={{ animationDelay: `${i * 0.3}s` }} />
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {/* State 3: Results */}
+            {insightState === 'done' && (
+              <div className="space-y-3 animate-fade-in">
+                {mockInsightResults.map((group) => {
+                  const colors = statusColors[group.status];
+                  return (
+                    <div key={group.status} className={`rounded-xl border ${colors.border} ${colors.bg} overflow-hidden`}>
+                      <div className="px-4 py-2.5 flex items-center gap-2">
+                        <div className={`w-2.5 h-2.5 rounded-full ${colors.dot}`} />
+                        <span className={`text-[13px] font-bold ${colors.text}`}>
+                          {group.label} ({group.cases.length})
+                        </span>
+                      </div>
+                      <div className="space-y-px">
+                        {group.cases.map((c, idx) => (
+                          <div key={idx} className="px-4 py-3 bg-card/50 border-t border-border/50">
+                            <p className="text-[13px] font-semibold text-foreground mb-1">{c.name}</p>
+                            <p className="text-[12px] text-muted-foreground leading-relaxed">{c.summary}</p>
+                            <p className="text-[11px] font-medium text-primary mt-1.5">→ {c.recommendation}</p>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            )}
           </div>
         )}
       </div>
