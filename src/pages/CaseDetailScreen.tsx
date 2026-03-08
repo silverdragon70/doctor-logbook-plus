@@ -327,7 +327,6 @@ const CaseDetailScreen = () => {
           onEdit={() => toggleEdit('patientInfo')}
           isEditing={editingSections.includes('patientInfo')}
         >
-        >
           <DisplayField label="Full Name (English)" value={mockCase.patientName} />
           <div className="space-y-1.5">
             <span style={{ color: '#6B7C93', fontSize: '12px', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.05em' }}>
