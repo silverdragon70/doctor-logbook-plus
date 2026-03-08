@@ -357,12 +357,14 @@ const CaseDetailScreen = () => {
           <DisplayField label="Admission Date" value={mockCase.admissionDate} />
         </AccordionSection>
 
-        {/* SECTION 2 — Initial Classification */}
+        {/* SECTION 2 — Classification */}
         <AccordionSection
-          icon="🩺" title="Initial Classification"
+          icon="🩺" title="Classification"
           isExpanded={expandedSections.includes('classification')}
           onToggle={() => toggleSection('classification')}
           sectionRef={sectionRefs.classification}
+          onEdit={() => toggleEdit('classification')}
+          isEditing={editingSections.includes('classification')}
         >
           <DisplayField label="Specialty" value={mockCase.specialty} />
           <DisplayField label="Provisional Diagnosis" value={mockCase.provisionalDiagnosis} isMultiLine />
