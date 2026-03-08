@@ -24,7 +24,7 @@ const PatientDetailScreen = () => {
           <ArrowLeft size={20} />
         </button>
         <h1 className="text-[16px] font-bold text-foreground">Patient Profile</h1>
-        <button onClick={() => console.log('edit patient')} className="p-2 rounded-full hover:bg-muted text-muted-foreground">
+        <button onClick={() => navigate(`/patient/${mockPatient.patientId}/edit`)} className="p-2 rounded-full hover:bg-muted text-muted-foreground">
           <Edit2 size={18} />
         </button>
       </header>
