@@ -1,6 +1,6 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Stethoscope, BookOpen, GraduationCap, ChevronRight } from 'lucide-react';
+import { Stethoscope, BookOpen, GraduationCap, ChevronRight, Diamond } from 'lucide-react';
 
 const logbookCards = [
   {
