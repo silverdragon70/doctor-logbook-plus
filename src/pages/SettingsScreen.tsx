@@ -73,6 +73,7 @@ const SettingsScreen = () => {
   const [confirmDialogs, setConfirmDialogs] = useState(true);
   const [autoSave, setAutoSave] = useState(true);
   const [exportOpen, setExportOpen] = useState(false);
+  const [backupLocation, setBackupLocation] = useState<'local' | 'gdrive'>('local');
 
   /* backup */
   const [isBackingUp, setIsBackingUp] = useState(false);
