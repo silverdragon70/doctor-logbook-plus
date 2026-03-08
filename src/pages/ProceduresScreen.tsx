@@ -369,7 +369,7 @@ const ProceduresScreen = () => {
           <button onClick={() => { resetForm(); setShowForm(false); }} className="p-1.5 -ml-1.5 rounded-xl hover:bg-muted/50 transition-colors">
             <X size={22} className="text-foreground" />
           </button>
-          <h1 className="text-lg font-bold text-foreground">Add Procedure</h1>
+          <h1 className="text-lg font-bold text-foreground">{editingId ? 'Edit Procedure' : 'Add Procedure'}</h1>
         </div>
 
         <div className="px-5 py-5 space-y-5 max-w-[430px] mx-auto pb-10">
