@@ -128,7 +128,7 @@ export async function createBackup(options: {
     // Browser download fallback
     try {
       const bytes = base64ToUint8Array(zipBase64);
-      const blob = new Blob([bytes], { type: 'application/octet-stream' });
+      const blob = new Blob([bytes.buffer as ArrayBuffer], { type: 'application/octet-stream' });
       const url = URL.createObjectURL(blob);
       const a = document.createElement('a');
       a.href = url;

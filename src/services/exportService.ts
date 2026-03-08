@@ -24,7 +24,7 @@ function base64ToUint8Array(base64: string): Uint8Array {
 
 function downloadBlob(data: Uint8Array | string, fileName: string, mimeType: string) {
   const blob = data instanceof Uint8Array
-    ? new Blob([data], { type: mimeType })
+    ? new Blob([data.buffer as ArrayBuffer], { type: mimeType })
     : new Blob([data], { type: mimeType });
   const url = URL.createObjectURL(blob);
   const a = document.createElement('a');
