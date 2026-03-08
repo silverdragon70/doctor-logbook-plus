@@ -34,13 +34,12 @@ const sections = [
 ] as const;
 
 const navPills = [
-  { key: 'complaint', label: 'Complaint' },
+  { key: 'complaint', label: 'Info' },
+  { key: 'diagnosis', label: 'Class' },
   { key: 'history', label: 'History' },
-  { key: 'examination', label: 'Exam' },
   { key: 'investigations', label: 'Inv' },
-  { key: 'diagnosis', label: 'Diagnosis' },
-  { key: 'management', label: 'Management' },
-  { key: 'notes', label: 'Notes' },
+  { key: 'management', label: 'Mgmt' },
+  { key: 'notes', label: 'Progress' },
 ];
 
 const exportColumns = [
