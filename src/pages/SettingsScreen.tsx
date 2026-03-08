@@ -88,6 +88,7 @@ const SettingsScreen = () => {
   const [fontSize, setFontSize] = useState('medium');
   const [dateSheetOpen, setDateSheetOpen] = useState(false);
   const [dateFormat, setDateFormat] = useState('DD MMM YYYY');
+  const [hospitalsSheetOpen, setHospitalsSheetOpen] = useState(false);
 
   const sw = (checked: boolean, onChange: (v: boolean) => void) => (
     <Switch checked={checked} onCheckedChange={onChange} />
