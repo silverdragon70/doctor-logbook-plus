@@ -1,5 +1,5 @@
 import React, { useState, useMemo } from 'react';
-import { Upload, CalendarIcon } from 'lucide-react';
+import { Upload, CalendarIcon, ChevronDown } from 'lucide-react';
 import { format, subMonths, subYears, isAfter, isBefore, startOfDay, endOfDay } from 'date-fns';
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
@@ -80,6 +80,7 @@ const ExportSheet: React.FC<ExportSheetProps> = ({ open, onOpenChange, title, da
   const [customFrom, setCustomFrom] = useState<Date>(subMonths(new Date(), 1));
   const [customTo, setCustomTo] = useState<Date>(new Date());
   const [selectedCaseIds, setSelectedCaseIds] = useState<string[]>([]);
+  const [caseDropdownOpen, setCaseDropdownOpen] = useState(false);
 
   // Initialize all cases as selected when cases change
   React.useEffect(() => {
@@ -219,45 +220,60 @@ const ExportSheet: React.FC<ExportSheetProps> = ({ open, onOpenChange, title, da
           {/* Filter by Case */}
           {cases && cases.length > 0 && (
             <div className="space-y-2">
-              <div>
-                <label className="text-sm font-medium text-foreground">Filter by Case</label>
-                <p className="text-xs text-muted-foreground mt-0.5">Select specific cases to export</p>
-              </div>
-              <button
-                onClick={toggleAll}
-                className="text-xs font-medium text-primary"
-              >
-                {allSelected ? 'Deselect All' : 'Select All'}
-              </button>
-              <div className="space-y-1.5 max-h-[200px] overflow-y-auto">
-                {cases.map(c => {
-                  const isChecked = selectedCaseIds.includes(c.id);
-                  return (
+              <label className="text-sm font-medium text-foreground">Filter by Case</label>
+              <div className="relative">
+                <button
+                  onClick={() => setCaseDropdownOpen(!caseDropdownOpen)}
+                  className="w-full px-3 py-2.5 rounded-lg border border-border bg-card text-left flex items-center justify-between text-[13px] font-medium text-foreground hover:bg-muted/50 transition-colors"
+                >
+                  <span>{allSelected ? `All Cases (${cases.length})` : `${selectedCaseIds.length} Case${selectedCaseIds.length !== 1 ? 's' : ''} Selected`}</span>
+                  <ChevronDown size={16} className={cn("text-muted-foreground transition-transform", caseDropdownOpen && "rotate-180")} />
+                </button>
+                {caseDropdownOpen && (
+                  <div className="mt-1 border border-border rounded-lg bg-card overflow-hidden shadow-sm">
+                    {/* Select All */}
                     <button
-                      key={c.id}
-                      onClick={() => toggleCase(c.id)}
-                      className={cn(
-                        "w-full text-left px-3 py-2.5 rounded-lg border transition-all flex items-start gap-2.5",
-                        isChecked
-                          ? "border-primary/30 bg-primary/5"
-                          : "border-border bg-card hover:bg-muted/50"
-                      )}
+                      onClick={toggleAll}
+                      className="w-full text-left px-3 py-2.5 flex items-center gap-2.5 border-b border-border hover:bg-muted/50 transition-colors"
                     >
                       <div className={cn(
-                        "w-4 h-4 rounded border-2 flex items-center justify-center mt-0.5 shrink-0 transition-colors",
-                        isChecked ? "border-[#2563EB] bg-[#2563EB]" : "border-muted-foreground"
+                        "w-4 h-4 rounded border-2 flex items-center justify-center shrink-0 transition-colors",
+                        allSelected ? "border-[#2563EB] bg-[#2563EB]" : "border-muted-foreground"
                       )}>
-                        {isChecked && (
+                        {allSelected && (
                           <svg width="10" height="8" viewBox="0 0 10 8" fill="none"><path d="M1 4L3.5 6.5L9 1" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/></svg>
                         )}
                       </div>
-                      <div className="min-w-0">
-                        <p className="text-[13px] font-semibold text-foreground truncate">{c.diagnosis}</p>
-                        <p className="text-[11px] text-muted-foreground">{c.date} • {c.complaint}</p>
-                      </div>
+                      <span className="text-[13px] font-medium text-foreground">{allSelected ? 'Deselect All' : 'Select All'}</span>
                     </button>
-                  );
-                })}
+                    {/* Case list */}
+                    <div className="max-h-[200px] overflow-y-auto">
+                      {cases.map(c => {
+                        const isChecked = selectedCaseIds.includes(c.id);
+                        return (
+                          <button
+                            key={c.id}
+                            onClick={() => toggleCase(c.id)}
+                            className="w-full text-left px-3 py-2.5 flex items-start gap-2.5 border-b border-border last:border-b-0 hover:bg-muted/50 transition-colors"
+                          >
+                            <div className={cn(
+                              "w-4 h-4 rounded border-2 flex items-center justify-center mt-0.5 shrink-0 transition-colors",
+                              isChecked ? "border-[#2563EB] bg-[#2563EB]" : "border-muted-foreground"
+                            )}>
+                              {isChecked && (
+                                <svg width="10" height="8" viewBox="0 0 10 8" fill="none"><path d="M1 4L3.5 6.5L9 1" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/></svg>
+                              )}
+                            </div>
+                            <div className="min-w-0">
+                              <p className="text-[13px] font-semibold text-foreground truncate">{c.diagnosis}</p>
+                              <p className="text-[11px] text-muted-foreground">{c.date} • {c.complaint}</p>
+                            </div>
+                          </button>
+                        );
+                      })}
+                    </div>
+                  </div>
+                )}
               </div>
             </div>
           )}
