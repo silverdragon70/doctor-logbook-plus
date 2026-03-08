@@ -93,43 +93,44 @@ const DisplayField = ({ label, value, isMultiLine = false }: { label: string; va
 // Accordion section wrapper
 const AccordionSection = ({
   icon, title, isExpanded, onToggle, children, sectionRef,
+  onEdit, onAdd, isEditing,
 }: {
   icon: string; title: string; isExpanded: boolean; onToggle: () => void;
   children: React.ReactNode; sectionRef?: React.RefObject<HTMLDivElement>;
+  onEdit?: () => void; onAdd?: () => void; isEditing?: boolean;
 }) => (
   <div
     ref={sectionRef}
     style={{
-      background: '#FFFFFF',
-      borderRadius: '18px',
-      padding: '0',
-      boxShadow: '0px 2px 8px rgba(0,0,0,0.06)',
-      marginBottom: '16px',
-      overflow: 'hidden',
+      background: '#FFFFFF', borderRadius: '18px', padding: '0',
+      boxShadow: '0px 2px 8px rgba(0,0,0,0.06)', marginBottom: '16px', overflow: 'hidden',
     }}
   >
-    <button
-      onClick={onToggle}
-      className="w-full flex items-center justify-between hover:bg-muted/30 transition-colors"
-      style={{ padding: '16px' }}
-    >
-      <div className="flex items-center gap-2">
+    <div className="flex items-center justify-between hover:bg-muted/30 transition-colors" style={{ padding: '16px' }}>
+      <button onClick={onToggle} className="flex items-center gap-2 flex-1 text-left">
         <span style={{ fontSize: '16px' }}>{icon}</span>
         <span style={{ fontSize: '14px', fontWeight: 700, color: '#1A2332' }}>{title}</span>
+      </button>
+      <div className="flex items-center gap-1">
+        {onAdd && (
+          <button onClick={(e) => { e.stopPropagation(); onAdd(); }} className="p-1.5 rounded-full hover:bg-muted/50 transition-colors">
+            <Plus size={16} style={{ color: '#2563EB' }} />
+          </button>
+        )}
+        {onEdit && (
+          <button onClick={(e) => { e.stopPropagation(); onEdit(); }} className="p-1.5 rounded-full hover:bg-muted/50 transition-colors">
+            <Pencil size={15} style={{ color: isEditing ? '#16A34A' : '#2563EB' }} />
+          </button>
+        )}
+        <button onClick={onToggle} className="p-1.5">
+          <ChevronDown size={18} className="text-muted-foreground transition-transform duration-300"
+            style={{ transform: isExpanded ? 'rotate(180deg)' : 'rotate(0deg)' }} />
+        </button>
       </div>
-      <ChevronDown
-        size={18}
-        className="text-muted-foreground transition-transform duration-300"
-        style={{ transform: isExpanded ? 'rotate(180deg)' : 'rotate(0deg)' }}
-      />
-    </button>
-    <div
-      className="transition-all duration-300 ease-in-out overflow-hidden"
-      style={{ maxHeight: isExpanded ? '2000px' : '0', opacity: isExpanded ? 1 : 0 }}
-    >
-      <div style={{ padding: '0 16px 16px 16px' }} className="space-y-3">
-        {children}
-      </div>
+    </div>
+    <div className="transition-all duration-300 ease-in-out overflow-hidden"
+      style={{ maxHeight: isExpanded ? '2000px' : '0', opacity: isExpanded ? 1 : 0 }}>
+      <div style={{ padding: '0 16px 16px 16px' }} className="space-y-3">{children}</div>
     </div>
   </div>
 );
