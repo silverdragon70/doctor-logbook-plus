@@ -6,6 +6,9 @@ import {
   AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent,
   AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle,
 } from '@/components/ui/alert-dialog';
+import AddInvestigationSheet from '@/components/case-detail/AddInvestigationSheet';
+import AddManagementSheet from '@/components/case-detail/AddManagementSheet';
+import AddProgressNoteSheet from '@/components/case-detail/AddProgressNoteSheet';
 
 // Mock data
 const mockCase = {
