@@ -135,6 +135,7 @@ const NewCaseScreen = () => {
 
   const [medications, setMedications] = useState('');
   const [respiratorySupport, setRespiratorySupport] = useState('');
+  const [respiratoryType, setRespiratoryType] = useState('');
   const [feeding, setFeeding] = useState('');
 
   const toggleSection = (key: string) => {
