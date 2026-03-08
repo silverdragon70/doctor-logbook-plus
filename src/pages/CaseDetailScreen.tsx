@@ -840,14 +840,14 @@ const CaseDetailScreen = () => {
       {/* Discharge Dialog */}
       {showDischargeDialog && (() => {
         const outcomes = [
-          { key: 'cured', label: 'Cured / Recovered', icon: '✅' },
-          { key: 'followup', label: 'Follow Up Required', icon: '🔄' },
-          { key: 'referred', label: 'Referred', icon: '👨‍⚕️' },
-          { key: 'transferred', label: 'Transferred', icon: '🔁' },
-          { key: 'lama', label: 'LAMA', icon: '🚪' },
-          { key: 'chronic', label: 'Chronic', icon: '📋' },
-          { key: 'homecare', label: 'Home Care', icon: '🏠' },
-          { key: 'died', label: 'Died', icon: '💀' },
+          { key: 'cured', label: 'Cured / Recovered' },
+          { key: 'followup', label: 'Follow Up Required' },
+          { key: 'referred', label: 'Referred to Specialist' },
+          { key: 'transferred', label: 'Transferred to Another Hospital' },
+          { key: 'lama', label: 'Left Against Medical Advice (LAMA)' },
+          { key: 'chronic', label: 'Chronic / Ongoing Management' },
+          { key: 'homecare', label: 'Discharged with Home Care' },
+          { key: 'died', label: 'Died' },
         ];
         const isValid = !!dischargeDate && !!dischargeOutcome;
         return (
@@ -903,7 +903,6 @@ const CaseDetailScreen = () => {
                             fontWeight: dischargeOutcome === o.key ? 700 : 400,
                           }}
                         >
-                          <span style={{ fontSize: '14px' }}>{o.icon}</span>
                           {o.label}
                         </button>
                       ))}
