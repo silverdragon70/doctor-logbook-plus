@@ -249,6 +249,30 @@ const NewCaseScreen = () => {
         </button>
       </header>
 
+      {/* Quick Navigation Bar */}
+      <div className="sticky top-[52px] z-40" style={{ background: '#F0F4F8' }}>
+        <div ref={pillBarRef} className="flex gap-2 overflow-x-auto no-scrollbar" style={{ padding: '10px 16px' }}>
+          {navPills.map((pill) => (
+            <button
+              key={pill.key}
+              onClick={() => handlePillClick(pill.key)}
+              className={cn(
+                'whitespace-nowrap text-[13px] font-semibold rounded-[20px] transition-colors shrink-0',
+                activePill === pill.key
+                  ? 'text-white'
+                  : 'text-[hsl(215,15%,50%)] border-[1.5px] border-[hsl(216,20%,90%)] bg-white'
+              )}
+              style={{
+                padding: '8px 14px',
+                ...(activePill === pill.key ? { backgroundColor: '#2563EB' } : {}),
+              }}
+            >
+              {pill.label}
+            </button>
+          ))}
+        </div>
+      </div>
+
       <div className="px-5 py-5 space-y-5 pb-10">
 
         {/* ═══ Patient Information ═══ */}
