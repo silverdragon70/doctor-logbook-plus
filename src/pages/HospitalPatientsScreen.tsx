@@ -53,28 +53,20 @@ const filterOptions: { category: FilterCategory; label: string; values: { key: s
   },
   {
     category: 'ageGroup', label: 'Age Group', values: [
-      { key: 'neonate', label: 'Neonate (0–1m)' },
-      { key: 'infant', label: 'Infant (1–12m)' },
-      { key: 'toddler', label: 'Toddler (1–3y)' },
-      { key: 'child', label: 'Child (3–12y)' },
-      { key: 'adolescent', label: 'Adolescent (12–18y)' },
+      { key: '0-2', label: '0 - 2 years' },
+      { key: '2-5', label: '2 - 5 years' },
+      { key: '5-12', label: '5 - 12 years' },
+      { key: '12-18', label: '12 - 18 years' },
     ],
   },
   {
     category: 'specialty', label: 'Specialty', values: [
+      { key: 'Respiratory', label: 'Respiratory' },
       { key: 'Cardiology', label: 'Cardiology' },
       { key: 'Neurology', label: 'Neurology' },
-      { key: 'Respiratory', label: 'Respiratory' },
       { key: 'General', label: 'General' },
-      { key: 'Gastroenterology', label: 'Gastroenterology' },
-    ],
-  },
-  {
-    category: 'dateRange', label: 'Date Range', values: [
-      { key: 'week', label: 'Last week' },
-      { key: 'month', label: 'Last month' },
-      { key: '3months', label: 'Last 3 months' },
-      { key: 'year', label: 'Last year' },
+      { key: 'Dermatology', label: 'Dermatology' },
+      { key: 'Gastroenterology', label: 'Gastroentero.' },
     ],
   },
 ];
