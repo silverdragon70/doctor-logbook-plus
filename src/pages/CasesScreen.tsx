@@ -116,7 +116,7 @@ const CasesScreen = () => {
             {mockCases.map((c) => (
               <div
                 key={c.caseId}
-                onClick={() => navigate(`/case/${c.caseId}`)}
+                onClick={() => navigate(`/patient/${c.caseId}`)}
                 className="group flex items-center justify-between p-3 bg-card border border-border rounded-xl active:scale-[0.98] transition-all cursor-pointer hover:shadow-card"
               >
                 <div className="flex items-center gap-3">
