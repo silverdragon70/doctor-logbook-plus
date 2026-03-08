@@ -153,9 +153,9 @@ const SettingsScreen = () => {
 
         {/* ─── 5. BACKUP & RESTORE ─── */}
         <Section title="Backup & Restore">
-          <Row icon={Database} label="Full Backup" subtitle="Database + All Images" right={<Upload size={16} style={{ color: '#6B7C93' }} />} onClick={() => simulateBackup('Full')} />
-          <Row icon={Zap} label="Incremental" subtitle="Only new changes since last backup (faster)" right={<Upload size={16} style={{ color: '#6B7C93' }} />} onClick={() => simulateBackup('Incremental')} />
-          <Row icon={FileText} label="Data Only" subtitle="Database only, no images" right={<Upload size={16} style={{ color: '#6B7C93' }} />} onClick={() => simulateBackup('Data')} />
+          <Row icon={Database} label="Full Backup" subtitle="Database + All Images" lastBackup={{ date: '2025-01-15', size: '245 MB' }} right={<Upload size={16} style={{ color: '#6B7C93' }} />} onClick={() => simulateBackup('Full')} />
+          <Row icon={Zap} label="Incremental" subtitle="Only new changes since last backup (faster)" lastBackup={{ date: '2025-01-13', size: '5 MB' }} right={<Upload size={16} style={{ color: '#6B7C93' }} />} onClick={() => simulateBackup('Incremental')} />
+          <Row icon={FileText} label="Data Only" subtitle="Database only, no images" lastBackup={{ date: '2025-01-14', size: '12 MB' }} right={<Upload size={16} style={{ color: '#6B7C93' }} />} onClick={() => simulateBackup('Data')} />
           <Row icon={Download} label="Restore from Backup" subtitle="Select a backup file" right={<Chevron />} noBorder />
         </Section>
 
