@@ -116,6 +116,9 @@ const SettingsScreen = () => {
     setProgressOpen(true);
   };
   const [restoreSheetOpen, setRestoreSheetOpen] = useState(false);
+  const [imageHandlingOpen, setImageHandlingOpen] = useState(false);
+  const [imageQuality, setImageQuality] = useState<'compress' | 'original'>('original');
+  const [imageMaxSize, setImageMaxSize] = useState<'1' | '5' | '10' | 'none'>('5');
   const [backupSheetOpen, setBackupSheetOpen] = useState(false);
   const [lastBackupInfo, setLastBackupInfo] = useState<{ date: string; size: string; destination: 'local' | 'gdrive' } | null>({ date: '2025-01-15 · 08:30', size: '245 MB', destination: 'local' });
   const [aboutOpen, setAboutOpen] = useState(false);
