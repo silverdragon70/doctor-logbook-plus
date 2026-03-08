@@ -34,10 +34,49 @@ const stats = [
   { label: 'DISCH', value: '12', className: 'text-amber-500' },
 ];
 
+type InsightState = 'ready' | 'loading' | 'done';
+
+const mockInsightResults = [
+  {
+    status: 'red' as const,
+    label: 'Needs Attention',
+    cases: [
+      { name: 'Lucas Miller', summary: 'Persistent cough worsening despite nebulization. SpO2 dropped to 94%. Consider escalating to IV antibiotics and chest CT.', recommendation: 'Urgent review by attending physician' },
+      { name: 'Sophia Chen', summary: 'New-onset arrhythmia with intermittent chest pain. ECG shows prolonged QT interval. Cardiology consult pending.', recommendation: 'Continuous cardiac monitoring required' },
+    ],
+  },
+  {
+    status: 'yellow' as const,
+    label: 'Review Plan',
+    cases: [
+      { name: 'Ethan Wright', summary: 'Fever trending down but fatigue persists. CBC shows improving WBC count. Current antivirals completing day 3.', recommendation: 'Reassess discharge readiness in 24h' },
+    ],
+  },
+  {
+    status: 'green' as const,
+    label: 'Ready for Discharge',
+    cases: [
+      { name: 'Maya Johnson', summary: 'Migraine resolved with treatment protocol. No recurrence in 48h. Tolerating oral medications well.', recommendation: 'Discharge with outpatient follow-up in 1 week' },
+    ],
+  },
+];
+
+const statusColors = {
+  red: { dot: 'bg-red-500', bg: 'bg-red-50 dark:bg-red-950/30', border: 'border-red-200 dark:border-red-900/50', text: 'text-red-700 dark:text-red-400' },
+  yellow: { dot: 'bg-amber-500', bg: 'bg-amber-50 dark:bg-amber-950/30', border: 'border-amber-200 dark:border-amber-900/50', text: 'text-amber-700 dark:text-amber-400' },
+  green: { dot: 'bg-emerald-500', bg: 'bg-emerald-50 dark:bg-emerald-950/30', border: 'border-emerald-200 dark:border-emerald-900/50', text: 'text-emerald-700 dark:text-emerald-400' },
+};
+
 const CasesScreen = () => {
   const [activeTab, setActiveTab] = useState('list');
   const [searchQuery, setSearchQuery] = useState('');
+  const [insightState, setInsightState] = useState<InsightState>('ready');
   const navigate = useNavigate();
+
+  const handleStartAnalysis = () => {
+    setInsightState('loading');
+    setTimeout(() => setInsightState('done'), 3500);
+  };
 
   return (
     <div className="px-5 py-6 space-y-6 animate-fade-in">
