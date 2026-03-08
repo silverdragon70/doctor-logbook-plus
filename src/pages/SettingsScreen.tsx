@@ -285,6 +285,7 @@ const SettingsScreen = () => {
       <ThemeColorSheet open={themeSheetOpen} onOpenChange={setThemeSheetOpen} value={themeColor} onApply={setThemeColor} />
       <FontSizeSheet open={fontSheetOpen} onOpenChange={setFontSheetOpen} value={fontSize} onApply={setFontSize} />
       <DateFormatSheet open={dateSheetOpen} onOpenChange={setDateSheetOpen} value={dateFormat} onApply={setDateFormat} />
+      <ManageHospitalsSheet open={hospitalsSheetOpen} onOpenChange={setHospitalsSheetOpen} />
     </div>
   );
 };
