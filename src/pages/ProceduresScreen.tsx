@@ -327,39 +327,9 @@ const ProceduresScreen = () => {
           </div>
 
           {/* Patient */}
-          <div className="space-y-1.5 relative">
+          <div className="space-y-1.5">
             <label className="text-sm font-medium text-foreground">Patient <span className="text-muted-foreground font-normal">(optional)</span></label>
-            <button
-              type="button"
-              onClick={() => setShowPatientDropdown(!showPatientDropdown)}
-              className="w-full flex items-center justify-between bg-card border border-border rounded-md px-3 py-2 text-sm text-left"
-            >
-              <span className={formPatient ? 'text-foreground' : 'text-muted-foreground'}>
-                {formPatient || 'Select patient...'}
-              </span>
-              <ChevronDown size={16} className="text-muted-foreground" />
-            </button>
-            {showPatientDropdown && (
-              <div className="absolute z-50 mt-1 w-full bg-card border border-border rounded-xl shadow-elevated max-h-48 overflow-auto">
-                <button
-                  type="button"
-                  className="w-full text-left px-3 py-2.5 text-sm text-muted-foreground hover:bg-muted/50"
-                  onClick={() => { setFormPatient(''); setShowPatientDropdown(false); }}
-                >
-                  None
-                </button>
-                {EXISTING_PATIENTS.map(p => (
-                  <button
-                    key={p.id}
-                    type="button"
-                    className="w-full text-left px-3 py-2.5 text-sm text-foreground hover:bg-muted/50"
-                    onClick={() => { setFormPatient(p.name); setShowPatientDropdown(false); }}
-                  >
-                    {p.name}
-                  </button>
-                ))}
-              </div>
-            )}
+            <PatientSearchDropdown value={formPatient} onChange={setFormPatient} />
           </div>
 
           {/* Hospital */}
