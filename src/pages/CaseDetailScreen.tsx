@@ -324,6 +324,9 @@ const CaseDetailScreen = () => {
           isExpanded={expandedSections.includes('patientInfo')}
           onToggle={() => toggleSection('patientInfo')}
           sectionRef={sectionRefs.patientInfo}
+          onEdit={() => toggleEdit('patientInfo')}
+          isEditing={editingSections.includes('patientInfo')}
+        >
         >
           <DisplayField label="Full Name (English)" value={mockCase.patientName} />
           <div className="space-y-1.5">
