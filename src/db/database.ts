@@ -51,7 +51,7 @@ export async function initDatabase(): Promise<void> {
     db = await sqlite.createConnection(
       DB_NAME,
       true, // encrypted
-      'secret', // mode
+      password, // mode
       1, // version
       false // readonly
     );
