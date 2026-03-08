@@ -372,6 +372,7 @@ const SettingsScreen = () => {
       />
       <ProgressSheet open={progressOpen} onOpenChange={setProgressOpen} type={progressType} detail={progressDetail} />
       <SyncProgressSheet open={syncProgressOpen} onOpenChange={setSyncProgressOpen} email={googleAccounts.find(a => a.active)?.email || ''} onComplete={(ts) => setLastSyncedText(ts)} />
+      <RestoreBackupSheet open={restoreSheetOpen} onOpenChange={setRestoreSheetOpen} onRestore={() => startProgress('restore', 'All records restored')} />
     </div>
   );
 };
