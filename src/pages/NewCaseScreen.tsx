@@ -799,8 +799,10 @@ const NewCaseScreen = () => {
             </div>
           </div>
         </CollapsibleSection>
+        </div>
 
         {/* ═══ Attach Images ═══ */}
+        <div ref={sectionRefs.attachImages}>
         <div className="bg-card border border-border rounded-[18px] p-4">
           <span className="text-[12px] font-bold text-foreground block mb-3">Attach Images</span>
           <div className="flex gap-3">
