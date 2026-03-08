@@ -7,6 +7,10 @@ import FontSizeSheet from '@/components/FontSizeSheet';
 import DateFormatSheet from '@/components/DateFormatSheet';
 import ManageHospitalsSheet from '@/components/ManageHospitalsSheet';
 import DefaultHospitalSheet from '@/components/DefaultHospitalSheet';
+import AIProviderSheet from '@/components/AIProviderSheet';
+import APIKeySheet from '@/components/APIKeySheet';
+import AIModelSheet from '@/components/AIModelSheet';
+import AILanguageSheet from '@/components/AILanguageSheet';
 import { useNavigate } from 'react-router-dom';
 import {
   ArrowLeft, Palette, Moon, Type, Globe, CalendarDays,
