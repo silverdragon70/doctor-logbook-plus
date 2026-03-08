@@ -595,6 +595,14 @@ const HospitalPatientsScreen = () => {
       {/* Edit Hospital Sheet */}
       <EditHospitalSheet open={editOpen} onClose={() => setEditOpen(false)} hospital={mockHospital} />
 
+      {/* Date Range Sheet */}
+      <DateRangeSheet
+        open={dateRangeOpen}
+        onClose={() => setDateRangeOpen(false)}
+        selected={activeFilters.dateRange || null}
+        onSelect={(key) => setActiveFilters(prev => ({ ...prev, dateRange: key }))}
+      />
+
       {/* Delete Confirmation Dialog */}
       <AlertDialog open={deleteOpen} onOpenChange={setDeleteOpen}>
         <AlertDialogContent>
