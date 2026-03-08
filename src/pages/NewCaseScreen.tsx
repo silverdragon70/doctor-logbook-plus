@@ -15,29 +15,17 @@ const existingPatients = [
   { patientId: '4', name: 'Maya Johnson', fileNumber: 'PED-2024-004', age: '5 years', gender: 'female' as const },
 ];
 
-const hospitals = [
-  { value: 'cairo-university', label: 'Cairo University Hospital' },
-  { value: 'ain-shams', label: 'Ain Shams University Hospital' },
-  { value: 'kasr-alainy', label: 'Kasr Al-Ainy Hospital' },
-];
-
-const GenderIcon = ({ gender, size = 13 }: { gender: 'male' | 'female'; size?: number }) => (
-  <span
-    className={`font-bold ${gender === 'male' ? 'text-blue-500' : 'text-rose-400'}`}
-    style={{ fontSize: size, lineHeight: 1 }}
-  >
-    {gender === 'male' ? '♂' : '♀'}
-  </span>
-);
-
-const formFields = [
-  { key: 'complaint', label: 'Chief Complaint', placeholder: 'What brought the patient in?', lines: 2 },
-  { key: 'history', label: 'History', placeholder: 'Relevant medical history...', lines: 3 },
-  { key: 'examination', label: 'Examination', placeholder: 'Physical exam findings...', lines: 3 },
-  { key: 'investigations', label: 'Investigations', placeholder: 'Lab results, imaging...', lines: 2 },
-  { key: 'diagnosis', label: 'Diagnosis', placeholder: 'Working or final diagnosis...', lines: 2 },
-  { key: 'management', label: 'Management', placeholder: 'Treatment plan...', lines: 3 },
-  { key: 'notes', label: 'Notes', placeholder: 'Additional notes...', lines: 2 },
+const specialties = [
+  { value: 'cardiology', label: 'Cardiology' },
+  { value: 'pulmonology', label: 'Pulmonology' },
+  { value: 'gastroenterology', label: 'Gastroenterology' },
+  { value: 'nephrology', label: 'Nephrology' },
+  { value: 'neurology', label: 'Neurology' },
+  { value: 'hematology', label: 'Hematology' },
+  { value: 'endocrinology', label: 'Endocrinology' },
+  { value: 'infectious-disease', label: 'Infectious Disease' },
+  { value: 'neonatology', label: 'Neonatology' },
+  { value: 'general-pediatrics', label: 'General Pediatrics' },
 ];
 
 const inputClass =
