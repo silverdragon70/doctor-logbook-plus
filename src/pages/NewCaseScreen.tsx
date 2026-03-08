@@ -521,12 +521,12 @@ const NewCaseScreen = () => {
                       <label className={labelClass} style={{ color: '#6B7C93' }}>Type</label>
                       <div className="grid grid-cols-3 gap-2">
                         {([
-                          { value: 'room-air', label: 'Room Air', emoji: '💨' },
-                          { value: 'nasal-o2', label: 'Nasal O₂', emoji: '👃' },
-                          { value: 'mask', label: 'Mask', emoji: '😷' },
-                          { value: 'hfnc', label: 'HFNC', emoji: '🌬️' },
-                          { value: 'cpap', label: 'CPAP', emoji: '⚙️' },
-                          { value: 'mv', label: 'MV', emoji: '🫁' },
+                          { value: 'room-air', label: 'Room Air', icon: <span>💨</span> },
+                          { value: 'nasal-o2', label: 'Nasal O₂', icon: <span>👃</span> },
+                          { value: 'mask', label: 'Mask', icon: <span>😷</span> },
+                          { value: 'hfnc', label: 'HFNC', icon: <span>🌬️</span> },
+                          { value: 'cpap', label: 'CPAP', icon: <span>⚙️</span> },
+                          { value: 'mv', label: 'MV', icon: <AirVent size={14} /> },
                         ] as const).map((opt) => (
                           <button
                             key={opt.value}
@@ -539,7 +539,7 @@ const NewCaseScreen = () => {
                                 : 'bg-[hsl(210,40%,98%)] text-muted-foreground border-[hsl(216,20%,90%)] hover:bg-muted/50'
                             )}
                           >
-                            <span>{opt.emoji}</span> {opt.label}
+                            {opt.icon} {opt.label}
                           </button>
                         ))}
                       </div>
