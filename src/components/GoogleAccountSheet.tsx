@@ -5,18 +5,20 @@ import {
   AlertDialogContent, AlertDialogDescription, AlertDialogFooter,
   AlertDialogHeader, AlertDialogTitle,
 } from '@/components/ui/alert-dialog';
-import { X, RefreshCw, Unplug, AlertTriangle } from 'lucide-react';
+import { X, RefreshCw, Unplug, Link } from 'lucide-react';
 
 interface GoogleAccountSheetProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   email: string;
+  onConnect: () => void;
   onSwitch: () => void;
   onDisconnect: () => void;
 }
 
-const GoogleAccountSheet = ({ open, onOpenChange, email, onSwitch, onDisconnect }: GoogleAccountSheetProps) => {
+const GoogleAccountSheet = ({ open, onOpenChange, email, onConnect, onSwitch, onDisconnect }: GoogleAccountSheetProps) => {
   const [confirmOpen, setConfirmOpen] = useState(false);
+  const isConnected = !!email;
 
   return (
     <>
@@ -29,39 +31,60 @@ const GoogleAccountSheet = ({ open, onOpenChange, email, onSwitch, onDisconnect 
             </DrawerClose>
           </DrawerHeader>
           <div className="px-5 pb-6 space-y-4">
-            <div>
-              <label className="text-[12px] font-bold uppercase tracking-wider mb-1.5 block" style={{ color: '#6B7C93' }}>Connected Account</label>
-              <div className="flex items-center gap-3 rounded-xl" style={{ padding: '12px 16px', background: '#F8FAFC', border: '1px solid #DDE3EA' }}>
-                <div className="w-2.5 h-2.5 rounded-full flex-shrink-0" style={{ background: '#22C55E' }} />
-                <div className="flex-1 min-w-0">
-                  <div className="text-[14px] font-bold truncate" style={{ color: '#1A2332' }}>{email}</div>
-                  <div className="text-[12px]" style={{ color: '#6B7C93' }}>Connected</div>
+            {isConnected ? (
+              <>
+                <div>
+                  <label className="text-[12px] font-bold uppercase tracking-wider mb-1.5 block" style={{ color: '#6B7C93' }}>Connected Account</label>
+                  <div className="flex items-center gap-3 rounded-xl" style={{ padding: '12px 16px', background: '#F8FAFC', border: '1px solid #DDE3EA' }}>
+                    <div className="w-2.5 h-2.5 rounded-full flex-shrink-0" style={{ background: '#22C55E' }} />
+                    <div className="flex-1 min-w-0">
+                      <div className="text-[14px] font-bold truncate" style={{ color: '#1A2332' }}>{email}</div>
+                      <div className="text-[12px]" style={{ color: '#6B7C93' }}>Connected</div>
+                    </div>
+                  </div>
                 </div>
-              </div>
-            </div>
 
-            <button
-              onClick={() => { onSwitch(); onOpenChange(false); }}
-              className="w-full flex items-center justify-center gap-2 font-bold text-white rounded-xl"
-              style={{ height: 48, background: '#2563EB' }}
-            >
-              <RefreshCw size={16} /> Switch Account
-            </button>
+                <button
+                  onClick={() => { onSwitch(); onOpenChange(false); }}
+                  className="w-full flex items-center justify-center gap-2 font-bold text-white rounded-xl"
+                  style={{ height: 48, background: '#2563EB' }}
+                >
+                  <RefreshCw size={16} /> Switch Account
+                </button>
 
-            <button
-              onClick={() => setConfirmOpen(true)}
-              className="w-full flex items-center justify-center gap-2 font-bold rounded-xl"
-              style={{ height: 48, background: '#fff', border: '1.5px solid #EF4444', color: '#EF4444' }}
-            >
-              <Unplug size={16} /> Disconnect Account
-            </button>
+                <button
+                  onClick={() => setConfirmOpen(true)}
+                  className="w-full flex items-center justify-center gap-2 font-bold rounded-xl"
+                  style={{ height: 48, background: '#fff', border: '1.5px solid #EF4444', color: '#EF4444' }}
+                >
+                  <Unplug size={16} /> Disconnect Account
+                </button>
+              </>
+            ) : (
+              <>
+                <div>
+                  <label className="text-[12px] font-bold uppercase tracking-wider mb-1.5 block" style={{ color: '#6B7C93' }}>No Account Connected</label>
+                  <div className="flex items-center gap-3 rounded-xl" style={{ padding: '12px 16px', background: '#F8FAFC', border: '1px solid #DDE3EA' }}>
+                    <div className="w-2.5 h-2.5 rounded-full flex-shrink-0" style={{ background: '#CBD5E1' }} />
+                    <div className="flex-1 min-w-0">
+                      <div className="text-[14px] font-medium" style={{ color: '#6B7C93' }}>Not connected</div>
+                    </div>
+                  </div>
+                </div>
 
-            <div className="flex items-start gap-2 rounded-xl p-3" style={{ background: '#FFFBEB' }}>
-              <AlertTriangle size={16} style={{ color: '#F59E0B' }} className="flex-shrink-0 mt-0.5" />
-              <p className="text-[12px] leading-[18px]" style={{ color: '#92400E' }}>
-                Disconnecting will disable Google Drive sync and cloud backup features.
-              </p>
-            </div>
+                <button
+                  onClick={() => { onConnect(); onOpenChange(false); }}
+                  className="w-full flex items-center justify-center gap-2 font-bold text-white rounded-xl"
+                  style={{ height: 48, background: '#2563EB' }}
+                >
+                  <Link size={16} /> Connect Google Account
+                </button>
+
+                <p className="text-[12px] leading-[18px] text-center" style={{ color: '#6B7C93' }}>
+                  Connect to enable Google Drive sync and cloud backup.
+                </p>
+              </>
+            )}
           </div>
         </DrawerContent>
       </Drawer>

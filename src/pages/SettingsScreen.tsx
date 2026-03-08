@@ -320,7 +320,7 @@ const SettingsScreen = () => {
       <AIModelSheet open={aiModelOpen} onOpenChange={setAiModelOpen} value={aiModel} onApply={setAiModel} />
       <AILanguageSheet open={aiLanguageOpen} onOpenChange={setAiLanguageOpen} value={aiLanguage} onApply={setAiLanguage} />
       <SyncFrequencySheet open={syncFreqOpen} onOpenChange={setSyncFreqOpen} value={syncFrequency} onApply={setSyncFrequency} />
-      <GoogleAccountSheet open={googleAccountOpen} onOpenChange={setGoogleAccountOpen} email={googleEmail} onSwitch={() => console.log('switch account')} onDisconnect={() => { setGoogleEmail(''); setSyncEnabled(false); }} />
+      <GoogleAccountSheet open={googleAccountOpen} onOpenChange={setGoogleAccountOpen} email={googleEmail} onConnect={() => { setGoogleEmail('user@gmail.com'); setSyncEnabled(true); }} onSwitch={() => console.log('switch account')} onDisconnect={() => { setGoogleEmail(''); setSyncEnabled(false); }} />
     </div>
   );
 };
