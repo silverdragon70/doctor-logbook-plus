@@ -75,11 +75,11 @@ const EXISTING_PATIENTS = [
 ];
 
 const MOCK_PROCEDURES: Procedure[] = [
-  { id: '1', name: 'Lumbar Puncture (LP)', date: '2026-03-08', participation: 'Performed', patientName: 'Ahmed Ali', location: 'NICU', indication: 'Rule out meningitis', notes: 'Successful on first attempt' },
-  { id: '2', name: 'Peripheral IV Catheter Placement', date: '2026-03-07', participation: 'Assisted', patientName: 'Fatima Hassan', location: 'ER' , indication: 'IV access for antibiotics' },
-  { id: '3', name: 'Bag-Mask Ventilation', date: '2026-03-06', participation: 'Observed', patientName: 'Omar Khalid', location: 'PICU', indication: 'Respiratory distress' },
-  { id: '4', name: 'Chest Tube Placement', date: '2026-03-05', participation: 'Performed', patientName: 'Sara Mohammed', location: 'ER', indication: 'Pneumothorax drainage' },
-  { id: '5', name: 'Venipuncture', date: '2026-03-04', participation: 'Performed', patientName: 'Ahmed Ali', location: 'Ward', indication: 'Blood sampling' },
+  { id: '1', name: 'Lumbar Puncture (LP)', date: '2026-03-08', participation: 'Performed', patientName: 'Ahmed Ali', hospital: 'King Fahad Medical City', supervisor: 'Dr. Nasser', indication: 'Rule out meningitis', notes: 'Successful on first attempt' },
+  { id: '2', name: 'Peripheral IV Catheter Placement', date: '2026-03-07', participation: 'Assisted', patientName: 'Fatima Hassan', hospital: 'National Guard Hospital', indication: 'IV access for antibiotics' },
+  { id: '3', name: 'Bag-Mask Ventilation', date: '2026-03-06', participation: 'Observed', patientName: 'Omar Khalid', supervisor: 'Dr. Layla', indication: 'Respiratory distress' },
+  { id: '4', name: 'Chest Tube Placement', date: '2026-03-05', participation: 'Performed', patientName: 'Sara Mohammed', hospital: 'King Faisal Specialist Hospital', supervisor: 'Dr. Ahmed', indication: 'Pneumothorax drainage' },
+  { id: '5', name: 'Venipuncture', date: '2026-03-04', participation: 'Performed', patientName: 'Ahmed Ali', indication: 'Blood sampling' },
 ];
 
 const participationStyles: Record<ParticipationType, { bg: string; text: string }> = {
