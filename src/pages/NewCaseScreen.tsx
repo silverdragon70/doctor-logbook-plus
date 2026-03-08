@@ -81,6 +81,17 @@ const NewCaseScreen = () => {
   const [weight, setWeight] = useState('');
   const [vitalDateTime, setVitalDateTime] = useState('');
 
+  const [expandedSections, setExpandedSections] = useState<Record<string, boolean>>({
+    patient: true,
+    classification: true,
+    history: false,
+    vitals: false,
+  });
+
+  const toggleSection = (key: string) => {
+    setExpandedSections((prev) => ({ ...prev, [key]: !prev[key] }));
+  };
+
   const filteredPatients = useMemo(() => {
     if (!searchQuery.trim()) return [];
     const q = searchQuery.toLowerCase();
