@@ -44,7 +44,7 @@ const CreateBackupSheet = ({ open, onOpenChange, defaultLocation, onBackupComple
     setTimeout(() => {
       setIsRunning(false);
       onOpenChange(false);
-      onBackupComplete();
+      onBackupComplete(saveLocation);
       toast({ title: 'Backup completed ✓', description: `${backupOptions.find(o => o.id === selectedType)?.label} saved to ${saveLocation === 'local' ? 'Device' : 'Google Drive'}.` });
       setSelectedType(null);
     }, 2500);
