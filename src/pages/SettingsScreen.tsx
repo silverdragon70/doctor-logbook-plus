@@ -91,7 +91,9 @@ const SettingsScreen = () => {
   const [syncFrequency, setSyncFrequency] = useState('daily');
   const [syncFreqOpen, setSyncFreqOpen] = useState(false);
   const [googleAccountOpen, setGoogleAccountOpen] = useState(false);
-  const [googleEmail, setGoogleEmail] = useState('user@gmail.com');
+  const [googleAccounts, setGoogleAccounts] = useState<{ id: string; email: string; active: boolean }[]>([
+    { id: '1', email: 'user@gmail.com', active: true },
+  ]);
   const [encryptedBackup, setEncryptedBackup] = useState(true);
   const [pinLock, setPinLock] = useState(false);
   const [biometric, setBiometric] = useState(true);
