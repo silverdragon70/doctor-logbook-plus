@@ -42,13 +42,13 @@ const App = () => (
             <Route path="/courses" element={<CoursesScreen />} />
           <Route path="/group-pearl" element={<GroupPearlScreen />} />
           <Route path="/case/:id" element={<CaseDetailScreen />} />
+            <Route path="/patient/:id" element={<PatientDetailScreen />} />
+            <Route path="/hospital/:id" element={<HospitalPatientsScreen />} />
           </Route>
           <Route path="/case/new" element={<NewCaseScreen />} />
           <Route path="/case/:id/media" element={<MediaGalleryScreen />} />
-          <Route path="/patient/:id" element={<PatientDetailScreen />} />
           <Route path="/patient/:id/edit" element={<EditPatientScreen />} />
           <Route path="/hospital/new" element={<AddHospitalScreen />} />
-          <Route path="/hospital/:id" element={<HospitalPatientsScreen />} />
           <Route path="/settings" element={<SettingsScreen />} />
           <Route path="*" element={<NotFound />} />
         </Routes>
