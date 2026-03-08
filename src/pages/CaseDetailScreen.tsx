@@ -393,6 +393,9 @@ const CaseDetailScreen = () => {
           isExpanded={expandedSections.includes('investigations')}
           onToggle={() => toggleSection('investigations')}
           sectionRef={sectionRefs.investigations}
+          onAdd={() => console.log('add investigation')}
+          onEdit={() => toggleEdit('investigations')}
+          isEditing={editingSections.includes('investigations')}
         >
           <DisplayField label="Investigation Name" value={mockCase.investigationName} />
           <div className="grid grid-cols-2 gap-3">
