@@ -1,6 +1,7 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Search, TrendingUp, Users, Activity, Hospital, Stethoscope } from 'lucide-react';
+import { Search, Hospital, Stethoscope } from 'lucide-react';
+import { BarChart, Bar, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, ComposedChart, LabelList } from 'recharts';
 
 const mockCases = [
   { caseId: '1', patientName: 'Lucas Miller', initials: 'LM', gender: 'male' as const, department: 'Respiratory', tagColor: 'bg-accent text-accent-foreground', complaint: 'Persistent cough', diagnosis: 'Bronchitis', room: 'Room 402', lastModified: Date.now() - 4 * 60 * 60 * 1000, mediaCount: 2 },
@@ -65,6 +66,131 @@ const statusColors = {
   red: { dot: 'bg-red-500', bg: 'bg-red-50 dark:bg-red-950/30', border: 'border-red-200 dark:border-red-900/50', text: 'text-red-700 dark:text-red-400' },
   yellow: { dot: 'bg-amber-500', bg: 'bg-amber-50 dark:bg-amber-950/30', border: 'border-amber-200 dark:border-amber-900/50', text: 'text-amber-700 dark:text-amber-400' },
   green: { dot: 'bg-emerald-500', bg: 'bg-emerald-50 dark:bg-emerald-950/30', border: 'border-emerald-200 dark:border-emerald-900/50', text: 'text-emerald-700 dark:text-emerald-400' },
+};
+
+// Mock data for stats
+const mockAdmissionsData = [
+  { month: 'Apr', admissions: 18, trend: 16 },
+  { month: 'May', admissions: 24, trend: 20 },
+  { month: 'Jun', admissions: 15, trend: 18 },
+  { month: 'Jul', admissions: 28, trend: 22 },
+  { month: 'Aug', admissions: 22, trend: 24 },
+  { month: 'Sep', admissions: 30, trend: 26 },
+  { month: 'Oct', admissions: 19, trend: 23 },
+  { month: 'Nov', admissions: 35, trend: 28 },
+  { month: 'Dec', admissions: 26, trend: 29 },
+  { month: 'Jan', admissions: 31, trend: 30 },
+  { month: 'Feb', admissions: 20, trend: 27 },
+  { month: 'Mar', admissions: 27, trend: 28 },
+];
+
+const mockDiagnosesData = [
+  { name: 'Bronchiolitis', count: 34 },
+  { name: 'Pneumonia', count: 28 },
+  { name: 'Sepsis', count: 19 },
+  { name: 'Gastroenteritis', count: 15 },
+  { name: 'Asthma', count: 12 },
+];
+
+const mockProcedureStats = { total: 142, performed: 89, assisted: 38, observed: 15 };
+
+type TimeFilter = 'All' | 'This Month' | '3M' | '6M' | 'Year';
+
+const StatsTab = () => {
+  const [timeFilter, setTimeFilter] = useState<TimeFilter>('All');
+  const filters: TimeFilter[] = ['All', 'This Month', '3M', '6M', 'Year'];
+
+  return (
+    <div className="space-y-4 py-4 animate-fade-in">
+      {/* Time Filter Pills */}
+      <div className="flex gap-2 overflow-x-auto no-scrollbar pb-1">
+        {filters.map((f) => (
+          <button
+            key={f}
+            onClick={() => setTimeFilter(f)}
+            className={`px-4 py-2 rounded-full text-[13px] font-semibold whitespace-nowrap transition-all ${
+              timeFilter === f
+                ? 'text-white'
+                : 'bg-white border border-[hsl(210,14%,83%)] text-[hsl(213,18%,50%)]'
+            }`}
+            style={timeFilter === f ? { backgroundColor: '#2563EB' } : {}}
+          >
+            {f}
+          </button>
+        ))}
+      </div>
+
+      {/* Section 1: Admissions per Month */}
+      <div className="bg-white rounded-[18px] p-4" style={{ boxShadow: '0px 2px 8px rgba(0,0,0,0.06)' }}>
+        <h3 className="text-[16px] font-bold mb-4" style={{ color: '#1A2332' }}>Admissions per Month</h3>
+        <div className="overflow-x-auto no-scrollbar -mx-2">
+          <div style={{ minWidth: 500, height: 200 }}>
+            <ResponsiveContainer width="100%" height="100%">
+              <ComposedChart data={mockAdmissionsData} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
+                <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="hsl(210,14%,89%)" />
+                <XAxis dataKey="month" tick={{ fontSize: 11, fill: '#6B7C93' }} axisLine={false} tickLine={false} />
+                <YAxis tick={{ fontSize: 11, fill: '#6B7C93' }} axisLine={false} tickLine={false} />
+                <Tooltip
+                  contentStyle={{ borderRadius: 12, border: '1px solid #DDE3EA', fontSize: 12 }}
+                />
+                <Bar dataKey="admissions" fill="#2563EB" radius={[4, 4, 0, 0]} barSize={20} />
+                <Line type="monotone" dataKey="trend" stroke="#0D9488" strokeWidth={2} dot={false} />
+              </ComposedChart>
+            </ResponsiveContainer>
+          </div>
+        </div>
+      </div>
+
+      {/* Section 2: Top Diagnoses */}
+      <div className="bg-white rounded-[18px] p-4" style={{ boxShadow: '0px 2px 8px rgba(0,0,0,0.06)' }}>
+        <h3 className="text-[16px] font-bold mb-4" style={{ color: '#1A2332' }}>Top Diagnoses</h3>
+        <div className="overflow-x-auto no-scrollbar -mx-2">
+          <div style={{ minWidth: 350, height: 200 }}>
+            <ResponsiveContainer width="100%" height="100%">
+              <BarChart data={mockDiagnosesData} margin={{ top: 20, right: 10, left: -20, bottom: 0 }}>
+                <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="hsl(210,14%,89%)" />
+                <XAxis
+                  dataKey="name"
+                  tick={{ fontSize: 10, fill: '#6B7C93' }}
+                  axisLine={false}
+                  tickLine={false}
+                  interval={0}
+                  tickFormatter={(v: string) => v.length > 10 ? v.slice(0, 9) + '…' : v}
+                />
+                <YAxis tick={{ fontSize: 11, fill: '#6B7C93' }} axisLine={false} tickLine={false} />
+                <Tooltip contentStyle={{ borderRadius: 12, border: '1px solid #DDE3EA', fontSize: 12 }} />
+                <Bar dataKey="count" fill="#2563EB" radius={[4, 4, 0, 0]} barSize={28}>
+                  <LabelList dataKey="count" position="top" style={{ fontSize: 11, fontWeight: 700, fill: '#1A2332' }} />
+                </Bar>
+              </BarChart>
+            </ResponsiveContainer>
+          </div>
+        </div>
+      </div>
+
+      {/* Section 3: Procedures Stats */}
+      <div className="bg-white rounded-[18px] p-4" style={{ boxShadow: '0px 2px 8px rgba(0,0,0,0.06)' }}>
+        <h3 className="text-[16px] font-bold mb-4" style={{ color: '#1A2332' }}>Procedures</h3>
+        <div className="grid grid-cols-2 gap-3">
+          {[
+            { value: mockProcedureStats.total, label: 'TOTAL' },
+            { value: mockProcedureStats.performed, label: 'PERFORMED' },
+            { value: mockProcedureStats.assisted, label: 'ASSISTED' },
+            { value: mockProcedureStats.observed, label: 'OBSERVED' },
+          ].map((item) => (
+            <div
+              key={item.label}
+              className="rounded-[14px] p-4 flex flex-col items-center justify-center"
+              style={{ backgroundColor: '#F0F4F8' }}
+            >
+              <span className="text-[28px] font-bold" style={{ color: '#2563EB' }}>{item.value}</span>
+              <span className="text-[11px] font-bold uppercase tracking-wider mt-1" style={{ color: '#6B7C93' }}>{item.label}</span>
+            </div>
+          ))}
+        </div>
+      </div>
+    </div>
+  );
 };
 
 const CasesScreen = () => {
@@ -191,38 +317,7 @@ const CasesScreen = () => {
           </>
         )}
 
-        {activeTab === 'stats' && (
-          <div className="space-y-4 py-4 animate-fade-in">
-            <div className="bg-card p-4 rounded-2xl border border-border">
-              <div className="flex items-center justify-between mb-4">
-                <div className="flex items-center gap-2">
-                  <TrendingUp size={16} className="text-secondary" />
-                  <span className="text-[13px] font-bold text-foreground">Admission Trends</span>
-                </div>
-                <span className="text-[10px] bg-secondary/10 text-secondary px-2 py-0.5 rounded-full font-semibold">+12% vs LW</span>
-              </div>
-              <div className="h-24 flex items-end justify-between gap-2 px-2">
-                {[40, 70, 45, 90, 65, 80, 55].map((h, i) => (
-                  <div key={i} className="flex-1 bg-muted rounded-t-sm relative">
-                    <div className="w-full bg-primary rounded-t-sm transition-all duration-500" style={{ height: `${h}%` }} />
-                  </div>
-                ))}
-              </div>
-            </div>
-            <div className="grid grid-cols-2 gap-3">
-              <div className="p-4 bg-card rounded-2xl border border-border">
-                <Users size={18} className="text-primary mb-2" />
-                <div className="text-[18px] font-mono font-bold text-foreground">12</div>
-                <div className="text-[10px] text-muted-foreground uppercase font-bold">New Patients</div>
-              </div>
-              <div className="p-4 bg-card rounded-2xl border border-border">
-                <Activity size={18} className="text-destructive mb-2" />
-                <div className="text-[18px] font-mono font-bold text-foreground">04</div>
-                <div className="text-[10px] text-muted-foreground uppercase font-bold">Critical Care</div>
-              </div>
-            </div>
-          </div>
-        )}
+        {activeTab === 'stats' && <StatsTab />}
 
         {activeTab === 'insights' && (
           <div className="space-y-3 py-4 animate-fade-in">
