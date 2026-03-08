@@ -3,6 +3,7 @@ import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
+import DatabaseProvider from "@/db/DatabaseProvider";
 import AppShell from "./components/AppShell";
 import PatientsScreen from "./pages/PatientsScreen";
 import CasesScreen from "./pages/CasesScreen";
@@ -26,8 +27,9 @@ import HospitalPatientsScreen from "./pages/HospitalPatientsScreen";
 const queryClient = new QueryClient();
 
 const App = () => (
-  <QueryClientProvider client={queryClient}>
-    <TooltipProvider>
+  <DatabaseProvider>
+    <QueryClientProvider client={queryClient}>
+      <TooltipProvider>
       <Toaster />
       <Sonner />
       <BrowserRouter>
@@ -53,8 +55,9 @@ const App = () => (
           <Route path="*" element={<NotFound />} />
         </Routes>
       </BrowserRouter>
-    </TooltipProvider>
-  </QueryClientProvider>
+      </TooltipProvider>
+    </QueryClientProvider>
+  </DatabaseProvider>
 );
 
 export default App;
