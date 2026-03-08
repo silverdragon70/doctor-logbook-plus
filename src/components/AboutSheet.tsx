@@ -189,7 +189,7 @@ const AboutSheet = ({ open, onOpenChange }: AboutSheetProps) => {
 
           {/* Medical Disclaimer */}
           <SectionHeader icon={AlertTriangle} label="Medical Disclaimer" />
-          <BodyText>PediLog is a documentation tool only. It is <B>NOT</B> a medical device and is <B>NOT</B> intended for diagnosis, treatment, monitoring, or clinical decision making.</BodyText>
+          <BodyText>Medora is a documentation tool only. It is <B>NOT</B> a medical device and is <B>NOT</B> intended for diagnosis, treatment, monitoring, or clinical decision making.</BodyText>
           <div className="h-3" />
           <BodyText>All clinical decisions must be made solely by qualified healthcare professionals using their own professional judgment.</BodyText>
           <div className="h-3" />
