@@ -52,6 +52,7 @@ const SettingsExportSheet: React.FC<SettingsExportSheetProps> = ({ open, onOpenC
   const handleExport = () => {
     console.log('export', { selectedCategories, hospital, period, exportFormat, saveLocation });
     onOpenChange(false);
+    onExportStart?.();
   };
 
   return (
