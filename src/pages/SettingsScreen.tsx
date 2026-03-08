@@ -5,7 +5,7 @@ import {
   ArrowLeft, Palette, Moon, Type, Globe, CalendarDays,
   Building2, Home, Bot, KeyRound, Brain, Languages, Zap,
   RefreshCw, Lock, UserCircle, Clock,
-  Database, HardDrive, Cloud, Download, Upload, CheckCircle,
+  Database, HardDrive, Cloud, Download, Upload,
   Shield, FileText, HardDriveDownload, Image, ToggleLeft,
   MessageSquare, Save, Eye, Trash2, Info
 } from 'lucide-react';
@@ -28,20 +28,30 @@ const Section = ({ title, children }: { title: string; children: React.ReactNode
 );
 
 const Row = ({
-  icon: Icon, iconColor, label, subtitle, right, onClick, noBorder,
+  icon: Icon, iconColor, label, subtitle, lastBackup, right, onClick, noBorder,
 }: {
   icon: any; iconColor?: string; label: string; subtitle?: string;
+  lastBackup?: { date: string; size: string } | null;
   right?: React.ReactNode; onClick?: () => void; noBorder?: boolean;
 }) => (
   <button
     onClick={onClick}
     className="w-full flex items-center gap-3 text-left transition-colors hover:bg-muted/40"
-    style={{ height: 56, padding: '0 16px', borderBottom: noBorder ? 'none' : '1px solid #F0F4F8' }}
+    style={{ minHeight: 56, padding: '12px 16px', borderBottom: noBorder ? 'none' : '1px solid #F0F4F8' }}
   >
-    <Icon size={20} style={{ color: iconColor || 'hsl(213,78%,48%)' }} className="flex-shrink-0" />
+    <Icon size={20} style={{ color: iconColor || 'hsl(213,78%,48%)' }} className="flex-shrink-0 mt-0.5" />
     <div className="flex-1 min-w-0">
       <div className="text-[15px] font-medium truncate" style={{ color: '#1A2332' }}>{label}</div>
       {subtitle && <div className="text-[12px] truncate" style={{ color: '#6B7C93' }}>{subtitle}</div>}
+      {lastBackup !== undefined && (
+        lastBackup ? (
+          <div className="text-[11px]" style={{ color: '#94A3B8' }}>
+            <span className="font-bold" style={{ color: '#6B7C93' }}>Last:</span> {lastBackup.date} · {lastBackup.size}
+          </div>
+        ) : (
+          <div className="text-[11px] font-medium" style={{ color: '#EF4444' }}>Never backed up</div>
+        )
+      )}
     </div>
     {right}
   </button>
@@ -80,11 +90,6 @@ const SettingsScreen = () => {
     }, 300);
   };
 
-  const backupHistory = [
-    { id: '1', type: 'Full Backup', date: '2025-01-15 · 08:30', size: '245 MB' },
-    { id: '2', type: 'Data Only', date: '2025-01-14 · 14:20', size: '12 MB' },
-    { id: '3', type: 'Incremental', date: '2025-01-13 · 09:00', size: '5 MB' },
-  ];
 
   const sw = (checked: boolean, onChange: (v: boolean) => void) => (
     <Switch checked={checked} onCheckedChange={onChange} />
@@ -148,9 +153,9 @@ const SettingsScreen = () => {
 
         {/* ─── 5. BACKUP & RESTORE ─── */}
         <Section title="Backup & Restore">
-          <Row icon={Database} label="Full Backup" subtitle="Database + All Images" right={<Upload size={16} style={{ color: '#6B7C93' }} />} onClick={() => simulateBackup('Full')} />
-          <Row icon={Zap} label="Incremental" subtitle="Only new changes since last backup (faster)" right={<Upload size={16} style={{ color: '#6B7C93' }} />} onClick={() => simulateBackup('Incremental')} />
-          <Row icon={FileText} label="Data Only" subtitle="Database only, no images" right={<Upload size={16} style={{ color: '#6B7C93' }} />} onClick={() => simulateBackup('Data')} />
+          <Row icon={Database} label="Full Backup" subtitle="Database + All Images" lastBackup={{ date: '2025-01-15', size: '245 MB' }} right={<Upload size={16} style={{ color: '#6B7C93' }} />} onClick={() => simulateBackup('Full')} />
+          <Row icon={Zap} label="Incremental" subtitle="Only new changes since last backup (faster)" lastBackup={{ date: '2025-01-13', size: '5 MB' }} right={<Upload size={16} style={{ color: '#6B7C93' }} />} onClick={() => simulateBackup('Incremental')} />
+          <Row icon={FileText} label="Data Only" subtitle="Database only, no images" lastBackup={{ date: '2025-01-14', size: '12 MB' }} right={<Upload size={16} style={{ color: '#6B7C93' }} />} onClick={() => simulateBackup('Data')} />
           <Row icon={Download} label="Restore from Backup" subtitle="Select a backup file" right={<Chevron />} noBorder />
         </Section>
 
@@ -184,21 +189,6 @@ const SettingsScreen = () => {
           </div>
         </div>
 
-        {/* Backup History */}
-        <div className="space-y-2">
-          <h4 className="text-[11px] font-bold uppercase tracking-wider px-1" style={{ color: '#6B7C93' }}>Backup History</h4>
-          <div className="rounded-2xl overflow-hidden" style={{ background: '#fff', boxShadow: '0px 1px 4px rgba(0,0,0,0.06)' }}>
-            {backupHistory.map((b, i) => (
-              <div key={b.id} className="flex items-center gap-3 px-4" style={{ height: 56, borderBottom: i < backupHistory.length - 1 ? '1px solid #F0F4F8' : 'none' }}>
-                <CheckCircle size={16} className="text-secondary flex-shrink-0" />
-                <div className="flex-1 min-w-0">
-                  <div className="text-[13px] font-bold" style={{ color: '#1A2332' }}>{b.type}</div>
-                  <div className="text-[10px]" style={{ color: '#6B7C93' }}>{b.date} · {b.size}</div>
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
 
         {/* ─── 6. SECURITY ─── */}
         <Section title="Security">
