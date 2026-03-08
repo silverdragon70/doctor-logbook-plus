@@ -96,8 +96,8 @@ const AppShell = () => {
           </nav>
         )}
 
-        {/* FAB */}
-        {!isDetailPage && (
+        {/* FAB — hidden on /procedures since it has its own */}
+        {!isDetailPage && !location.pathname.startsWith('/procedures') && (
           <button
             onClick={() => navigate('/case/new')}
             className="fixed bottom-[84px] left-1/2 translate-x-[110px] w-14 h-14 bg-primary rounded-[18px] flex items-center justify-center text-primary-foreground shadow-brand active:scale-90 transition-all z-50 group overflow-hidden"
