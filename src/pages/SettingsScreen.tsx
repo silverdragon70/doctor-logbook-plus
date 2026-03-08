@@ -5,6 +5,7 @@ import AboutSheet from '@/components/AboutSheet';
 import ThemeColorSheet from '@/components/ThemeColorSheet';
 import FontSizeSheet from '@/components/FontSizeSheet';
 import DateFormatSheet from '@/components/DateFormatSheet';
+import ManageHospitalsSheet from '@/components/ManageHospitalsSheet';
 import { useNavigate } from 'react-router-dom';
 import {
   ArrowLeft, Palette, Moon, Type, Globe, CalendarDays,
@@ -87,6 +88,7 @@ const SettingsScreen = () => {
   const [fontSize, setFontSize] = useState('medium');
   const [dateSheetOpen, setDateSheetOpen] = useState(false);
   const [dateFormat, setDateFormat] = useState('DD MMM YYYY');
+  const [hospitalsSheetOpen, setHospitalsSheetOpen] = useState(false);
 
   const sw = (checked: boolean, onChange: (v: boolean) => void) => (
     <Switch checked={checked} onCheckedChange={onChange} />
@@ -114,7 +116,7 @@ const SettingsScreen = () => {
 
         {/* ─── 2. HOSPITAL MANAGEMENT ─── */}
         <Section title="Hospital Management">
-          <Row icon={Building2} iconColor="#0EA5E9" label="Manage Hospitals" subtitle="Add, edit or remove" right={<Chevron />} />
+          <Row icon={Building2} iconColor="#0EA5E9" label="Manage Hospitals" subtitle="Add, edit or remove" right={<Chevron />} onClick={() => setHospitalsSheetOpen(true)} />
           <Row icon={Home} iconColor="#0EA5E9" label="Default Hospital" subtitle="Cairo University" right={<Chevron />} noBorder />
         </Section>
 
@@ -283,6 +285,7 @@ const SettingsScreen = () => {
       <ThemeColorSheet open={themeSheetOpen} onOpenChange={setThemeSheetOpen} value={themeColor} onApply={setThemeColor} />
       <FontSizeSheet open={fontSheetOpen} onOpenChange={setFontSheetOpen} value={fontSize} onApply={setFontSize} />
       <DateFormatSheet open={dateSheetOpen} onOpenChange={setDateSheetOpen} value={dateFormat} onApply={setDateFormat} />
+      <ManageHospitalsSheet open={hospitalsSheetOpen} onOpenChange={setHospitalsSheetOpen} />
     </div>
   );
 };
