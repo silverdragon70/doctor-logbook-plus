@@ -3,12 +3,12 @@ import { useNavigate } from 'react-router-dom';
 import { Search, ChevronRight, Plus, ChevronDown } from 'lucide-react';
 
 const mockPatients = [
-  { patientId: '1', name: 'Lucas Miller', age: 7, gender: 'male' as const, caseCount: 4, lastVisit: '2025-01-15', specialty: 'Respiratory', dateAdded: '2025-01-10' },
-  { patientId: '2', name: 'Sophia Chen', age: 3, gender: 'female' as const, caseCount: 2, lastVisit: '2025-01-14', specialty: 'Cardiology', dateAdded: '2025-01-05' },
-  { patientId: '3', name: 'Ethan Wright', age: 12, gender: 'male' as const, caseCount: 6, lastVisit: '2025-01-10', specialty: 'Neurology', dateAdded: '2024-12-20' },
-  { patientId: '4', name: 'Maya Johnson', age: 5, gender: 'female' as const, caseCount: 1, lastVisit: '2025-01-08', specialty: 'General', dateAdded: '2024-11-15' },
-  { patientId: '5', name: 'Noah Davis', age: 9, gender: 'male' as const, caseCount: 3, lastVisit: '2025-01-05', specialty: 'Gastroenterology', dateAdded: '2024-10-01' },
-  { patientId: '6', name: 'Ava Thompson', age: 0.08, gender: 'female' as const, caseCount: 8, lastVisit: '2025-01-03', specialty: 'Cardiology', dateAdded: '2025-01-01' },
+  { patientId: '1', name: 'Lucas Miller', age: 7, gender: 'male' as const, caseCount: 4, lastVisit: '2025-01-15', specialty: 'Respiratory', dateAdded: '2025-01-10', status: 'active' as const },
+  { patientId: '2', name: 'Sophia Chen', age: 3, gender: 'female' as const, caseCount: 2, lastVisit: '2025-01-14', specialty: 'Cardiology', dateAdded: '2025-01-05', status: 'active' as const },
+  { patientId: '3', name: 'Ethan Wright', age: 12, gender: 'male' as const, caseCount: 6, lastVisit: '2025-01-10', specialty: 'Neurology', dateAdded: '2024-12-20', status: 'discharged' as const },
+  { patientId: '4', name: 'Maya Johnson', age: 5, gender: 'female' as const, caseCount: 1, lastVisit: '2025-01-08', specialty: 'General', dateAdded: '2024-11-15', status: 'discharged' as const },
+  { patientId: '5', name: 'Noah Davis', age: 9, gender: 'male' as const, caseCount: 3, lastVisit: '2025-01-05', specialty: 'Gastroenterology', dateAdded: '2024-10-01', status: 'active' as const },
+  { patientId: '6', name: 'Ava Thompson', age: 0.08, gender: 'female' as const, caseCount: 8, lastVisit: '2025-01-03', specialty: 'Cardiology', dateAdded: '2025-01-01', status: 'discharged' as const },
 ];
 
 const getInitials = (name: string) => name.split(' ').map(n => n[0]).join('');
