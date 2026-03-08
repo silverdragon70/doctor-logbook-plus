@@ -24,8 +24,6 @@ const EditPatientScreen = () => {
   const [name, setName] = useState(mockPatient.name);
   const [dob, setDob] = useState<Date | undefined>(mockPatient.dob);
   const [gender, setGender] = useState<'male' | 'female'>(mockPatient.gender);
-  const [bloodType, setBloodType] = useState(mockPatient.bloodType);
-  const [phone, setPhone] = useState(mockPatient.phone);
   const [notes, setNotes] = useState(mockPatient.notes);
 
   const handleSave = () => {
