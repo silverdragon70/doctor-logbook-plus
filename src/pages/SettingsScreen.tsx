@@ -311,10 +311,11 @@ const SettingsScreen = () => {
         onOpenChange={setBackupSheetOpen}
         defaultLocation={lastBackupInfo?.destination || 'local'}
         onBackupComplete={(destination: 'local' | 'gdrive') => {
+          startProgress('backup', destination === 'local' ? '245 MB · Local Storage' : '245 MB · Google Drive');
           const now = new Date();
           setLastBackupInfo({
             date: now.toISOString().slice(0, 10) + ' · ' + now.toTimeString().slice(0, 5),
-            size: 'calculating...',
+            size: '245 MB',
             destination,
           });
         }}
