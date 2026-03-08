@@ -1240,6 +1240,7 @@ interface GoogleAccount {
 
 #### PUT /lectures/:id
 #### DELETE /lectures/:id
+| Response 200 | `{ success: true }` |
 
 ### Courses
 
