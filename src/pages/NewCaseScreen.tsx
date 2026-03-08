@@ -73,6 +73,13 @@ const NewCaseScreen = () => {
   const [pastMedicalHistory, setPastMedicalHistory] = useState('');
   const [allergies, setAllergies] = useState('');
   const [currentMedications, setCurrentMedications] = useState('');
+  const [hr, setHr] = useState('');
+  const [spo2, setSpo2] = useState('');
+  const [temp, setTemp] = useState('');
+  const [rr, setRr] = useState('');
+  const [bp, setBp] = useState('');
+  const [weight, setWeight] = useState('');
+  const [vitalDateTime, setVitalDateTime] = useState('');
 
   const filteredPatients = useMemo(() => {
     if (!searchQuery.trim()) return [];
