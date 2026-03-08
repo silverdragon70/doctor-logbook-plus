@@ -294,19 +294,49 @@ const NewCaseScreen = () => {
           )}
         </div>
 
-        {/* Clinical Fields */}
-        {formFields.map((field) => (
-          <div key={field.key} className="bg-card border border-border rounded-xl overflow-hidden">
-            <div className="px-4 py-2.5 border-b border-border">
-              <span className="text-[12px] font-bold text-foreground">{field.label}</span>
-            </div>
+        {/* Initial Classification */}
+        <div className="space-y-4">
+          <h2 className="text-[17px] font-bold" style={{ color: '#1A2332' }}>Initial Classification</h2>
+
+          {/* Specialty */}
+          <div className="space-y-1.5">
+            <label className={labelClass} style={{ color: '#6B7C93' }}>Specialty <span className="text-destructive">*</span></label>
+            <Select value={specialty} onValueChange={setSpecialty}>
+              <SelectTrigger className="w-full h-11 bg-[hsl(210,40%,98%)] border-[1.5px] border-[hsl(216,20%,90%)] rounded-[12px] text-[14px] focus:border-primary">
+                <SelectValue placeholder="Select specialty..." />
+              </SelectTrigger>
+              <SelectContent>
+                {specialties.map((s) => (
+                  <SelectItem key={s.value} value={s.value}>{s.label}</SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+
+          {/* Provisional Diagnosis */}
+          <div className="space-y-1.5">
+            <label className={labelClass} style={{ color: '#6B7C93' }}>Provisional Diagnosis</label>
             <textarea
-              placeholder={field.placeholder}
-              rows={field.lines}
-              className="w-full px-4 py-3 text-[13px] text-foreground placeholder:text-muted-foreground bg-transparent focus:outline-none resize-none"
+              value={provisionalDiagnosis}
+              onChange={(e) => setProvisionalDiagnosis(e.target.value)}
+              placeholder="Enter working diagnosis..."
+              rows={3}
+              className={cn(inputClass, 'h-auto py-3 resize-none')}
             />
           </div>
-        ))}
+
+          {/* Chief Complaint */}
+          <div className="space-y-1.5">
+            <label className={labelClass} style={{ color: '#6B7C93' }}>Chief Complaint</label>
+            <textarea
+              value={chiefComplaint}
+              onChange={(e) => setChiefComplaint(e.target.value)}
+              placeholder="Main presenting symptom..."
+              rows={3}
+              className={cn(inputClass, 'h-auto py-3 resize-none')}
+            />
+          </div>
+        </div>
 
         {/* Media */}
         <div className="bg-card border border-border rounded-xl p-4">
