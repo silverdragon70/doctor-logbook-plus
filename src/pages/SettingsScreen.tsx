@@ -275,6 +275,7 @@ const SettingsScreen = () => {
           });
         }}
       />
+      <AboutSheet open={aboutOpen} onOpenChange={setAboutOpen} />
     </div>
   );
 };
