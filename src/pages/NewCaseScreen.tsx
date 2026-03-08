@@ -15,6 +15,19 @@ const existingPatients = [
   { patientId: '4', name: 'Maya Johnson', fileNumber: 'PED-2024-004', age: '5 years', gender: 'female' as const },
 ];
 
+const specialties = [
+  { value: 'cardiology', label: 'Cardiology' },
+  { value: 'pulmonology', label: 'Pulmonology' },
+  { value: 'gastroenterology', label: 'Gastroenterology' },
+  { value: 'nephrology', label: 'Nephrology' },
+  { value: 'neurology', label: 'Neurology' },
+  { value: 'hematology', label: 'Hematology' },
+  { value: 'endocrinology', label: 'Endocrinology' },
+  { value: 'infectious-disease', label: 'Infectious Disease' },
+  { value: 'neonatology', label: 'Neonatology' },
+  { value: 'general-pediatrics', label: 'General Pediatrics' },
+];
+
 const hospitals = [
   { value: 'cairo-university', label: 'Cairo University Hospital' },
   { value: 'ain-shams', label: 'Ain Shams University Hospital' },
@@ -29,16 +42,6 @@ const GenderIcon = ({ gender, size = 13 }: { gender: 'male' | 'female'; size?: n
     {gender === 'male' ? '♂' : '♀'}
   </span>
 );
-
-const formFields = [
-  { key: 'complaint', label: 'Chief Complaint', placeholder: 'What brought the patient in?', lines: 2 },
-  { key: 'history', label: 'History', placeholder: 'Relevant medical history...', lines: 3 },
-  { key: 'examination', label: 'Examination', placeholder: 'Physical exam findings...', lines: 3 },
-  { key: 'investigations', label: 'Investigations', placeholder: 'Lab results, imaging...', lines: 2 },
-  { key: 'diagnosis', label: 'Diagnosis', placeholder: 'Working or final diagnosis...', lines: 2 },
-  { key: 'management', label: 'Management', placeholder: 'Treatment plan...', lines: 3 },
-  { key: 'notes', label: 'Notes', placeholder: 'Additional notes...', lines: 2 },
-];
 
 const inputClass =
   'w-full h-11 px-4 rounded-[12px] text-[14px] text-foreground placeholder:text-muted-foreground focus:outline-none transition-colors'
@@ -62,6 +65,9 @@ const NewCaseScreen = () => {
   const [fileNumber, setFileNumber] = useState('');
   const [hospital, setHospital] = useState('');
   const [admissionDate, setAdmissionDate] = useState<Date | undefined>(undefined);
+  const [specialty, setSpecialty] = useState('');
+  const [provisionalDiagnosis, setProvisionalDiagnosis] = useState('');
+  const [chiefComplaint, setChiefComplaint] = useState('');
 
   const filteredPatients = useMemo(() => {
     if (!searchQuery.trim()) return [];
@@ -306,19 +312,49 @@ const NewCaseScreen = () => {
           )}
         </div>
 
-        {/* Clinical Fields */}
-        {formFields.map((field) => (
-          <div key={field.key} className="bg-card border border-border rounded-xl overflow-hidden">
-            <div className="px-4 py-2.5 border-b border-border">
-              <span className="text-[12px] font-bold text-foreground">{field.label}</span>
-            </div>
+        {/* Initial Classification */}
+        <div className="space-y-4">
+          <h2 className="text-[17px] font-bold" style={{ color: '#1A2332' }}>Initial Classification</h2>
+
+          {/* Specialty */}
+          <div className="space-y-1.5">
+            <label className={labelClass} style={{ color: '#6B7C93' }}>Specialty <span className="text-destructive">*</span></label>
+            <Select value={specialty} onValueChange={setSpecialty}>
+              <SelectTrigger className="w-full h-11 bg-[hsl(210,40%,98%)] border-[1.5px] border-[hsl(216,20%,90%)] rounded-[12px] text-[14px] focus:border-primary">
+                <SelectValue placeholder="Select specialty..." />
+              </SelectTrigger>
+              <SelectContent>
+                {specialties.map((s) => (
+                  <SelectItem key={s.value} value={s.value}>{s.label}</SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+
+          {/* Provisional Diagnosis */}
+          <div className="space-y-1.5">
+            <label className={labelClass} style={{ color: '#6B7C93' }}>Provisional Diagnosis</label>
             <textarea
-              placeholder={field.placeholder}
-              rows={field.lines}
-              className="w-full px-4 py-3 text-[13px] text-foreground placeholder:text-muted-foreground bg-transparent focus:outline-none resize-none"
+              value={provisionalDiagnosis}
+              onChange={(e) => setProvisionalDiagnosis(e.target.value)}
+              placeholder="Enter working diagnosis..."
+              rows={3}
+              className={cn(inputClass, 'h-auto py-3 resize-none')}
             />
           </div>
-        ))}
+
+          {/* Chief Complaint */}
+          <div className="space-y-1.5">
+            <label className={labelClass} style={{ color: '#6B7C93' }}>Chief Complaint</label>
+            <textarea
+              value={chiefComplaint}
+              onChange={(e) => setChiefComplaint(e.target.value)}
+              placeholder="Main presenting symptom..."
+              rows={3}
+              className={cn(inputClass, 'h-auto py-3 resize-none')}
+            />
+          </div>
+        </div>
 
         {/* Media */}
         <div className="bg-card border border-border rounded-xl p-4">
