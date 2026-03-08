@@ -282,9 +282,6 @@ const CaseDetailScreen = () => {
           <button onClick={() => navigate(`/case/${id}/pearl`, { state: { caseData: mockCase } })} className="p-2 rounded-full hover:bg-muted transition-colors" style={{ color: '#D97706' }}>
             <Lightbulb size={18} />
           </button>
-          <button onClick={() => navigate(`/case/${id}/edit`)} className="p-2 rounded-full hover:bg-muted text-muted-foreground">
-            <Edit2 size={18} />
-          </button>
           <button onClick={() => setShowDeleteDialog(true)} className="p-2 rounded-full hover:bg-muted text-destructive">
             <Trash2 size={18} />
           </button>
