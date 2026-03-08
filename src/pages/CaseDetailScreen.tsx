@@ -191,6 +191,26 @@ const CaseDetailScreen = () => {
         </div>
       </header>
 
+      {/* Quick Navigation Bar — between header and content */}
+      <div className="sticky top-[52px] z-40 px-4 py-2.5 overflow-x-auto no-scrollbar flex gap-2" style={{ background: '#F0F4F8' }}>
+        {navPills.map(({ key, label }) => (
+          <button
+            key={key}
+            onClick={() => handlePillClick(key)}
+            className="flex-shrink-0 text-[13px] font-semibold transition-colors"
+            style={{
+              padding: '8px 14px',
+              borderRadius: '20px',
+              background: activePill === key ? '#2563EB' : '#FFFFFF',
+              color: activePill === key ? '#FFFFFF' : '#6B7C93',
+              border: activePill === key ? 'none' : '1.5px solid #DDE3EA',
+            }}
+          >
+            {label}
+          </button>
+        ))}
+      </div>
+
       <div className="px-5 py-5 space-y-4 pb-10">
         {/* Patient Info Card */}
         <div className="bg-card border border-border rounded-2xl overflow-hidden shadow-card">
@@ -207,26 +227,6 @@ const CaseDetailScreen = () => {
               {mockCase.mediaCount} 📷
             </div>
           </div>
-        </div>
-
-        {/* Quick Navigation Bar */}
-        <div className="sticky top-[52px] z-40 -mx-5 px-4 py-2.5 overflow-x-auto no-scrollbar flex gap-2" style={{ background: '#F0F4F8' }}>
-          {navPills.map(({ key, label }) => (
-            <button
-              key={key}
-              onClick={() => handlePillClick(key)}
-              className="flex-shrink-0 text-[13px] font-semibold transition-colors"
-              style={{
-                padding: '8px 14px',
-                borderRadius: '20px',
-                background: activePill === key ? '#2563EB' : '#FFFFFF',
-                color: activePill === key ? '#FFFFFF' : '#6B7C93',
-                border: activePill === key ? 'none' : '1.5px solid #DDE3EA',
-              }}
-            >
-              {label}
-            </button>
-          ))}
         </div>
 
         {/* Clinical Sections — Read Only */}
