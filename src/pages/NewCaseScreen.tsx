@@ -100,7 +100,10 @@ const NewCaseScreen = () => {
                     <User size={18} className="text-primary" />
                   </div>
                   <div className="flex-1 min-w-0">
-                    <p className="text-[14px] font-bold text-foreground">{selectedPatient.name}</p>
+                    <p className="text-[14px] font-bold text-foreground flex items-center gap-1.5">
+                      {selectedPatient.name}
+                      <GenderIcon gender={selectedPatient.gender} size={14} />
+                    </p>
                     <p className="text-[12px] text-muted-foreground mt-0.5">{selectedPatient.fileNumber}</p>
                     <p className="text-[12px] text-muted-foreground">{selectedPatient.age}</p>
                   </div>
