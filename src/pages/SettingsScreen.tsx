@@ -185,6 +185,21 @@ const SettingsScreen = () => {
               </div>
             </div>
           </div>
+          {/* Last Backup */}
+          <div className="px-4 py-3 flex items-center gap-3" style={{ borderBottom: '1px solid #F0F4F8' }}>
+            <Clock size={20} className="text-primary flex-shrink-0" />
+            <div className="flex-1">
+              <div className="text-[15px] font-medium" style={{ color: '#1A2332' }}>Last Backup</div>
+              <div className="text-[12px]" style={{ color: '#6B7C93' }}>{lastBackupInfo.date} · {lastBackupInfo.size}</div>
+            </div>
+            <button
+              onClick={() => setBackupSheetOpen(true)}
+              className="text-[13px] font-bold rounded-[10px] px-3.5 py-1.5"
+              style={{ background: '#2563EB', color: '#fff' }}
+            >
+              Backup Now
+            </button>
+          </div>
           <Row icon={Upload} label="Export Data" subtitle="Export your records" right={<Chevron />} onClick={() => setExportOpen(true)} noBorder />
         </Section>
 
