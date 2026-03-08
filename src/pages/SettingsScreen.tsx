@@ -28,20 +28,30 @@ const Section = ({ title, children }: { title: string; children: React.ReactNode
 );
 
 const Row = ({
-  icon: Icon, iconColor, label, subtitle, right, onClick, noBorder,
+  icon: Icon, iconColor, label, subtitle, lastBackup, right, onClick, noBorder,
 }: {
   icon: any; iconColor?: string; label: string; subtitle?: string;
+  lastBackup?: { date: string; size: string } | null;
   right?: React.ReactNode; onClick?: () => void; noBorder?: boolean;
 }) => (
   <button
     onClick={onClick}
     className="w-full flex items-center gap-3 text-left transition-colors hover:bg-muted/40"
-    style={{ height: 56, padding: '0 16px', borderBottom: noBorder ? 'none' : '1px solid #F0F4F8' }}
+    style={{ minHeight: 56, padding: '12px 16px', borderBottom: noBorder ? 'none' : '1px solid #F0F4F8' }}
   >
-    <Icon size={20} style={{ color: iconColor || 'hsl(213,78%,48%)' }} className="flex-shrink-0" />
+    <Icon size={20} style={{ color: iconColor || 'hsl(213,78%,48%)' }} className="flex-shrink-0 mt-0.5" />
     <div className="flex-1 min-w-0">
       <div className="text-[15px] font-medium truncate" style={{ color: '#1A2332' }}>{label}</div>
       {subtitle && <div className="text-[12px] truncate" style={{ color: '#6B7C93' }}>{subtitle}</div>}
+      {lastBackup !== undefined && (
+        lastBackup ? (
+          <div className="text-[11px]" style={{ color: '#94A3B8' }}>
+            <span className="font-bold" style={{ color: '#6B7C93' }}>Last:</span> {lastBackup.date} · {lastBackup.size}
+          </div>
+        ) : (
+          <div className="text-[11px] font-medium" style={{ color: '#EF4444' }}>Never backed up</div>
+        )
+      )}
     </div>
     {right}
   </button>
