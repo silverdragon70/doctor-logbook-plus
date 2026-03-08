@@ -1,37 +1,47 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Stethoscope, BookOpen, GraduationCap, ChevronRight, Lightbulb } from 'lucide-react';
-
-const logbookCards = [
-  {
-    id: 'procedures',
-    title: 'Procedures',
-    icon: Stethoscope,
-    stats: [
-      { label: 'Performed', value: 12 },
-      { label: 'Assisted', value: 8 },
-      { label: 'Observed', value: 15 },
-    ],
-    color: 'primary',
-  },
-  {
-    id: 'lectures',
-    title: 'Lectures',
-    icon: BookOpen,
-    stats: [{ label: 'Attended', value: 5 }],
-    color: 'secondary',
-  },
-  {
-    id: 'courses',
-    title: 'Courses',
-    icon: GraduationCap,
-    stats: [{ label: 'Completed', value: 3 }],
-    color: 'accent',
-  },
-];
+import { useProcedureStats } from '@/hooks/useProcedures';
+import { useLectures } from '@/hooks/useLectures';
+import { useCourses } from '@/hooks/useCourses';
 
 const LogbookScreen = () => {
   const navigate = useNavigate();
+  const { data: procedureStats } = useProcedureStats();
+  const { data: lectures } = useLectures();
+  const { data: courses } = useCourses();
+
+  const pStats = procedureStats ?? { performed: 0, assisted: 0, observed: 0 };
+  const lecturesCount = lectures?.length ?? 0;
+  const coursesCount = courses?.length ?? 0;
+
+  const logbookCards = [
+    {
+      id: 'procedures',
+      title: 'Procedures',
+      icon: Stethoscope,
+      stats: [
+        { label: 'Performed', value: pStats.performed },
+        { label: 'Assisted', value: pStats.assisted },
+        { label: 'Observed', value: pStats.observed },
+      ],
+      color: 'primary',
+    },
+    {
+      id: 'lectures',
+      title: 'Lectures',
+      icon: BookOpen,
+      stats: [{ label: 'Attended', value: lecturesCount }],
+      color: 'secondary',
+    },
+    {
+      id: 'courses',
+      title: 'Courses',
+      icon: GraduationCap,
+      stats: [{ label: 'Completed', value: coursesCount }],
+      color: 'accent',
+    },
+  ];
 
   return (
     <div className="px-5 py-6 space-y-4 animate-fade-in">
