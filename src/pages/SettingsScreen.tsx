@@ -74,23 +74,9 @@ const SettingsScreen = () => {
   const [confirmDialogs, setConfirmDialogs] = useState(true);
   const [autoSave, setAutoSave] = useState(true);
   const [exportOpen, setExportOpen] = useState(false);
+  const [backupSheetOpen, setBackupSheetOpen] = useState(false);
   const [backupLocation, setBackupLocation] = useState<'local' | 'gdrive'>('local');
-
-  /* backup */
-  const [isBackingUp, setIsBackingUp] = useState(false);
-  const [progress, setProgress] = useState(0);
-
-  const simulateBackup = (type: string) => {
-    console.log('backup', type);
-    setIsBackingUp(true);
-    setProgress(0);
-    const interval = setInterval(() => {
-      setProgress(prev => {
-        if (prev >= 100) { clearInterval(interval); setIsBackingUp(false); return 100; }
-        return prev + 10;
-      });
-    }, 300);
-  };
+  const [lastBackupInfo, setLastBackupInfo] = useState({ date: '2025-01-15 · 08:30', size: '245 MB' });
 
 
   const sw = (checked: boolean, onChange: (v: boolean) => void) => (
