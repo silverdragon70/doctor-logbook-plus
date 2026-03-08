@@ -140,10 +140,6 @@ const SettingsScreen = () => {
           />
         </Section>
 
-        {/* ─── 5. BACKUP & RESTORE ─── */}
-        <Section title="Backup & Restore">
-          <Row icon={Download} label="Restore from Backup" subtitle="Select a backup file" right={<Chevron />} noBorder />
-        </Section>
 
         {/* ─── STORAGE & EXPORTING ─── */}
         <Section title="Storage & Exporting">
