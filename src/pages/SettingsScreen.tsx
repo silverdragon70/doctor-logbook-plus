@@ -179,6 +179,7 @@ const SettingsScreen = () => {
               Backup Now
             </button>
           </div>
+          <Row icon={Download} label="Restore from Backup" subtitle="Select a backup file" right={<Chevron />} />
           <Row icon={Upload} label="Export Data" subtitle="Export your records" right={<Chevron />} onClick={() => setExportOpen(true)} noBorder />
         </Section>
 
