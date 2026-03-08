@@ -21,6 +21,7 @@ import ProceduresScreen from "./pages/ProceduresScreen";
 import LecturesScreen from "./pages/LecturesScreen";
 import CoursesScreen from "./pages/CoursesScreen";
 import EditPatientScreen from "./pages/EditPatientScreen";
+import HospitalPatientsScreen from "./pages/HospitalPatientsScreen";
 
 const queryClient = new QueryClient();
 
