@@ -5,7 +5,7 @@ import {
   ArrowLeft, Palette, Moon, Type, Globe, CalendarDays,
   Building2, Home, Bot, KeyRound, Brain, Languages, Zap,
   RefreshCw, Lock, UserCircle, Clock,
-  Database, HardDrive, Cloud, Download, Upload, CheckCircle,
+  Database, HardDrive, Cloud, Download, Upload,
   Shield, FileText, HardDriveDownload, Image, ToggleLeft,
   MessageSquare, Save, Eye, Trash2, Info
 } from 'lucide-react';
