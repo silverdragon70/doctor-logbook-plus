@@ -387,6 +387,17 @@ const CaseDetailScreen = () => {
             <DisplayField label="Date" value={mockCase.investigationDate} />
           </div>
           <DisplayField label="Result (Text)" value={mockCase.investigationResult} isMultiLine />
+          {/* UI LOGIC — Investigations Image Thumbnails
+              Show the thumbnails container ONLY if the
+              investigation has attached images.
+              If investigation.images.length === 0
+              → hide the thumbnails container completely
+              If investigation.images.length > 0
+              → show thumbnails container with all images
+              This is conditional rendering (UI only).
+              No backend call needed — images array comes
+              from the case data already loaded on this screen.
+              END UI LOGIC */}
           {mockCase.investigationImages.length > 0 && (
             <div className="space-y-1.5">
               <span style={{ color: '#6B7C93', fontSize: '12px', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.05em' }}>
