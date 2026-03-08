@@ -226,3 +226,4 @@ const PatientsScreen = () => {
 };
 
 export default PatientsScreen;
+
