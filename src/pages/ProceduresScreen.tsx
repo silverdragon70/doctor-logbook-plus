@@ -272,11 +272,15 @@ const ProceduresScreen = () => {
 
   const resetForm = () => {
     setFormName(''); setFormDate(new Date()); setFormParticipation('Performed');
-    setFormPatient(''); setFormIndication(''); setFormNotes('');
+    setFormPatient(''); setFormHospital(''); setFormSupervisor(''); setFormIndication(''); setFormNotes('');
+  };
+
+  const handleAddHospital = (name: string) => {
+    setHospitals(prev => [...prev, name]);
   };
 
   const handleSave = () => {
-    console.log('Save procedure', { formName, formDate, formParticipation, formPatient, formIndication, formNotes });
+    console.log('Save procedure', { formName, formDate, formParticipation, formPatient, formHospital, formSupervisor, formIndication, formNotes });
     resetForm();
     setShowForm(false);
   };
