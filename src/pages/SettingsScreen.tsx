@@ -305,7 +305,7 @@ const SettingsScreen = () => {
         </p>
       </div>
 
-      <SettingsExportSheet open={exportOpen} onOpenChange={setExportOpen} />
+      <SettingsExportSheet open={exportOpen} onOpenChange={setExportOpen} onExportStart={() => startProgress('export', 'File saved to Downloads')} />
       <CreateBackupSheet
         open={backupSheetOpen}
         onOpenChange={setBackupSheetOpen}
