@@ -86,8 +86,6 @@ const PillButton = ({
 
 const GroupPearlScreen = () => {
   const navigate = useNavigate();
-  const [isDarkMode, setIsDarkMode] = useState(document.documentElement.classList.contains('dark'));
-
   // Filter state
   const [diagnosis, setDiagnosis] = useState('');
   const [timePeriod, setTimePeriod] = useState<TimePeriod | null>(null);
