@@ -439,6 +439,9 @@ const CaseDetailScreen = () => {
           isExpanded={expandedSections.includes('management')}
           onToggle={() => toggleSection('management')}
           sectionRef={sectionRefs.management}
+          onAdd={() => console.log('add management')}
+          onEdit={() => toggleEdit('management')}
+          isEditing={editingSections.includes('management')}
         >
           {/* Sub 5A — Medications */}
           <SubAccordion
