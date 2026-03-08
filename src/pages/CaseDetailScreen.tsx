@@ -190,8 +190,13 @@ const CaseDetailScreen = () => {
   const [activePill, setActivePill] = useState('patientInfo');
 
   // Expanded states
-  const [expandedSections, setExpandedSections] = useState<string[]>(['patientInfo']);
+  const [expandedSections, setExpandedSections] = useState<string[]>([]);
   const [expandedSubs, setExpandedSubs] = useState<string[]>([]);
+  const [editingSections, setEditingSections] = useState<string[]>([]);
+
+  const toggleEdit = (key: string) => {
+    setEditingSections(prev => prev.includes(key) ? prev.filter(s => s !== key) : [...prev, key]);
+  };
 
   // Section refs
   const sectionRefs: Record<string, React.RefObject<HTMLDivElement>> = {
