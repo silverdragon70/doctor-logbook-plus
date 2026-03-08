@@ -717,6 +717,38 @@ Features certificate upload (JPEG, PNG, PDF) via file input.
 **API Contract**:
 - `POST /ai/group-pearl` → `{ diagnosis, timePeriod, outcome, fromDate?, toDate? }`
 - Response: `{ summary, patterns[], comparison, pearl, diseaseReview }`
+### 5.10b CasePearlScreen
+- **File**: `src/pages/CasePearlScreen.tsx`
+- **Route**: `/case/:id/pearl`
+- **Screen type**: Standalone (no AppShell)
+- **Header**: Sub-header with back arrow ← and title "Case Pearl"
+- **Bottom nav**: No
+
+**Navigation entry**: CaseDetailScreen → tap lightbulb icon (💡)
+**Data passed**: Full case object (de-identified) via route state
+
+#### UI Elements
+
+**Loading State**
+- Spinner animation while AI processes
+- Text: "Analyzing case..."
+
+**Error State**
+- Error message card
+- "Try Again" button
+- Retry triggers re-send to AI provider
+
+**Results State**
+- Clinical Summary card
+- Key Findings card (bulleted list)
+- Recommendations card
+- Disease Review card (if applicable)
+- Language: controlled by aiLanguage setting
+
+**API Contract**:
+- `POST /ai/case-pearl`
+- Request: `{ caseId, caseData: DeIdentifiedCase }`
+- Response: `{ summary, keyFindings: string[], recommendations: string[], diseaseReview?: string }`
 
 ### 5.11 SearchScreen
 - **File**: `src/pages/SearchScreen.tsx`
