@@ -551,7 +551,7 @@ const CaseDetailScreen = () => {
                   </div>
                   {isCardExpanded && (
                     <div className="flex items-center gap-1">
-                      <button onClick={(e) => { e.stopPropagation(); toggleEdit(`mgmt-${entry.id}`); }} className="p-1 rounded-full hover:bg-muted/50">
+                      <button onClick={(e) => { e.stopPropagation(); setEditManagement({ type: entry.type, medications: 'medications' in entry ? (entry as any).medications?.join('\n') : '', mode: 'mode' in entry ? (entry as any).mode : '', details: 'details' in entry ? (entry as any).details : '' }); }} className="p-1 rounded-full hover:bg-muted/50">
                         <Pencil size={14} style={{ color: '#2563EB' }} />
                       </button>
                       <button onClick={(e) => { e.stopPropagation(); setDeleteTarget(`mgmt-${entry.id}`); }} className="p-1 rounded-full hover:bg-muted/50">
