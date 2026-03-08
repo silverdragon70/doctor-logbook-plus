@@ -20,10 +20,19 @@ interface Procedure {
   date: string;
   participation: ParticipationType;
   patientName?: string;
+  hospital?: string;
+  supervisor?: string;
   location?: string;
   indication?: string;
   notes?: string;
 }
+
+const EXISTING_HOSPITALS = [
+  'King Fahad Medical City',
+  'King Faisal Specialist Hospital',
+  'Prince Sultan Military Medical City',
+  'National Guard Hospital',
+];
 
 const CORE_PROCEDURES = [
   'Bag-Mask Ventilation',
