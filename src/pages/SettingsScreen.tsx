@@ -81,7 +81,12 @@ const SettingsScreen = () => {
   const [backupSheetOpen, setBackupSheetOpen] = useState(false);
   const [lastBackupInfo, setLastBackupInfo] = useState<{ date: string; size: string; destination: 'local' | 'gdrive' } | null>({ date: '2025-01-15 · 08:30', size: '245 MB', destination: 'local' });
   const [aboutOpen, setAboutOpen] = useState(false);
-
+  const [themeSheetOpen, setThemeSheetOpen] = useState(false);
+  const [themeColor, setThemeColor] = useState('blue');
+  const [fontSheetOpen, setFontSheetOpen] = useState(false);
+  const [fontSize, setFontSize] = useState('medium');
+  const [dateSheetOpen, setDateSheetOpen] = useState(false);
+  const [dateFormat, setDateFormat] = useState('DD MMM YYYY');
 
   const sw = (checked: boolean, onChange: (v: boolean) => void) => (
     <Switch checked={checked} onCheckedChange={onChange} />
