@@ -35,6 +35,7 @@ const LecturesScreen = () => {
   const [lectures, setLectures] = useState<Lecture[]>(MOCK_LECTURES);
   const [editingId, setEditingId] = useState<string | null>(null);
   const [deleteId, setDeleteId] = useState<string | null>(null);
+  const [showExport, setShowExport] = useState(false);
 
   // Form state
   const [formTopic, setFormTopic] = useState('');
