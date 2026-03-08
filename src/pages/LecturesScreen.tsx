@@ -37,6 +37,12 @@ const LecturesScreen = () => {
   const [deleteId, setDeleteId] = useState<string | null>(null);
   const [showExport, setShowExport] = useState(false);
 
+  useEffect(() => {
+    const handler = () => setShowExport(true);
+    window.addEventListener('open-export-sheet', handler);
+    return () => window.removeEventListener('open-export-sheet', handler);
+  }, []);
+
   // Form state
   const [formTopic, setFormTopic] = useState('');
   const [formDate, setFormDate] = useState<Date>(new Date());
