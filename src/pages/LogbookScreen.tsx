@@ -43,7 +43,7 @@ const LogbookScreen = () => {
       {logbookCards.map((card) => (
         <button
           key={card.id}
-          onClick={() => console.log(`Navigate to ${card.id}`)}
+          onClick={() => card.id === 'procedures' ? navigate('/procedures') : console.log(`Navigate to ${card.id}`)}
           className="w-full bg-card rounded-2xl border border-border shadow-card p-5 flex items-center gap-4 active:scale-[0.98] transition-all duration-150 hover:shadow-elevated text-left group"
         >
           <div className={`w-12 h-12 rounded-xl flex items-center justify-center shrink-0 ${
