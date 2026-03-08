@@ -9,6 +9,7 @@ import CasesScreen from "./pages/CasesScreen";
 import CaseDetailScreen from "./pages/CaseDetailScreen";
 import NewCaseScreen from "./pages/NewCaseScreen";
 import SearchScreen from "./pages/SearchScreen";
+import LogbookScreen from "./pages/LogbookScreen";
 
 import SettingsScreen from "./pages/SettingsScreen";
 import MediaGalleryScreen from "./pages/MediaGalleryScreen";
@@ -28,6 +29,7 @@ const App = () => (
             <Route path="/" element={<PatientsScreen />} />
             <Route path="/cases" element={<CasesScreen />} />
             <Route path="/search" element={<SearchScreen />} />
+            <Route path="/logbook" element={<LogbookScreen />} />
             
           </Route>
           <Route path="/case/new" element={<NewCaseScreen />} />
