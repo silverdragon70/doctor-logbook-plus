@@ -197,6 +197,7 @@ const CaseDetailScreen = () => {
   const [expandedSections, setExpandedSections] = useState<string[]>([]);
   const [expandedSubs, setExpandedSubs] = useState<string[]>([]);
   const [editingSections, setEditingSections] = useState<string[]>([]);
+  const [deleteTarget, setDeleteTarget] = useState<string | null>(null);
 
   const toggleEdit = (key: string) => {
     setEditingSections(prev => prev.includes(key) ? prev.filter(s => s !== key) : [...prev, key]);
@@ -396,8 +397,6 @@ const CaseDetailScreen = () => {
           onToggle={() => toggleSection('investigations')}
           sectionRef={sectionRefs.investigations}
           onAdd={() => console.log('add investigation')}
-          onEdit={() => toggleEdit('investigations')}
-          isEditing={editingSections.includes('investigations')}
         >
           {/* UI LOGIC — Investigation Cards
               Render one card per investigation record.
@@ -436,9 +435,14 @@ const CaseDetailScreen = () => {
                   <span style={{ fontSize: '12px', color: '#6B7C93' }}>{inv.date}</span>
                   <div className="flex items-center gap-1">
                     {isCardExpanded && (
-                      <button onClick={(e) => { e.stopPropagation(); toggleEdit(`inv-${inv.id}`); }} className="p-1 rounded-full hover:bg-muted/50">
-                        <Pencil size={14} style={{ color: '#2563EB' }} />
-                      </button>
+                      <>
+                        <button onClick={(e) => { e.stopPropagation(); toggleEdit(`inv-${inv.id}`); }} className="p-1 rounded-full hover:bg-muted/50">
+                          <Pencil size={14} style={{ color: '#2563EB' }} />
+                        </button>
+                        <button onClick={(e) => { e.stopPropagation(); setDeleteTarget(`inv-${inv.id}`); }} className="p-1 rounded-full hover:bg-muted/50">
+                          <Trash2 size={14} style={{ color: '#EF4444' }} />
+                        </button>
+                      </>
                     )}
                   </div>
                 </div>
@@ -510,8 +514,6 @@ const CaseDetailScreen = () => {
           onToggle={() => toggleSection('management')}
           sectionRef={sectionRefs.management}
           onAdd={() => console.log('add management')}
-          onEdit={() => toggleEdit('management')}
-          isEditing={editingSections.includes('management')}
         >
           {/* UI LOGIC — Management Cards
               Render one card per management entry.
@@ -542,9 +544,14 @@ const CaseDetailScreen = () => {
                     <span style={{ fontSize: '14px', fontWeight: 700, color: '#1A2332' }}>{entry.type}</span>
                   </div>
                   {isCardExpanded && (
-                    <button onClick={(e) => { e.stopPropagation(); toggleEdit(`mgmt-${entry.id}`); }} className="p-1 rounded-full hover:bg-muted/50">
-                      <Pencil size={14} style={{ color: '#2563EB' }} />
-                    </button>
+                    <div className="flex items-center gap-1">
+                      <button onClick={(e) => { e.stopPropagation(); toggleEdit(`mgmt-${entry.id}`); }} className="p-1 rounded-full hover:bg-muted/50">
+                        <Pencil size={14} style={{ color: '#2563EB' }} />
+                      </button>
+                      <button onClick={(e) => { e.stopPropagation(); setDeleteTarget(`mgmt-${entry.id}`); }} className="p-1 rounded-full hover:bg-muted/50">
+                        <Trash2 size={14} style={{ color: '#EF4444' }} />
+                      </button>
+                    </div>
                   )}
                 </div>
                 <div className="flex items-center justify-between mt-1">
@@ -625,8 +632,6 @@ const CaseDetailScreen = () => {
           onToggle={() => toggleSection('progress')}
           sectionRef={sectionRefs.progress}
           onAdd={() => console.log('add progress note')}
-          onEdit={() => toggleEdit('progress')}
-          isEditing={editingSections.includes('progress')}
         >
           {/* UI LOGIC — Progress Note Cards
               Render one card per progress note entry.
@@ -658,9 +663,14 @@ const CaseDetailScreen = () => {
                     <span style={{ fontSize: '14px', fontWeight: 700, color: '#1A2332' }}>Progress Note</span>
                   </div>
                   {isCardExpanded && (
-                    <button onClick={(e) => { e.stopPropagation(); toggleEdit(`prog-${note.id}`); }} className="p-1 rounded-full hover:bg-muted/50">
-                      <Pencil size={14} style={{ color: '#2563EB' }} />
-                    </button>
+                    <div className="flex items-center gap-1">
+                      <button onClick={(e) => { e.stopPropagation(); toggleEdit(`prog-${note.id}`); }} className="p-1 rounded-full hover:bg-muted/50">
+                        <Pencil size={14} style={{ color: '#2563EB' }} />
+                      </button>
+                      <button onClick={(e) => { e.stopPropagation(); setDeleteTarget(`prog-${note.id}`); }} className="p-1 rounded-full hover:bg-muted/50">
+                        <Trash2 size={14} style={{ color: '#EF4444' }} />
+                      </button>
+                    </div>
                   )}
                 </div>
                 <div className="flex items-center justify-between mt-1">
@@ -762,6 +772,24 @@ const CaseDetailScreen = () => {
           <AlertDialogFooter>
             <AlertDialogCancel>Cancel</AlertDialogCancel>
             <AlertDialogAction onClick={handleDelete} className="bg-destructive text-destructive-foreground hover:bg-destructive/90">
+              Delete
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+
+      {/* Delete Card Confirmation */}
+      <AlertDialog open={!!deleteTarget} onOpenChange={(open) => { if (!open) setDeleteTarget(null); }}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Delete Entry</AlertDialogTitle>
+            <AlertDialogDescription>
+              Are you sure you want to delete this? This action cannot be undone.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogAction onClick={() => { console.log('delete card', deleteTarget); setDeleteTarget(null); }} className="bg-destructive text-destructive-foreground hover:bg-destructive/90">
               Delete
             </AlertDialogAction>
           </AlertDialogFooter>
