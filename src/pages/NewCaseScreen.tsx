@@ -68,6 +68,7 @@ const NewCaseScreen = () => {
   const [specialty, setSpecialty] = useState('');
   const [provisionalDiagnosis, setProvisionalDiagnosis] = useState('');
   const [chiefComplaint, setChiefComplaint] = useState('');
+  const [finalDiagnosis, setFinalDiagnosis] = useState('');
   const [presentHistory, setPresentHistory] = useState('');
   const [pastMedicalHistory, setPastMedicalHistory] = useState('');
   const [allergies, setAllergies] = useState('');
