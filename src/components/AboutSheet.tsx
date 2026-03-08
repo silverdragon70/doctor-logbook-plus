@@ -47,7 +47,7 @@ const AboutSheet = ({ open, onOpenChange }: AboutSheetProps) => {
     <Drawer open={open} onOpenChange={onOpenChange}>
       <DrawerContent className="max-h-[90vh]">
         <DrawerHeader className="flex items-center justify-between px-5 pb-2">
-          <DrawerTitle className="text-[17px] font-bold" style={{ color: '#1A2332' }}>About PediLog</DrawerTitle>
+          <DrawerTitle className="text-[17px] font-bold" style={{ color: '#1A2332' }}>About Medora</DrawerTitle>
           <DrawerClose asChild>
             <button className="p-1.5 rounded-full hover:bg-muted"><X size={20} style={{ color: '#6B7C93' }} /></button>
           </DrawerClose>
