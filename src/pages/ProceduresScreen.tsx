@@ -176,12 +176,10 @@ const HospitalSearchDropdown = ({
   value,
   onChange,
   hospitals,
-  onAddHospital,
 }: {
   value: string;
   onChange: (v: string) => void;
   hospitals: string[];
-  onAddHospital: (name: string) => void;
 }) => {
   const [query, setQuery] = useState(value);
   const [open, setOpen] = useState(false);
@@ -203,18 +201,16 @@ const HospitalSearchDropdown = ({
     return hospitals.filter(h => h.toLowerCase().includes(q));
   }, [query, hospitals]);
 
-  const exactMatch = hospitals.some(h => h.toLowerCase() === query.trim().toLowerCase());
-
   return (
     <div ref={ref} className="relative">
       <Input
         placeholder="Search or add hospital..."
         value={query}
-        onChange={e => { setQuery(e.target.value); setOpen(true); }}
+        onChange={e => { setQuery(e.target.value); onChange(e.target.value); setOpen(true); }}
         onFocus={() => setOpen(true)}
         className="bg-card border-border"
       />
-      {open && (
+      {open && filtered.length > 0 && (
         <div className="absolute z-50 mt-1 w-full bg-card border border-border rounded-xl shadow-elevated max-h-48 overflow-auto">
           {filtered.map(h => (
             <button
@@ -226,18 +222,6 @@ const HospitalSearchDropdown = ({
               {h}
             </button>
           ))}
-          {query.trim() && !exactMatch && (
-            <button
-              type="button"
-              className="w-full text-left px-3 py-2.5 text-sm text-primary font-medium hover:bg-muted/50 transition-colors border-t border-border"
-              onClick={() => { onAddHospital(query.trim()); onChange(query.trim()); setOpen(false); }}
-            >
-              + Add "{query.trim()}"
-            </button>
-          )}
-          {filtered.length === 0 && !query.trim() && (
-            <div className="px-3 py-4 text-sm text-muted-foreground text-center">No hospitals found</div>
-          )}
         </div>
       )}
     </div>
