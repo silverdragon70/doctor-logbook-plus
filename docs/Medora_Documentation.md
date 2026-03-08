@@ -1269,6 +1269,30 @@ interface GoogleAccount {
 | Request Body | Same as POST |
 
 #### DELETE /hospitals/:id
+| Property | Detail |
+|---|---|
+| Method | DELETE |
+| Path | `/hospitals/:id` |
+| Purpose | Remove hospital from list |
+| Response 200 | `{ success: true }` |
+| Note | Does NOT delete patient cases. Cases retain hospital name as text. |
+| Triggered By | ManageHospitalsSheet delete confirmation |
+
+#### DELETE /media/:id
+| Response 200 | `{ success: true }` |
+| Side Effect | Delete image file from local storage path |
+
+#### POST /ai/case-pearl
+| Property | Detail |
+|---|---|
+| Method | POST |
+| Path | `/ai/case-pearl` |
+| Purpose | Generate clinical pearl for single case |
+| Request Body | `{ caseId: string, caseData: DeIdentifiedCase }` |
+| Response 200 | `{ summary: string, keyFindings: string[], recommendations: string[], diseaseReview?: string }` |
+| Response 400 | `{ error: 'Missing case data' }` |
+| Response 500 | `{ error: 'AI provider error', message: string }` |
+| Triggered By | CasePearlScreen on mount |
 
 ### Search
 
