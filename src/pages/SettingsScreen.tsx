@@ -114,6 +114,7 @@ const SettingsScreen = () => {
     setProgressDetail(detail || '');
     setProgressOpen(true);
   };
+  const [restoreSheetOpen, setRestoreSheetOpen] = useState(false);
   const [backupSheetOpen, setBackupSheetOpen] = useState(false);
   const [lastBackupInfo, setLastBackupInfo] = useState<{ date: string; size: string; destination: 'local' | 'gdrive' } | null>({ date: '2025-01-15 · 08:30', size: '245 MB', destination: 'local' });
   const [aboutOpen, setAboutOpen] = useState(false);
