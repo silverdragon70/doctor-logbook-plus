@@ -166,7 +166,7 @@ const PatientsScreen = () => {
 
       {/* Filter Chips */}
       <div className="flex items-center gap-2">
-        <div className="flex overflow-x-auto gap-2 pb-1 flex-1" style={{ scrollbarWidth: 'none' }}>
+        <div className="flex gap-2 pb-1 flex-1" style={{ scrollbarWidth: 'none' }}>
           {filterOptions.map((group) => (
             <FilterChip
               key={group.category}
