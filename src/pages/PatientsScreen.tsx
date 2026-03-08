@@ -70,6 +70,60 @@ const matchesDateAdded = (dateStr: string, key: string) => {
   }
 };
 
+const FilterChip = ({ label, options, selected, onSelect }: {
+  label: string;
+  options: { key: string; label: string }[];
+  selected: string | null;
+  onSelect: (key: string) => void;
+}) => {
+  const [open, setOpen] = useState(false);
+  const ref = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const handler = (e: MouseEvent) => {
+      if (ref.current && !ref.current.contains(e.target as Node)) setOpen(false);
+    };
+    if (open) document.addEventListener('mousedown', handler);
+    return () => document.removeEventListener('mousedown', handler);
+  }, [open]);
+
+  const selectedLabel = options.find(o => o.key === selected)?.label;
+  const isActive = !!selected;
+
+  return (
+    <div ref={ref} className="relative shrink-0">
+      <button
+        onClick={() => setOpen(prev => !prev)}
+        className={`flex items-center gap-1 px-3 py-1.5 rounded-full text-[11px] font-semibold border transition-all ${
+          isActive
+            ? 'bg-primary text-primary-foreground border-primary'
+            : 'bg-card text-muted-foreground border-border hover:border-primary/50'
+        }`}
+      >
+        {selectedLabel || label}
+        <ChevronDown size={12} className={`transition-transform ${open ? 'rotate-180' : ''}`} />
+      </button>
+      {open && (
+        <div className="absolute top-full left-0 mt-1 z-50 min-w-[180px] bg-card border border-border rounded-xl shadow-lg overflow-hidden animate-fade-in">
+          {options.map((o) => (
+            <button
+              key={o.key}
+              onClick={() => { onSelect(o.key); setOpen(false); }}
+              className={`w-full px-4 py-2.5 text-left text-[12px] transition-colors ${
+                selected === o.key
+                  ? 'bg-primary/10 text-primary font-bold'
+                  : 'text-foreground hover:bg-muted/50'
+              }`}
+            >
+              {o.label}
+            </button>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+};
+
 const PatientsScreen = () => {
   const [searchQuery, setSearchQuery] = useState('');
   const [activeFilters, setActiveFilters] = useState<Record<string, string | null>>({});
