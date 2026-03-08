@@ -28,6 +28,21 @@ const specialties = [
   { value: 'general-pediatrics', label: 'General Pediatrics' },
 ];
 
+const hospitals = [
+  { value: 'cairo-university', label: 'Cairo University Hospital' },
+  { value: 'ain-shams', label: 'Ain Shams University Hospital' },
+  { value: 'kasr-alainy', label: 'Kasr Al-Ainy Hospital' },
+];
+
+const GenderIcon = ({ gender, size = 13 }: { gender: 'male' | 'female'; size?: number }) => (
+  <span
+    className={`font-bold ${gender === 'male' ? 'text-blue-500' : 'text-rose-400'}`}
+    style={{ fontSize: size, lineHeight: 1 }}
+  >
+    {gender === 'male' ? '♂' : '♀'}
+  </span>
+);
+
 const inputClass =
   'w-full h-11 px-4 rounded-[12px] text-[14px] text-foreground placeholder:text-muted-foreground focus:outline-none transition-colors'
   + ' bg-[hsl(210,40%,98%)] border-[1.5px] border-[hsl(216,20%,90%)] focus:border-primary';
