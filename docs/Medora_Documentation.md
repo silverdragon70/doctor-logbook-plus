@@ -1044,6 +1044,44 @@ interface GoogleAccount {
 }
 ```
 
+### DeIdentifiedCase
+```typescript
+interface DeIdentifiedCase {
+  token: string;                // e.g. "Patient A" — replaces real name
+  age: number;                  // Real age kept (clinical relevance)
+  gender: 'male' | 'female';   // Kept
+  specialty: string;            // Kept
+  provisionalDiagnosis: string; // Kept
+  chiefComplaint: string;       // Kept
+  presentHistory: string;       // Kept
+  pastMedicalHistory: string;   // Kept
+  allergies: string;            // Kept
+  currentMedications: string;   // Kept
+  investigations: {
+    name: string;
+    type: string;
+    result: string;
+    relativeDate: string;       // date replaced: "Day 1", "Day 3"
+  }[];
+  management: {
+    type: string;
+    medications?: string[];
+    mode?: string;
+    details?: string;
+    relativeDate: string;
+  }[];
+  progressNotes: {
+    assessment: string;
+    vitals: VitalSigns;
+    relativeDate: string;
+  }[];
+  status: 'active' | 'discharged';
+  dischargeOutcome?: string;
+  // FIELDS REMOVED BEFORE SENDING TO AI:
+  // name, fileNumber, hospital, exact dates, patientId
+}
+```
+
 ---
 
 ## 7. API Contract
