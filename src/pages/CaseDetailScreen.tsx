@@ -471,7 +471,7 @@ const CaseDetailScreen = () => {
                           Attached Images
                         </span>
                         <div className="flex gap-2 overflow-x-auto no-scrollbar">
-                          {inv.images.slice(0, 3).map((_, i) => (
+                          {(inv.images || []).slice(0, 3).map((_, i) => (
                             <div key={i} style={{
                               width: '72px', height: '72px', borderRadius: '10px',
                               background: '#F1F5F9', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0,
