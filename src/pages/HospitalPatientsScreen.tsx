@@ -412,6 +412,7 @@ const HospitalPatientsScreen = () => {
   const [activeFilters, setActiveFilters] = useState<Record<string, string | null>>({});
   const [editOpen, setEditOpen] = useState(false);
   const [deleteOpen, setDeleteOpen] = useState(false);
+  const [dateRangeOpen, setDateRangeOpen] = useState(false);
 
   const hasActiveFilters = Object.values(activeFilters).some(Boolean);
 
