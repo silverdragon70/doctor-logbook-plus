@@ -68,6 +68,10 @@ const NewCaseScreen = () => {
   const [specialty, setSpecialty] = useState('');
   const [provisionalDiagnosis, setProvisionalDiagnosis] = useState('');
   const [chiefComplaint, setChiefComplaint] = useState('');
+  const [presentHistory, setPresentHistory] = useState('');
+  const [pastMedicalHistory, setPastMedicalHistory] = useState('');
+  const [allergies, setAllergies] = useState('');
+  const [currentMedications, setCurrentMedications] = useState('');
 
   const filteredPatients = useMemo(() => {
     if (!searchQuery.trim()) return [];
@@ -343,13 +347,68 @@ const NewCaseScreen = () => {
             />
           </div>
 
+
+        </div>
+
+        {/* Patient History */}
+        <div className="space-y-4">
+          <h2 className="text-[17px] font-bold" style={{ color: '#1A2332' }}>Patient History</h2>
+
           {/* Chief Complaint */}
           <div className="space-y-1.5">
             <label className={labelClass} style={{ color: '#6B7C93' }}>Chief Complaint</label>
             <textarea
               value={chiefComplaint}
               onChange={(e) => setChiefComplaint(e.target.value)}
-              placeholder="Main presenting symptom..."
+              placeholder="High-grade fever and cough..."
+              rows={3}
+              className={cn(inputClass, 'h-auto py-3 resize-none')}
+            />
+          </div>
+
+          {/* Present History */}
+          <div className="space-y-1.5">
+            <label className={labelClass} style={{ color: '#6B7C93' }}>Present History</label>
+            <textarea
+              value={presentHistory}
+              onChange={(e) => setPresentHistory(e.target.value)}
+              placeholder="History of present illness..."
+              rows={3}
+              className={cn(inputClass, 'h-auto py-3 resize-none')}
+            />
+          </div>
+
+          {/* Past Medical History */}
+          <div className="space-y-1.5">
+            <label className={labelClass} style={{ color: '#6B7C93' }}>Past Medical History</label>
+            <textarea
+              value={pastMedicalHistory}
+              onChange={(e) => setPastMedicalHistory(e.target.value)}
+              placeholder="No significant PMH..."
+              rows={3}
+              className={cn(inputClass, 'h-auto py-3 resize-none')}
+            />
+          </div>
+
+          {/* Allergies */}
+          <div className="space-y-1.5">
+            <label className={labelClass} style={{ color: '#6B7C93' }}>Allergies</label>
+            <input
+              type="text"
+              value={allergies}
+              onChange={(e) => setAllergies(e.target.value)}
+              placeholder="Penicillin — Rash"
+              className={cn(inputClass, 'h-12')}
+            />
+          </div>
+
+          {/* Current Medications (Pre-Admission) */}
+          <div className="space-y-1.5">
+            <label className={labelClass} style={{ color: '#6B7C93' }}>Current Medications (Pre-Admission)</label>
+            <textarea
+              value={currentMedications}
+              onChange={(e) => setCurrentMedications(e.target.value)}
+              placeholder="List current medications..."
               rows={3}
               className={cn(inputClass, 'h-auto py-3 resize-none')}
             />
