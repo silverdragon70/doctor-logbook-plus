@@ -426,6 +426,7 @@ const HospitalPatientsScreen = () => {
   const [editOpen, setEditOpen] = useState(false);
   const [deleteOpen, setDeleteOpen] = useState(false);
   const [dateRangeOpen, setDateRangeOpen] = useState(false);
+  const [openFilter, setOpenFilter] = useState<FilterCategory | null>(null);
 
   const hasActiveFilters = Object.values(activeFilters).some(Boolean);
 
