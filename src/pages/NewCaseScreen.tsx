@@ -164,7 +164,6 @@ const NewCaseScreen = () => {
     { key: 'investigations', label: 'Inv' },
     { key: 'management', label: 'Management' },
     { key: 'progressNote', label: 'Progress' },
-    { key: 'attachImages', label: 'Notes' },
   ];
 
   const [activePill, setActivePill] = useState('patient');
@@ -174,16 +173,19 @@ const NewCaseScreen = () => {
     const ref = sectionRefs[key as keyof typeof sectionRefs];
     if (ref.current) {
       // Expand section if collapsed
-      if (key === 'attachImages') {
-        // no accordion to expand
-      } else if (key === 'progressNote') {
+      if (key === 'progressNote') {
         setExpandedSections(prev => ({ ...prev, progressNote: true }));
       } else {
         setExpandedSections(prev => ({ ...prev, [key]: true }));
       }
       
       setTimeout(() => {
-        ref.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        const el = ref.current;
+        if (!el) return;
+        // Calculate offset: header (~52px) + nav bar (~50px)
+        const offset = 110;
+        const top = el.getBoundingClientRect().top + window.scrollY - offset;
+        window.scrollTo({ top, behavior: 'smooth' });
       }, 100);
     }
     setActivePill(key);
