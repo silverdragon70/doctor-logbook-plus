@@ -502,7 +502,7 @@ const NewCaseScreen = () => {
                 className="w-full px-3 py-3 flex items-center justify-between"
               >
                 <div className="flex items-center gap-2">
-                  <span className="text-[16px]">😷</span>
+                  <AirVent size={16} className="text-primary" />
                   <span className="text-[15px] font-bold" style={{ color: '#1A2332' }}>Respiratory Support</span>
                 </div>
                 <ChevronDown
