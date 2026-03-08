@@ -347,17 +347,7 @@ const NewCaseScreen = () => {
             />
           </div>
 
-          {/* Chief Complaint */}
-          <div className="space-y-1.5">
-            <label className={labelClass} style={{ color: '#6B7C93' }}>Chief Complaint</label>
-            <textarea
-              value={chiefComplaint}
-              onChange={(e) => setChiefComplaint(e.target.value)}
-              placeholder="Main presenting symptom..."
-              rows={3}
-              className={cn(inputClass, 'h-auto py-3 resize-none')}
-            />
-          </div>
+
         </div>
 
         {/* Patient History */}
