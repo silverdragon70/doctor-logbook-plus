@@ -275,12 +275,13 @@ const SettingsScreen = () => {
       <CreateBackupSheet
         open={backupSheetOpen}
         onOpenChange={setBackupSheetOpen}
-        defaultLocation={backupLocation}
-        onBackupComplete={() => {
+        defaultLocation={lastBackupInfo?.destination || 'local'}
+        onBackupComplete={(destination: 'local' | 'gdrive') => {
           const now = new Date();
           setLastBackupInfo({
             date: now.toISOString().slice(0, 10) + ' · ' + now.toTimeString().slice(0, 5),
             size: 'calculating...',
+            destination,
           });
         }}
       />
