@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate, useLocation, Outlet } from 'react-router-dom';
-import { Moon, Sun, Settings, Activity, Search, Users, Plus, ClipboardList } from 'lucide-react';
+import { Moon, Sun, Settings, Activity, Search, Users, Plus, ClipboardList, Upload } from 'lucide-react';
 
 const AppShell = () => {
   const [isDarkMode, setIsDarkMode] = useState(false);
@@ -54,6 +54,14 @@ const AppShell = () => {
               </div>
             </div>
             <div className="flex items-center gap-2">
+              {logbookSubScreens.some((p) => location.pathname.startsWith(p)) && (
+                <button
+                  onClick={() => window.dispatchEvent(new CustomEvent('open-export-sheet'))}
+                  className="p-2 rounded-full hover:bg-muted transition-colors text-[#2563EB]"
+                >
+                  <Upload size={20} />
+                </button>
+              )}
               <button
                 onClick={() => setIsDarkMode(!isDarkMode)}
                 className="p-2 rounded-full hover:bg-muted text-muted-foreground transition-colors"

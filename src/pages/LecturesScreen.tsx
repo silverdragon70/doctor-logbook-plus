@@ -1,6 +1,6 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Plus, X, BookOpen, CalendarIcon, Pencil, Trash2, Upload } from 'lucide-react';
+import { Plus, X, BookOpen, CalendarIcon, Pencil, Trash2 } from 'lucide-react';
 import { format } from 'date-fns';
 import { cn } from '@/lib/utils';
 import { Calendar } from '@/components/ui/calendar';
@@ -36,6 +36,12 @@ const LecturesScreen = () => {
   const [editingId, setEditingId] = useState<string | null>(null);
   const [deleteId, setDeleteId] = useState<string | null>(null);
   const [showExport, setShowExport] = useState(false);
+
+  useEffect(() => {
+    const handler = () => setShowExport(true);
+    window.addEventListener('open-export-sheet', handler);
+    return () => window.removeEventListener('open-export-sheet', handler);
+  }, []);
 
   // Form state
   const [formTopic, setFormTopic] = useState('');
@@ -147,16 +153,6 @@ const LecturesScreen = () => {
   return (
     <>
       <div className="px-5 py-6 space-y-5 animate-fade-in pb-24">
-        {/* Export Button */}
-        <div className="flex justify-end">
-          <button
-            onClick={() => setShowExport(true)}
-            className="inline-flex items-center gap-1.5 text-[13px] font-medium px-3.5 py-1.5 rounded-full bg-[#EFF6FF] text-[#2563EB] border border-[#2563EB] hover:bg-[#DBEAFE] transition-colors"
-          >
-            <Upload size={14} /> Export
-          </button>
-        </div>
-
         {/* Stats */}
         <div className="grid grid-cols-1 gap-3">
           <div className="rounded-2xl p-4 text-center bg-[#DBEAFE]">

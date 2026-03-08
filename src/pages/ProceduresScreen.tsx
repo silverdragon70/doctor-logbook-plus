@@ -1,6 +1,6 @@
-import React, { useState, useMemo, useRef, useEffect } from 'react';
+import React, { useState, useMemo, useRef, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { ArrowLeft, Plus, Stethoscope, X, ChevronDown, CalendarIcon, Pencil, Trash2, Upload } from 'lucide-react';
+import { ArrowLeft, Plus, Stethoscope, X, ChevronDown, CalendarIcon, Pencil, Trash2 } from 'lucide-react';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from '@/components/ui/alert-dialog';
 import ExportSheet from '@/components/ExportSheet';
 import { format } from 'date-fns';
@@ -296,6 +296,12 @@ const ProceduresScreen = () => {
   const [deleteId, setDeleteId] = useState<string | null>(null);
   const [showExport, setShowExport] = useState(false);
 
+  useEffect(() => {
+    const handler = () => setShowExport(true);
+    window.addEventListener('open-export-sheet', handler);
+    return () => window.removeEventListener('open-export-sheet', handler);
+  }, []);
+
   // Form state
   const [formName, setFormName] = useState('');
   const [formDate, setFormDate] = useState<Date>(new Date());
@@ -485,16 +491,6 @@ const ProceduresScreen = () => {
   return (
     <>
       <div className="px-5 py-6 space-y-5 animate-fade-in pb-24">
-        {/* Export Button */}
-        <div className="flex justify-end">
-          <button
-            onClick={() => setShowExport(true)}
-            className="inline-flex items-center gap-1.5 text-[13px] font-medium px-3.5 py-1.5 rounded-full bg-[#EFF6FF] text-[#2563EB] border border-[#2563EB] hover:bg-[#DBEAFE] transition-colors"
-          >
-            <Upload size={14} /> Export
-          </button>
-        </div>
-
         {/* Stats Row */}
         <div className="grid grid-cols-3 gap-3">
           {statCards.map(s => (
