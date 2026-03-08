@@ -34,8 +34,17 @@ const AppShell = () => {
     return location.pathname === path || location.pathname.startsWith(`${path}/`);
   };
 
-  // Hide shell chrome on detail pages
+  // Hide global header on detail pages, but show bottom nav on case detail
   const isDetailPage = location.pathname.includes('/case/') || location.pathname.includes('/patient/');
+  const isCaseDetail = /^\/case\/[^/]+$/.test(location.pathname) && !location.pathname.includes('/case/new');
+  const showBottomNav = !isDetailPage ? isMainTabScreen : isCaseDetail;
+
+  // For case detail pages, highlight "Patients"
+  const getActive = (path: string) => {
+    if (isCaseDetail && path === '/AllPatientList') return true;
+    if (isCaseDetail) return false;
+    return isActive(path);
+  };
 
   return (
     <div className="min-h-screen bg-background transition-colors duration-300">
@@ -84,18 +93,18 @@ const AppShell = () => {
         </main>
 
         {/* BOTTOM NAV */}
-        {!isDetailPage && isMainTabScreen && (
+        {showBottomNav && (
           <nav className="fixed bottom-0 left-1/2 -translate-x-1/2 w-full max-w-[430px] h-[72px] bg-card/90 backdrop-blur-xl border-t border-border flex items-center justify-around px-6 z-40">
             {navItems.map((item) => (
               <button
                 key={item.path}
                 onClick={() => navigate(item.path)}
                 className={`flex flex-col items-center transition-colors ${
-                  isActive(item.path) ? 'text-primary' : 'text-muted-foreground'
+                  getActive(item.path) ? 'text-primary' : 'text-muted-foreground'
                 }`}
               >
                 <item.icon size={24} />
-                <span className={`text-[10px] mt-1 ${isActive(item.path) ? 'font-bold' : 'font-medium'}`}>
+                <span className={`text-[10px] mt-1 ${getActive(item.path) ? 'font-bold' : 'font-medium'}`}>
                   {item.label}
                 </span>
               </button>

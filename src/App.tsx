@@ -38,10 +38,10 @@ const App = () => (
             <Route path="/procedures" element={<ProceduresScreen />} />
             <Route path="/lectures" element={<LecturesScreen />} />
             <Route path="/courses" element={<CoursesScreen />} />
-            <Route path="/group-pearl" element={<GroupPearlScreen />} />
+          <Route path="/group-pearl" element={<GroupPearlScreen />} />
+          <Route path="/case/:id" element={<CaseDetailScreen />} />
           </Route>
           <Route path="/case/new" element={<NewCaseScreen />} />
-          <Route path="/case/:id" element={<CaseDetailScreen />} />
           <Route path="/case/:id/media" element={<MediaGalleryScreen />} />
           <Route path="/patient/:id" element={<PatientDetailScreen />} />
           <Route path="/hospital/new" element={<AddHospitalScreen />} />
