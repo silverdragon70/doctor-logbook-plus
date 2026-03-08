@@ -68,6 +68,10 @@ const NewCaseScreen = () => {
   const [specialty, setSpecialty] = useState('');
   const [provisionalDiagnosis, setProvisionalDiagnosis] = useState('');
   const [chiefComplaint, setChiefComplaint] = useState('');
+  const [presentHistory, setPresentHistory] = useState('');
+  const [pastMedicalHistory, setPastMedicalHistory] = useState('');
+  const [allergies, setAllergies] = useState('');
+  const [currentMedications, setCurrentMedications] = useState('');
 
   const filteredPatients = useMemo(() => {
     if (!searchQuery.trim()) return [];
