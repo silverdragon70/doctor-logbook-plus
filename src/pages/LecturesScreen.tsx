@@ -228,6 +228,23 @@ const LecturesScreen = () => {
       >
         <Plus size={26} />
       </button>
+
+      {/* Export Sheet */}
+      <ExportSheet
+        open={showExport}
+        onOpenChange={setShowExport}
+        title="Lectures"
+        data={lectures}
+        dateKey="date"
+        columns={[
+          { header: 'Topic / Title', key: 'topic' },
+          { header: 'Date', key: 'date' },
+          { header: 'Speaker', key: 'speaker' },
+          { header: 'Duration', key: 'duration' },
+          { header: 'Location', key: 'location' },
+          { header: 'Notes', key: 'notes' },
+        ]}
+      />
     </>
   );
 };

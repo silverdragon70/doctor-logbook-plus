@@ -34,6 +34,7 @@ const CoursesScreen = () => {
   const [courses, setCourses] = useState<Course[]>(MOCK_COURSES);
   const [editingId, setEditingId] = useState<string | null>(null);
   const [deleteId, setDeleteId] = useState<string | null>(null);
+  const [showExport, setShowExport] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   // Form state
