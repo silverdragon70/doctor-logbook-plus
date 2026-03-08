@@ -146,7 +146,70 @@ const NewCaseScreen = () => {
   const [progressNoteDate, setProgressNoteDate] = useState<Date | undefined>(undefined);
   const [progressNoteAssessment, setProgressNoteAssessment] = useState('');
 
-  const toggleSection = (key: string) => {
+  // Section refs for quick nav
+  const sectionRefs = {
+    patient: useRef<HTMLDivElement>(null),
+    classification: useRef<HTMLDivElement>(null),
+    history: useRef<HTMLDivElement>(null),
+    investigations: useRef<HTMLDivElement>(null),
+    management: useRef<HTMLDivElement>(null),
+    progressNote: useRef<HTMLDivElement>(null),
+    attachImages: useRef<HTMLDivElement>(null),
+  };
+
+  const navPills = [
+    { key: 'patient', label: 'Info' },
+    { key: 'classification', label: 'Class' },
+    { key: 'history', label: 'History' },
+    { key: 'investigations', label: 'Inv' },
+    { key: 'management', label: 'Mgmt' },
+    { key: 'progressNote', label: 'Progress' },
+    { key: 'attachImages', label: 'Notes' },
+  ];
+
+  const [activePill, setActivePill] = useState('patient');
+  const pillBarRef = useRef<HTMLDivElement>(null);
+
+  const handlePillClick = useCallback((key: string) => {
+    const ref = sectionRefs[key as keyof typeof sectionRefs];
+    if (ref.current) {
+      // Expand section if collapsed
+      if (key === 'attachImages') {
+        // no accordion to expand
+      } else if (key === 'progressNote') {
+        setExpandedSections(prev => ({ ...prev, progressNote: true }));
+      } else {
+        setExpandedSections(prev => ({ ...prev, [key]: true }));
+      }
+      
+      setTimeout(() => {
+        ref.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }, 100);
+    }
+    setActivePill(key);
+  }, []);
+
+  useEffect(() => {
+    const observers: IntersectionObserver[] = [];
+    const entries = Object.entries(sectionRefs);
+    
+    entries.forEach(([key, ref]) => {
+      if (!ref.current) return;
+      const observer = new IntersectionObserver(
+        ([entry]) => {
+          if (entry.isIntersecting) {
+            setActivePill(key);
+          }
+        },
+        { rootMargin: '-100px 0px -60% 0px', threshold: 0 }
+      );
+      observer.observe(ref.current);
+      observers.push(observer);
+    });
+
+    return () => observers.forEach(o => o.disconnect());
+  }, []);
+
     setExpandedSections((prev) => ({ ...prev, [key]: !prev[key] }));
   };
 
