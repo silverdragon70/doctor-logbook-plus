@@ -904,7 +904,6 @@ const CaseDetailScreen = () => {
                           }}
                         >
                           {o.label}
-                          {o.label}
                         </button>
                       ))}
                     </div>
