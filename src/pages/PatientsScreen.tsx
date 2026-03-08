@@ -1,15 +1,7 @@
-import React, { useState, useMemo, useRef, useEffect } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Search, ChevronRight, Plus, ChevronDown } from 'lucide-react';
-
-const mockPatients = [
-  { patientId: '1', name: 'Lucas Miller', age: 7, gender: 'male' as const, caseCount: 4, lastVisit: '2025-01-15', specialty: 'Respiratory', dateAdded: '2025-01-10', status: 'active' as const },
-  { patientId: '2', name: 'Sophia Chen', age: 3, gender: 'female' as const, caseCount: 2, lastVisit: '2025-01-14', specialty: 'Cardiology', dateAdded: '2025-01-05', status: 'active' as const },
-  { patientId: '3', name: 'Ethan Wright', age: 12, gender: 'male' as const, caseCount: 6, lastVisit: '2025-01-10', specialty: 'Neurology', dateAdded: '2024-12-20', status: 'discharged' as const },
-  { patientId: '4', name: 'Maya Johnson', age: 5, gender: 'female' as const, caseCount: 1, lastVisit: '2025-01-08', specialty: 'General', dateAdded: '2024-11-15', status: 'discharged' as const },
-  { patientId: '5', name: 'Noah Davis', age: 9, gender: 'male' as const, caseCount: 3, lastVisit: '2025-01-05', specialty: 'Gastroenterology', dateAdded: '2024-10-01', status: 'active' as const },
-  { patientId: '6', name: 'Ava Thompson', age: 0.08, gender: 'female' as const, caseCount: 8, lastVisit: '2025-01-03', specialty: 'Cardiology', dateAdded: '2025-01-01', status: 'discharged' as const },
-];
+import { Search, ChevronRight, Plus, ChevronDown, Loader2 } from 'lucide-react';
+import { usePatients } from '@/hooks/usePatients';
 
 const getInitials = (name: string) => name.split(' ').map(n => n[0]).join('');
 
@@ -43,32 +35,6 @@ const filterOptions: { category: FilterCategory; label: string; values: { key: s
     ],
   },
 ];
-
-const matchesAgeGroup = (ageYears: number, key: string) => {
-  const months = ageYears * 12;
-  switch (key) {
-    case 'neonate': return months >= 0 && months <= 1;
-    case 'infant': return months > 1 && months <= 12;
-    case 'toddler': return ageYears >= 1 && ageYears < 3;
-    case 'child': return ageYears >= 3 && ageYears < 12;
-    case 'adolescent': return ageYears >= 12 && ageYears <= 18;
-    default: return true;
-  }
-};
-
-const matchesDateAdded = (dateStr: string, key: string) => {
-  const now = new Date();
-  const date = new Date(dateStr);
-  const diffMs = now.getTime() - date.getTime();
-  const diffDays = diffMs / (1000 * 60 * 60 * 24);
-  switch (key) {
-    case 'week': return diffDays <= 7;
-    case 'month': return diffDays <= 30;
-    case '3months': return diffDays <= 90;
-    case 'year': return diffDays <= 365;
-    default: return true;
-  }
-};
 
 const FilterChip = ({ label, options, selected, onSelect, align = 'left' }: {
   label: string;
@@ -144,15 +110,13 @@ const PatientsScreen = () => {
 
   const clearAll = () => setActiveFilters({});
 
-  const filtered = useMemo(() => {
-    return mockPatients.filter(p => {
-      if (searchQuery && !p.name.toLowerCase().includes(searchQuery.toLowerCase())) return false;
-      if (activeFilters.dateAdded && !matchesDateAdded(p.dateAdded, activeFilters.dateAdded)) return false;
-      if (activeFilters.ageGroup && !matchesAgeGroup(p.age, activeFilters.ageGroup)) return false;
-      if (activeFilters.specialty && p.specialty !== activeFilters.specialty) return false;
-      return true;
-    });
-  }, [searchQuery, activeFilters]);
+  const filters: any = {};
+  if (searchQuery) filters.search = searchQuery;
+  if (activeFilters.dateAdded) filters.dateAdded = activeFilters.dateAdded;
+  if (activeFilters.ageGroup) filters.ageGroup = activeFilters.ageGroup;
+  if (activeFilters.specialty) filters.specialty = activeFilters.specialty;
+
+  const { data: patients = [], isLoading } = usePatients(Object.keys(filters).length > 0 ? filters : undefined);
 
   return (
     <div className="px-5 py-6 space-y-5 animate-fade-in">
@@ -191,7 +155,7 @@ const PatientsScreen = () => {
 
       {/* Stats */}
       <div className="flex items-center justify-between">
-        <h3 className="text-[14px] font-bold text-foreground">{filtered.length} Patients</h3>
+        <h3 className="text-[14px] font-bold text-foreground">{patients.length} Patients</h3>
         <button
           onClick={() => navigate('/case/new')}
           className="flex items-center gap-1 text-[12px] text-primary font-semibold"
@@ -202,43 +166,49 @@ const PatientsScreen = () => {
 
       {/* Patient List */}
       <div className="space-y-3">
-        {filtered.map((patient) => (
-          <div
-            key={patient.patientId}
-            onClick={() => navigate(`/patient/${patient.patientId}`)}
-            className="group p-3 bg-card border border-border rounded-xl active:scale-[0.98] transition-all cursor-pointer hover:shadow-card"
-          >
-            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-3">
-                <div className="w-10 h-10 rounded-xl gradient-avatar flex items-center justify-center text-primary-foreground font-bold text-[14px] shadow-sm">
-                  {getInitials(patient.name)}
+        {isLoading ? (
+          <div className="py-10 flex justify-center"><Loader2 className="animate-spin text-primary" size={24} /></div>
+        ) : (
+          <>
+            {patients.map((patient: any) => (
+              <div
+                key={patient.patientId || patient.id}
+                onClick={() => navigate(`/patient/${patient.patientId || patient.id}`)}
+                className="group p-3 bg-card border border-border rounded-xl active:scale-[0.98] transition-all cursor-pointer hover:shadow-card"
+              >
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-3">
+                    <div className="w-10 h-10 rounded-xl gradient-avatar flex items-center justify-center text-primary-foreground font-bold text-[14px] shadow-sm">
+                      {getInitials(patient.name)}
+                    </div>
+                    <div>
+                      <h4 className="text-[14px] font-bold text-foreground">{patient.name}</h4>
+                      <p className="text-[11px] text-muted-foreground">
+                        {patient.age >= 1 ? `${Math.floor(patient.age)}y` : `${Math.round(patient.age * 12)}m`} • {patient.gender} • {patient.caseCount ?? 0} cases
+                      </p>
+                    </div>
+                  </div>
+                  <ChevronRight size={18} className="text-muted-foreground group-hover:text-primary transition-colors" />
                 </div>
-                <div>
-                  <h4 className="text-[14px] font-bold text-foreground">{patient.name}</h4>
-                  <p className="text-[11px] text-muted-foreground">
-                    {patient.age >= 1 ? `${Math.floor(patient.age)}y` : `${Math.round(patient.age * 12)}m`} • {patient.gender} • {patient.caseCount} cases
-                  </p>
+                <div className="flex justify-end mt-1">
+                  <span
+                    className="text-[11px] font-bold"
+                    style={{
+                      borderRadius: 20,
+                      padding: '3px 10px',
+                      backgroundColor: patient.status === 'active' ? '#DCFCE7' : '#F1F5F9',
+                      color: patient.status === 'active' ? '#16A34A' : '#64748B',
+                    }}
+                  >
+                    {patient.status === 'active' ? 'Active' : 'Discharged'}
+                  </span>
                 </div>
               </div>
-              <ChevronRight size={18} className="text-muted-foreground group-hover:text-primary transition-colors" />
-            </div>
-            <div className="flex justify-end mt-1">
-              <span
-                className="text-[11px] font-bold"
-                style={{
-                  borderRadius: 20,
-                  padding: '3px 10px',
-                  backgroundColor: patient.status === 'active' ? '#DCFCE7' : '#F1F5F9',
-                  color: patient.status === 'active' ? '#16A34A' : '#64748B',
-                }}
-              >
-                {patient.status === 'active' ? 'Active' : 'Discharged'}
-              </span>
-            </div>
-          </div>
-        ))}
-        {filtered.length === 0 && (
-          <div className="py-10 text-center text-[13px] text-muted-foreground">No patients match the filters</div>
+            ))}
+            {patients.length === 0 && !isLoading && (
+              <div className="py-10 text-center text-[13px] text-muted-foreground">No patients match the filters</div>
+            )}
+          </>
         )}
       </div>
     </div>
@@ -246,4 +216,3 @@ const PatientsScreen = () => {
 };
 
 export default PatientsScreen;
-
