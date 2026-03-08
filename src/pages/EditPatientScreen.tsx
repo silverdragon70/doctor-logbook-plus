@@ -18,7 +18,6 @@ const mockPatient = {
   fileNumber: 'PED-2024-001',
   hospital: 'cairo-university',
   admissionDate: new Date('2025-01-15'),
-  notes: 'No known allergies. Vaccinations up to date.',
 };
 
 const hospitals = [
@@ -26,6 +25,12 @@ const hospitals = [
   { value: 'ain-shams', label: 'Ain Shams University Hospital' },
   { value: 'kasr-alainy', label: 'Kasr Al-Ainy Hospital' },
 ];
+
+const inputClass =
+  'w-full h-11 px-4 rounded-[12px] text-[14px] text-foreground placeholder:text-muted-foreground focus:outline-none transition-colors'
+    + ' bg-[hsl(210,40%,98%)] border-[1.5px] border-[hsl(216,20%,90%)] focus:border-primary';
+
+const labelClass = 'text-[12px] font-bold uppercase tracking-wide';
 
 const EditPatientScreen = () => {
   const navigate = useNavigate();
@@ -35,7 +40,7 @@ const EditPatientScreen = () => {
   const [dobDay, setDobDay] = useState(mockPatient.dobDay);
   const [dobMonth, setDobMonth] = useState(mockPatient.dobMonth);
   const [dobYear, setDobYear] = useState(mockPatient.dobYear);
-  const [gender, setGender] = useState<string>(mockPatient.gender);
+  const [gender, setGender] = useState<'male' | 'female'>(mockPatient.gender);
   const [fileNumber, setFileNumber] = useState(mockPatient.fileNumber);
   const [hospital, setHospital] = useState(mockPatient.hospital);
   const [admissionDate, setAdmissionDate] = useState<Date | undefined>(mockPatient.admissionDate);
@@ -58,19 +63,19 @@ const EditPatientScreen = () => {
       <div className="px-5 py-5 space-y-5 pb-10">
         {/* ROW 1 — Full Name (English) */}
         <div className="space-y-1.5">
-          <label className="text-[13px] font-semibold text-foreground">Full Name (English) <span className="text-destructive">*</span></label>
+          <label className={labelClass} style={{ color: '#6B7C93' }}>Full Name (English) <span className="text-destructive">*</span></label>
           <input
             type="text"
             value={name}
             onChange={(e) => setName(e.target.value)}
             placeholder="Patient's full name in English"
-            className="w-full h-11 px-4 bg-card border border-border rounded-xl text-[14px] text-foreground placeholder:text-muted-foreground focus:outline-none focus:border-primary transition-colors"
+            className={inputClass}
           />
         </div>
 
-        {/* ROW 2 — Date of Birth (3 columns) */}
+        {/* ROW 2 — Date of Birth (3 numeric columns) */}
         <div className="space-y-1.5">
-          <label className="text-[13px] font-semibold text-foreground">Date of Birth <span className="text-destructive">*</span></label>
+          <label className={labelClass} style={{ color: '#6B7C93' }}>Date of Birth <span className="text-destructive">*</span></label>
           <div className="grid grid-cols-3 gap-3">
             <input
               type="text"
@@ -80,7 +85,7 @@ const EditPatientScreen = () => {
               value={dobDay}
               onChange={(e) => setDobDay(e.target.value.replace(/\D/g, ''))}
               placeholder="DD"
-              className="w-full h-11 px-4 bg-card border border-border rounded-xl text-[14px] text-foreground text-center placeholder:text-muted-foreground focus:outline-none focus:border-primary transition-colors"
+              className={cn(inputClass, 'text-center')}
             />
             <input
               type="text"
@@ -90,7 +95,7 @@ const EditPatientScreen = () => {
               value={dobMonth}
               onChange={(e) => setDobMonth(e.target.value.replace(/\D/g, ''))}
               placeholder="MM"
-              className="w-full h-11 px-4 bg-card border border-border rounded-xl text-[14px] text-foreground text-center placeholder:text-muted-foreground focus:outline-none focus:border-primary transition-colors"
+              className={cn(inputClass, 'text-center')}
             />
             <input
               type="text"
@@ -100,41 +105,49 @@ const EditPatientScreen = () => {
               value={dobYear}
               onChange={(e) => setDobYear(e.target.value.replace(/\D/g, ''))}
               placeholder="YYYY"
-              className="w-full h-11 px-4 bg-card border border-border rounded-xl text-[14px] text-foreground text-center placeholder:text-muted-foreground focus:outline-none focus:border-primary transition-colors"
+              className={cn(inputClass, 'text-center')}
             />
           </div>
         </div>
 
-        {/* ROW 3 — Gender */}
+        {/* ROW 3 — Gender (pill buttons) */}
         <div className="space-y-1.5">
-          <label className="text-[13px] font-semibold text-foreground">Gender <span className="text-destructive">*</span></label>
-          <Select value={gender} onValueChange={setGender}>
-            <SelectTrigger className="w-full h-11 bg-card border-border rounded-xl text-[14px]">
-              <SelectValue placeholder="Select" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="male">Male</SelectItem>
-              <SelectItem value="female">Female</SelectItem>
-            </SelectContent>
-          </Select>
+          <label className={labelClass} style={{ color: '#6B7C93' }}>Gender <span className="text-destructive">*</span></label>
+          <div className="flex gap-3">
+            {(['male', 'female'] as const).map((g) => (
+              <button
+                key={g}
+                type="button"
+                onClick={() => setGender(g)}
+                className={cn(
+                  'flex-1 h-11 rounded-[12px] text-[14px] font-medium border-[1.5px] transition-colors',
+                  gender === g
+                    ? 'bg-primary text-primary-foreground border-primary'
+                    : 'bg-white text-muted-foreground border-[hsl(216,20%,90%)] hover:bg-muted/50'
+                )}
+              >
+                {g === 'male' ? '♂ Male' : '♀ Female'}
+              </button>
+            ))}
+          </div>
         </div>
 
         {/* ROW 4 — File Number + Hospital (2 columns) */}
         <div className="grid grid-cols-2 gap-3">
           <div className="space-y-1.5">
-            <label className="text-[13px] font-semibold text-foreground">File Number</label>
+            <label className={labelClass} style={{ color: '#6B7C93' }}>File Number</label>
             <input
               type="text"
               value={fileNumber}
               onChange={(e) => setFileNumber(e.target.value)}
               placeholder="e.g. 24-10842"
-              className="w-full h-11 px-4 bg-card border border-border rounded-xl text-[14px] text-foreground placeholder:text-muted-foreground focus:outline-none focus:border-primary transition-colors"
+              className={inputClass}
             />
           </div>
           <div className="space-y-1.5">
-            <label className="text-[13px] font-semibold text-foreground">Hospital <span className="text-destructive">*</span></label>
+            <label className={labelClass} style={{ color: '#6B7C93' }}>Hospital <span className="text-destructive">*</span></label>
             <Select value={hospital} onValueChange={setHospital}>
-              <SelectTrigger className="w-full h-11 bg-card border-border rounded-xl text-[14px]">
+              <SelectTrigger className="w-full h-11 bg-[hsl(210,40%,98%)] border-[1.5px] border-[hsl(216,20%,90%)] rounded-[12px] text-[14px] focus:border-primary">
                 <SelectValue placeholder="Select" />
               </SelectTrigger>
               <SelectContent>
@@ -148,12 +161,12 @@ const EditPatientScreen = () => {
 
         {/* ROW 5 — Admission Date */}
         <div className="space-y-1.5">
-          <label className="text-[13px] font-semibold text-foreground">Admission Date <span className="text-destructive">*</span></label>
+          <label className={labelClass} style={{ color: '#6B7C93' }}>Admission Date <span className="text-destructive">*</span></label>
           <Popover>
             <PopoverTrigger asChild>
               <Button
                 variant="outline"
-                className="w-full justify-start text-left text-[14px] h-11 bg-card border-border rounded-xl"
+                className="w-full justify-start text-left text-[14px] h-11 bg-[hsl(210,40%,98%)] border-[1.5px] border-[hsl(216,20%,90%)] rounded-[12px] hover:border-primary"
               >
                 <CalendarIcon className="mr-2 h-4 w-4 text-muted-foreground" />
                 {admissionDate ? format(admissionDate, 'MM/dd/yyyy') : <span className="text-muted-foreground">mm/dd/yyyy</span>}
@@ -165,7 +178,7 @@ const EditPatientScreen = () => {
                 selected={admissionDate}
                 onSelect={setAdmissionDate}
                 initialFocus
-                className={cn("p-3 pointer-events-auto")}
+                className={cn('p-3 pointer-events-auto')}
               />
             </PopoverContent>
           </Popover>
@@ -175,7 +188,7 @@ const EditPatientScreen = () => {
         <Button
           onClick={handleSave}
           disabled={!name.trim() || !dobDay || !dobMonth || !dobYear || !gender || !hospital || !admissionDate}
-          className="w-full h-12 rounded-xl text-[15px] font-semibold"
+          className="w-full h-12 rounded-[12px] text-[15px] font-semibold"
         >
           Save Changes
         </Button>
