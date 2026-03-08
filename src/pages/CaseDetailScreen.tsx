@@ -416,11 +416,14 @@ const CaseDetailScreen = () => {
             const isCardExpanded = expandedSubs.includes(`inv-${inv.id}`);
             const typeIcon = inv.type === 'Lab Result' ? '🧪' : inv.type === 'Imaging' ? '🩻' : '📄';
             return (
-              <div key={inv.id} style={{
-                background: '#FFFFFF', borderRadius: '14px', border: '1px solid #DDE3EA',
-                padding: '12px 16px', marginBottom: '10px',
-                boxShadow: '0px 1px 4px rgba(0,0,0,0.06)',
-              }}>
+              <div key={inv.id}
+                onClick={() => toggleSub(`inv-${inv.id}`)}
+                className="cursor-pointer active:opacity-95 transition-opacity"
+                style={{
+                  background: '#FFFFFF', borderRadius: '14px', border: '1px solid #DDE3EA',
+                  padding: '12px 16px', marginBottom: '10px',
+                  boxShadow: '0px 1px 4px rgba(0,0,0,0.06)',
+                }}>
                 {/* Card header */}
                 <div className="flex items-center justify-between">
                   <span style={{ fontSize: '14px', fontWeight: 700, color: '#1A2332' }}>{inv.name}</span>
@@ -431,26 +434,26 @@ const CaseDetailScreen = () => {
                 </div>
                 <div className="flex items-center justify-between mt-1">
                   <span style={{ fontSize: '12px', color: '#6B7C93' }}>{inv.date}</span>
-                  {isCardExpanded && (
-                    <button onClick={() => toggleEdit(`inv-${inv.id}`)} className="p-1 rounded-full hover:bg-muted/50">
-                      <Pencil size={14} style={{ color: '#2563EB' }} />
-                    </button>
-                  )}
+                  <div className="flex items-center gap-1">
+                    {isCardExpanded && (
+                      <button onClick={(e) => { e.stopPropagation(); toggleEdit(`inv-${inv.id}`); }} className="p-1 rounded-full hover:bg-muted/50">
+                        <Pencil size={14} style={{ color: '#2563EB' }} />
+                      </button>
+                    )}
+                  </div>
                 </div>
 
-                {/* Divider */}
                 <div style={{ borderTop: '1px solid #DDE3EA', margin: '8px 0' }} />
 
-                {/* Result preview / full */}
                 {!isCardExpanded ? (
-                  <button onClick={() => toggleSub(`inv-${inv.id}`)} className="w-full flex items-center justify-between">
-                    <span style={{ fontSize: '13px', color: '#1A2332', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', flex: 1, textAlign: 'left' }}>
+                  <div className="flex items-center justify-between">
+                    <span style={{ fontSize: '13px', color: '#1A2332', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', flex: 1 }}>
                       {inv.result || '—'}
                     </span>
                     <ChevronDown size={14} className="text-muted-foreground ml-2 flex-shrink-0" />
-                  </button>
+                  </div>
                 ) : (
-                  <div className="space-y-3">
+                  <div className="space-y-3" onClick={(e) => e.stopPropagation()}>
                     <div className="space-y-1.5">
                       <span style={{ color: '#6B7C93', fontSize: '12px', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.05em' }}>
                         Result
@@ -463,11 +466,6 @@ const CaseDetailScreen = () => {
                       </div>
                     </div>
 
-                    {/* UI LOGIC — Investigations Image Thumbnails
-                        Show thumbnails ONLY if investigation has attached images.
-                        If investigation.images.length === 0 → hide completely
-                        If investigation.images.length > 0 → show all images
-                        END UI LOGIC */}
                     {(inv.images || []).length > 0 && (
                       <div className="space-y-1.5">
                         <span style={{ color: '#6B7C93', fontSize: '12px', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.05em' }}>
@@ -495,9 +493,9 @@ const CaseDetailScreen = () => {
                       </div>
                     )}
 
-                    <button onClick={() => toggleSub(`inv-${inv.id}`)} className="w-full flex justify-end">
-                      <ChevronUp size={14} className="text-muted-foreground" />
-                    </button>
+                    <div className="flex justify-end" onClick={() => toggleSub(`inv-${inv.id}`)}>
+                      <ChevronUp size={14} className="text-muted-foreground cursor-pointer" />
+                    </div>
                   </div>
                 )}
               </div>
@@ -530,34 +528,35 @@ const CaseDetailScreen = () => {
             const isCardExpanded = expandedSubs.includes(`mgmt-${entry.id}`);
             const typeIcon = entry.type === 'Medications' ? '💊' : entry.type === 'Respiratory Support' ? '🫁' : '🍼';
             return (
-              <div key={entry.id} style={{
-                background: '#FFFFFF', borderRadius: '14px', border: '1px solid #DDE3EA',
-                padding: '12px 16px', marginBottom: '10px',
-                boxShadow: '0px 1px 4px rgba(0,0,0,0.06)',
-              }}>
+              <div key={entry.id}
+                onClick={() => toggleSub(`mgmt-${entry.id}`)}
+                className="cursor-pointer active:opacity-95 transition-opacity"
+                style={{
+                  background: '#FFFFFF', borderRadius: '14px', border: '1px solid #DDE3EA',
+                  padding: '12px 16px', marginBottom: '10px',
+                  boxShadow: '0px 1px 4px rgba(0,0,0,0.06)',
+                }}>
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-2">
                     <span style={{ fontSize: '16px' }}>{typeIcon}</span>
                     <span style={{ fontSize: '14px', fontWeight: 700, color: '#1A2332' }}>{entry.type}</span>
                   </div>
                   {isCardExpanded && (
-                    <button onClick={() => toggleEdit(`mgmt-${entry.id}`)} className="p-1 rounded-full hover:bg-muted/50">
+                    <button onClick={(e) => { e.stopPropagation(); toggleEdit(`mgmt-${entry.id}`); }} className="p-1 rounded-full hover:bg-muted/50">
                       <Pencil size={14} style={{ color: '#2563EB' }} />
                     </button>
                   )}
                 </div>
                 <div className="flex items-center justify-between mt-1">
                   <span style={{ fontSize: '12px', color: '#6B7C93' }}>{entry.date}</span>
-                  <button onClick={() => toggleSub(`mgmt-${entry.id}`)} className="p-1">
-                    <ChevronDown size={14} className="text-muted-foreground transition-transform duration-300"
-                      style={{ transform: isCardExpanded ? 'rotate(180deg)' : 'rotate(0deg)' }} />
-                  </button>
+                  <ChevronDown size={14} className="text-muted-foreground transition-transform duration-300"
+                    style={{ transform: isCardExpanded ? 'rotate(180deg)' : 'rotate(0deg)' }} />
                 </div>
 
                 {isCardExpanded && (
                   <>
                     <div style={{ borderTop: '1px solid #DDE3EA', margin: '8px 0' }} />
-                    <div className="space-y-3">
+                    <div className="space-y-3" onClick={(e) => e.stopPropagation()}>
                       {entry.type === 'Medications' && 'medications' in entry && (
                         <>
                           <div className="space-y-1.5">
@@ -645,52 +644,53 @@ const CaseDetailScreen = () => {
           {(mockCase.progressNotes || []).map((note) => {
             const isCardExpanded = expandedSubs.includes(`prog-${note.id}`);
             return (
-              <div key={note.id} style={{
-                background: '#FFFFFF', borderRadius: '14px', border: '1px solid #DDE3EA',
-                padding: '12px 16px', marginBottom: '10px',
-                boxShadow: '0px 1px 4px rgba(0,0,0,0.06)',
-              }}>
+              <div key={note.id}
+                onClick={() => toggleSub(`prog-${note.id}`)}
+                className="cursor-pointer active:opacity-95 transition-opacity"
+                style={{
+                  background: '#FFFFFF', borderRadius: '14px', border: '1px solid #DDE3EA',
+                  padding: '12px 16px', marginBottom: '10px',
+                  boxShadow: '0px 1px 4px rgba(0,0,0,0.06)',
+                }}>
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-2">
                     <span style={{ fontSize: '16px' }}>📝</span>
                     <span style={{ fontSize: '14px', fontWeight: 700, color: '#1A2332' }}>Progress Note</span>
                   </div>
                   {isCardExpanded && (
-                    <button onClick={() => toggleEdit(`prog-${note.id}`)} className="p-1 rounded-full hover:bg-muted/50">
+                    <button onClick={(e) => { e.stopPropagation(); toggleEdit(`prog-${note.id}`); }} className="p-1 rounded-full hover:bg-muted/50">
                       <Pencil size={14} style={{ color: '#2563EB' }} />
                     </button>
                   )}
                 </div>
                 <div className="flex items-center justify-between mt-1">
                   <span style={{ fontSize: '12px', color: '#6B7C93' }}>{note.date}</span>
-                  <button onClick={() => toggleSub(`prog-${note.id}`)} className="p-1">
-                    <ChevronDown size={14} className="text-muted-foreground transition-transform duration-300"
-                      style={{ transform: isCardExpanded ? 'rotate(180deg)' : 'rotate(0deg)' }} />
-                  </button>
+                  <ChevronDown size={14} className="text-muted-foreground transition-transform duration-300"
+                    style={{ transform: isCardExpanded ? 'rotate(180deg)' : 'rotate(0deg)' }} />
                 </div>
 
                 {isCardExpanded && (
                   <>
                     <div style={{ borderTop: '1px solid #DDE3EA', margin: '8px 0' }} />
-                    <div className="space-y-3">
+                    <div className="space-y-3" onClick={(e) => e.stopPropagation()}>
                       <DisplayField label="Assessment" value={note.assessment} isMultiLine />
 
                       {/* Nested Vital Signs */}
-                      <div style={{ background: '#F8FAFC', borderRadius: '12px', border: '1px solid #DDE3EA', overflow: 'hidden' }}>
-                        <button
-                          onClick={() => toggleSub(`vitals-${note.id}`)}
-                          className="w-full flex items-center justify-between hover:bg-muted/30 transition-colors"
-                          style={{ padding: '12px' }}
-                        >
+                      <div
+                        onClick={() => toggleSub(`vitals-${note.id}`)}
+                        className="cursor-pointer active:opacity-95 transition-opacity"
+                        style={{ background: '#F8FAFC', borderRadius: '12px', border: '1px solid #DDE3EA', overflow: 'hidden' }}
+                      >
+                        <div className="flex items-center justify-between hover:bg-muted/30 transition-colors" style={{ padding: '12px' }}>
                           <div className="flex items-center gap-2">
                             <span style={{ fontSize: '14px' }}>🫀</span>
                             <span style={{ fontSize: '13px', fontWeight: 700, color: '#1A2332' }}>Vital Signs</span>
                           </div>
                           <ChevronDown size={16} className="text-muted-foreground transition-transform duration-300"
                             style={{ transform: expandedSubs.includes(`vitals-${note.id}`) ? 'rotate(180deg)' : 'rotate(0deg)' }} />
-                        </button>
+                        </div>
                         {expandedSubs.includes(`vitals-${note.id}`) && (
-                          <div style={{ padding: '0 12px 12px 12px', borderTop: '1px solid #DDE3EA' }} className="space-y-3 pt-3">
+                          <div onClick={(e) => e.stopPropagation()} style={{ padding: '0 12px 12px 12px', borderTop: '1px solid #DDE3EA' }} className="space-y-3 pt-3">
                             <div className="grid grid-cols-2 gap-3">
                               <DisplayField label="HR (BPM)" value={note.vitals.hr} />
                               <DisplayField label="SPO₂ (%)" value={note.vitals.spo2} />
