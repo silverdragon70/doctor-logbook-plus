@@ -148,12 +148,20 @@ const GroupPearlScreen = () => {
               <p className="text-[11px] text-muted-foreground mt-0.5">Analyze case patterns</p>
             </div>
           </div>
-          <button
-            onClick={toggleDark}
-            className="p-2 rounded-full hover:bg-muted text-muted-foreground transition-colors"
-          >
-            {isDarkMode ? <Sun size={20} /> : <Moon size={20} />}
-          </button>
+          <div className="flex items-center gap-2">
+            <button
+              onClick={toggleDark}
+              className="p-2 rounded-full hover:bg-muted text-muted-foreground transition-colors"
+            >
+              {isDarkMode ? <Sun size={20} /> : <Moon size={20} />}
+            </button>
+            <button
+              onClick={() => navigate('/settings')}
+              className="p-2 rounded-full hover:bg-muted text-muted-foreground transition-colors"
+            >
+              <Settings size={20} />
+            </button>
+          </div>
         </header>
 
         {/* SCROLLABLE CONTENT */}
