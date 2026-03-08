@@ -192,38 +192,7 @@ const CasesScreen = () => {
           </>
         )}
 
-        {activeTab === 'stats' && (
-          <div className="space-y-4 py-4 animate-fade-in">
-            <div className="bg-card p-4 rounded-2xl border border-border">
-              <div className="flex items-center justify-between mb-4">
-                <div className="flex items-center gap-2">
-                  <TrendingUp size={16} className="text-secondary" />
-                  <span className="text-[13px] font-bold text-foreground">Admission Trends</span>
-                </div>
-                <span className="text-[10px] bg-secondary/10 text-secondary px-2 py-0.5 rounded-full font-semibold">+12% vs LW</span>
-              </div>
-              <div className="h-24 flex items-end justify-between gap-2 px-2">
-                {[40, 70, 45, 90, 65, 80, 55].map((h, i) => (
-                  <div key={i} className="flex-1 bg-muted rounded-t-sm relative">
-                    <div className="w-full bg-primary rounded-t-sm transition-all duration-500" style={{ height: `${h}%` }} />
-                  </div>
-                ))}
-              </div>
-            </div>
-            <div className="grid grid-cols-2 gap-3">
-              <div className="p-4 bg-card rounded-2xl border border-border">
-                <Users size={18} className="text-primary mb-2" />
-                <div className="text-[18px] font-mono font-bold text-foreground">12</div>
-                <div className="text-[10px] text-muted-foreground uppercase font-bold">New Patients</div>
-              </div>
-              <div className="p-4 bg-card rounded-2xl border border-border">
-                <Activity size={18} className="text-destructive mb-2" />
-                <div className="text-[18px] font-mono font-bold text-foreground">04</div>
-                <div className="text-[10px] text-muted-foreground uppercase font-bold">Critical Care</div>
-              </div>
-            </div>
-          </div>
-        )}
+        {activeTab === 'stats' && <StatsTab />}
 
         {activeTab === 'insights' && (
           <div className="space-y-3 py-4 animate-fade-in">
