@@ -93,18 +93,18 @@ const AppShell = () => {
         </main>
 
         {/* BOTTOM NAV */}
-        {!isDetailPage && isMainTabScreen && (
+        {showBottomNav && (
           <nav className="fixed bottom-0 left-1/2 -translate-x-1/2 w-full max-w-[430px] h-[72px] bg-card/90 backdrop-blur-xl border-t border-border flex items-center justify-around px-6 z-40">
             {navItems.map((item) => (
               <button
                 key={item.path}
                 onClick={() => navigate(item.path)}
                 className={`flex flex-col items-center transition-colors ${
-                  isActive(item.path) ? 'text-primary' : 'text-muted-foreground'
+                  getActive(item.path) ? 'text-primary' : 'text-muted-foreground'
                 }`}
               >
                 <item.icon size={24} />
-                <span className={`text-[10px] mt-1 ${isActive(item.path) ? 'font-bold' : 'font-medium'}`}>
+                <span className={`text-[10px] mt-1 ${getActive(item.path) ? 'font-bold' : 'font-medium'}`}>
                   {item.label}
                 </span>
               </button>
