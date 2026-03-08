@@ -1,6 +1,6 @@
 import React, { useState, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Plus, X, GraduationCap, CalendarIcon, Upload, FileText, Image as ImageIcon } from 'lucide-react';
+import { Plus, X, GraduationCap, CalendarIcon, Upload, FileText, Pencil, Trash2 } from 'lucide-react';
 import { format } from 'date-fns';
 import { cn } from '@/lib/utils';
 import { Calendar } from '@/components/ui/calendar';
@@ -8,6 +8,7 @@ import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from '@/components/ui/alert-dialog';
 
 interface Course {
   id: string;
@@ -29,7 +30,9 @@ const MOCK_COURSES: Course[] = [
 const CoursesScreen = () => {
   const navigate = useNavigate();
   const [showForm, setShowForm] = useState(false);
-  const [courses] = useState<Course[]>(MOCK_COURSES);
+  const [courses, setCourses] = useState<Course[]>(MOCK_COURSES);
+  const [editingId, setEditingId] = useState<string | null>(null);
+  const [deleteId, setDeleteId] = useState<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   // Form state
@@ -47,6 +50,7 @@ const CoursesScreen = () => {
   const resetForm = () => {
     setFormName(''); setFormDate(new Date()); setFormProvider('');
     setFormDuration(''); setFormCertFile(null); setFormCertPreview(null); setFormNotes('');
+    setEditingId(null);
   };
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -62,13 +66,42 @@ const CoursesScreen = () => {
     }
   };
 
+  const handleEdit = (course: Course) => {
+    setEditingId(course.id);
+    setFormName(course.name);
+    setFormDate(new Date(course.date));
+    setFormProvider(course.provider || '');
+    setFormDuration(course.duration || '');
+    setFormNotes(course.notes || '');
+    setFormCertFile(null);
+    setFormCertPreview(null);
+    setShowForm(true);
+  };
+
+  const handleDelete = () => {
+    if (deleteId) {
+      setCourses(prev => prev.filter(c => c.id !== deleteId));
+      setDeleteId(null);
+    }
+  };
+
   const handleSave = () => {
-    console.log('Save course', { formName, formDate, formProvider, formDuration, formCertFile, formNotes });
+    if (editingId) {
+      setCourses(prev => prev.map(c => c.id === editingId ? {
+        ...c, name: formName, date: format(formDate, 'yyyy-MM-dd'),
+        provider: formProvider || undefined, duration: formDuration || undefined,
+        notes: formNotes || undefined,
+        hasCertificate: formCertFile ? true : c.hasCertificate,
+        certificateName: formCertFile ? formCertFile.name : c.certificateName,
+      } : c));
+    } else {
+      console.log('Save course', { formName, formDate, formProvider, formDuration, formCertFile, formNotes });
+    }
     resetForm();
     setShowForm(false);
   };
 
-  // ─── Add Course Form ───
+  // ─── Add/Edit Course Form ───
   if (showForm) {
     return (
       <div className="min-h-screen bg-background">
@@ -76,7 +109,7 @@ const CoursesScreen = () => {
           <button onClick={() => { resetForm(); setShowForm(false); }} className="p-1.5 -ml-1.5 rounded-xl hover:bg-muted/50 transition-colors">
             <X size={22} className="text-foreground" />
           </button>
-          <h1 className="text-lg font-bold text-foreground">Add Course</h1>
+          <h1 className="text-lg font-bold text-foreground">{editingId ? 'Edit Course' : 'Add Course'}</h1>
         </div>
 
         <div className="px-5 py-5 space-y-5 max-w-[430px] mx-auto pb-10">
@@ -153,7 +186,7 @@ const CoursesScreen = () => {
           </div>
 
           <Button onClick={handleSave} disabled={!formName.trim()} className="w-full h-12 rounded-xl text-base font-semibold">
-            Save Course
+            {editingId ? 'Update Course' : 'Save Course'}
           </Button>
         </div>
       </div>
@@ -207,11 +240,33 @@ const CoursesScreen = () => {
                 {course.notes && (
                   <p className="text-xs text-muted-foreground"><span className="font-medium text-foreground/70">Notes:</span> {course.notes}</p>
                 )}
+                <div className="flex gap-2 pt-1">
+                  <button onClick={() => handleEdit(course)} className="inline-flex items-center gap-1 text-xs font-medium px-3 py-1 rounded-full bg-[#EFF6FF] text-[#2563EB] hover:bg-[#DBEAFE] transition-colors">
+                    <Pencil size={12} /> Edit
+                  </button>
+                  <button onClick={() => setDeleteId(course.id)} className="inline-flex items-center gap-1 text-xs font-medium px-3 py-1 rounded-full bg-[#FEE2E2] text-[#DC2626] hover:bg-[#FECACA] transition-colors">
+                    <Trash2 size={12} /> Delete
+                  </button>
+                </div>
               </div>
             ))}
           </div>
         )}
       </div>
+
+      {/* Delete Confirmation */}
+      <AlertDialog open={!!deleteId} onOpenChange={(open) => !open && setDeleteId(null)}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Are you sure you want to delete this?</AlertDialogTitle>
+            <AlertDialogDescription>This action cannot be undone.</AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogAction onClick={handleDelete} className="bg-[#DC2626] hover:bg-[#B91C1C] text-white">Delete</AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
 
       {/* FAB */}
       <button

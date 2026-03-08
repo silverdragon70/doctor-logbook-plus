@@ -1,6 +1,7 @@
 import React, { useState, useMemo, useRef, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { ArrowLeft, Plus, Stethoscope, X, ChevronDown, CalendarIcon } from 'lucide-react';
+import { ArrowLeft, Plus, Stethoscope, X, ChevronDown, CalendarIcon, Pencil, Trash2 } from 'lucide-react';
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from '@/components/ui/alert-dialog';
 import { format } from 'date-fns';
 import { cn } from '@/lib/utils';
 import { Calendar } from '@/components/ui/calendar';
@@ -288,8 +289,10 @@ const ProceduresScreen = () => {
   const navigate = useNavigate();
   const [filter, setFilter] = useState<FilterType>('All');
   const [showForm, setShowForm] = useState(false);
-  const [procedures] = useState<Procedure[]>(MOCK_PROCEDURES);
+  const [procedures, setProcedures] = useState<Procedure[]>(MOCK_PROCEDURES);
   const [hospitals, setHospitals] = useState<string[]>(EXISTING_HOSPITALS);
+  const [editingId, setEditingId] = useState<string | null>(null);
+  const [deleteId, setDeleteId] = useState<string | null>(null);
 
   // Form state
   const [formName, setFormName] = useState('');
@@ -312,6 +315,7 @@ const ProceduresScreen = () => {
   const resetForm = () => {
     setFormName(''); setFormDate(new Date()); setFormParticipation('Performed');
     setFormPatient(''); setFormHospital(''); setFormSupervisor(''); setFormIndication(''); setFormNotes('');
+    setEditingId(null);
   };
 
   const handleAddHospital = (name: string) => {
@@ -322,8 +326,36 @@ const ProceduresScreen = () => {
     navigate('/');
   };
 
+  const handleEdit = (proc: Procedure) => {
+    setEditingId(proc.id);
+    setFormName(proc.name);
+    setFormDate(new Date(proc.date));
+    setFormParticipation(proc.participation);
+    setFormPatient(proc.patientName || '');
+    setFormHospital(proc.hospital || '');
+    setFormSupervisor(proc.supervisor || '');
+    setFormIndication(proc.indication || '');
+    setFormNotes(proc.notes || '');
+    setShowForm(true);
+  };
+
+  const handleDelete = () => {
+    if (deleteId) {
+      setProcedures(prev => prev.filter(p => p.id !== deleteId));
+      setDeleteId(null);
+    }
+  };
+
   const handleSave = () => {
-    console.log('Save procedure', { formName, formDate, formParticipation, formPatient, formHospital, formSupervisor, formIndication, formNotes });
+    if (editingId) {
+      setProcedures(prev => prev.map(p => p.id === editingId ? {
+        ...p, name: formName, date: format(formDate, 'yyyy-MM-dd'), participation: formParticipation,
+        patientName: formPatient || undefined, hospital: formHospital || undefined,
+        supervisor: formSupervisor || undefined, indication: formIndication || undefined, notes: formNotes || undefined,
+      } : p));
+    } else {
+      console.log('Save procedure', { formName, formDate, formParticipation, formPatient, formHospital, formSupervisor, formIndication, formNotes });
+    }
     resetForm();
     setShowForm(false);
   };
@@ -337,7 +369,7 @@ const ProceduresScreen = () => {
           <button onClick={() => { resetForm(); setShowForm(false); }} className="p-1.5 -ml-1.5 rounded-xl hover:bg-muted/50 transition-colors">
             <X size={22} className="text-foreground" />
           </button>
-          <h1 className="text-lg font-bold text-foreground">Add Procedure</h1>
+          <h1 className="text-lg font-bold text-foreground">{editingId ? 'Edit Procedure' : 'Add Procedure'}</h1>
         </div>
 
         <div className="px-5 py-5 space-y-5 max-w-[430px] mx-auto pb-10">
@@ -527,11 +559,33 @@ const ProceduresScreen = () => {
                 {proc.notes && (
                   <p className="text-xs text-muted-foreground"><span className="font-medium text-foreground/70">Notes:</span> {proc.notes}</p>
                 )}
+                <div className="flex gap-2 pt-1">
+                  <button onClick={() => handleEdit(proc)} className="inline-flex items-center gap-1 text-xs font-medium px-3 py-1 rounded-full bg-[#EFF6FF] text-[#2563EB] hover:bg-[#DBEAFE] transition-colors">
+                    <Pencil size={12} /> Edit
+                  </button>
+                  <button onClick={() => setDeleteId(proc.id)} className="inline-flex items-center gap-1 text-xs font-medium px-3 py-1 rounded-full bg-[#FEE2E2] text-[#DC2626] hover:bg-[#FECACA] transition-colors">
+                    <Trash2 size={12} /> Delete
+                  </button>
+                </div>
               </div>
             ))}
           </div>
         )}
       </div>
+
+      {/* Delete Confirmation */}
+      <AlertDialog open={!!deleteId} onOpenChange={(open) => !open && setDeleteId(null)}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Are you sure you want to delete this?</AlertDialogTitle>
+            <AlertDialogDescription>This action cannot be undone.</AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogAction onClick={handleDelete} className="bg-[#DC2626] hover:bg-[#B91C1C] text-white">Delete</AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
 
       {/* FAB — outside animate-fade-in so it's visible immediately */}
       <button
