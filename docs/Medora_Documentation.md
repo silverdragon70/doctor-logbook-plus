@@ -1134,9 +1134,11 @@ interface GoogleAccount {
 |---|---|
 | Method | DELETE |
 | Path | `/cases/:id` |
-| Purpose | Delete case |
+| Purpose | Delete case and all related records |
 | Response 200 | `{ success: true }` |
-| Triggered By | Delete Case AlertDialog |
+| Response 404 | `{ error: 'Case not found' }` |
+| Cascade | Deletes investigations, management, progress_notes, vitals, media |
+| Triggered By | CaseDetailScreen delete confirmation dialog |
 
 ### Investigations
 
