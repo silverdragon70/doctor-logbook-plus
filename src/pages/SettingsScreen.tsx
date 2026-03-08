@@ -62,6 +62,7 @@ const SettingsScreen = () => {
   const [quickEntry, setQuickEntry] = useState(false);
   const [confirmDialogs, setConfirmDialogs] = useState(true);
   const [autoSave, setAutoSave] = useState(true);
+  const [exportOpen, setExportOpen] = useState(false);
 
   /* backup */
   const [isBackingUp, setIsBackingUp] = useState(false);
