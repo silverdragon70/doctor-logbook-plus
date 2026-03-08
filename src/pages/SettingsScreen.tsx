@@ -81,7 +81,7 @@ const SettingsScreen = () => {
   const [aiProvider, setAiProvider] = useState('anthropic');
   const [apiKey, setApiKey] = useState('sk-ant-api03-xxxxxxxxxxxx');
   const [aiModel, setAiModel] = useState('sonnet');
-  const [aiLanguage, setAiLanguage] = useState('arabic');
+  const [aiLanguage, setAiLanguage] = useState('english');
   const [aiProviderOpen, setAiProviderOpen] = useState(false);
   const [apiKeyOpen, setApiKeyOpen] = useState(false);
   const [aiModelOpen, setAiModelOpen] = useState(false);
