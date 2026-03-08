@@ -214,6 +214,7 @@ const CaseDetailScreen = () => {
   const [showDischargeDialog, setShowDischargeDialog] = useState(false);
   const [dischargeDate, setDischargeDate] = useState<Date>(new Date());
   const [dischargeNotes, setDischargeNotes] = useState('');
+  const [dischargeOutcome, setDischargeOutcome] = useState<string | null>(null);
   const [caseStatus, setCaseStatus] = useState<'active' | 'discharged'>('active');
 
   const toggleEdit = (key: string) => {
