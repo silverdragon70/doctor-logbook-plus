@@ -111,29 +111,20 @@ const PatientsScreen = () => {
       </div>
 
       {/* Filter Chips */}
-      <div className="space-y-2">
-        <div className="flex overflow-x-auto gap-2 pb-1 scrollbar-hide" style={{ scrollbarWidth: 'none' }}>
-          {filterOptions.map((group) =>
-            group.values.map((v) => {
-              const isActive = activeFilters[group.category] === v.key;
-              return (
-                <button
-                  key={`${group.category}-${v.key}`}
-                  onClick={() => toggleFilter(group.category, v.key)}
-                  className={`shrink-0 px-3 py-1.5 rounded-full text-[11px] font-semibold border transition-all ${
-                    isActive
-                      ? 'bg-primary text-primary-foreground border-primary'
-                      : 'bg-card text-muted-foreground border-border hover:border-primary/50'
-                  }`}
-                >
-                  {v.label}
-                </button>
-              );
-            })
-          )}
+      <div className="flex items-center gap-2">
+        <div className="flex overflow-x-auto gap-2 pb-1 flex-1" style={{ scrollbarWidth: 'none' }}>
+          {filterOptions.map((group) => (
+            <FilterChip
+              key={group.category}
+              label={group.label}
+              options={group.values}
+              selected={activeFilters[group.category] || null}
+              onSelect={(key) => toggleFilter(group.category, key)}
+            />
+          ))}
         </div>
         {hasActiveFilters && (
-          <button onClick={clearAll} className="text-[11px] text-primary font-semibold">
+          <button onClick={clearAll} className="shrink-0 text-[11px] text-primary font-semibold">
             Clear All
           </button>
         )}
