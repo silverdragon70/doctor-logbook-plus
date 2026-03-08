@@ -20,10 +20,19 @@ interface Procedure {
   date: string;
   participation: ParticipationType;
   patientName?: string;
+  hospital?: string;
+  supervisor?: string;
   location?: string;
   indication?: string;
   notes?: string;
 }
+
+const EXISTING_HOSPITALS = [
+  'King Fahad Medical City',
+  'King Faisal Specialist Hospital',
+  'Prince Sultan Military Medical City',
+  'National Guard Hospital',
+];
 
 const CORE_PROCEDURES = [
   'Bag-Mask Ventilation',
@@ -66,11 +75,11 @@ const EXISTING_PATIENTS = [
 ];
 
 const MOCK_PROCEDURES: Procedure[] = [
-  { id: '1', name: 'Lumbar Puncture (LP)', date: '2026-03-08', participation: 'Performed', patientName: 'Ahmed Ali', location: 'NICU', indication: 'Rule out meningitis', notes: 'Successful on first attempt' },
-  { id: '2', name: 'Peripheral IV Catheter Placement', date: '2026-03-07', participation: 'Assisted', patientName: 'Fatima Hassan', location: 'ER' , indication: 'IV access for antibiotics' },
-  { id: '3', name: 'Bag-Mask Ventilation', date: '2026-03-06', participation: 'Observed', patientName: 'Omar Khalid', location: 'PICU', indication: 'Respiratory distress' },
-  { id: '4', name: 'Chest Tube Placement', date: '2026-03-05', participation: 'Performed', patientName: 'Sara Mohammed', location: 'ER', indication: 'Pneumothorax drainage' },
-  { id: '5', name: 'Venipuncture', date: '2026-03-04', participation: 'Performed', patientName: 'Ahmed Ali', location: 'Ward', indication: 'Blood sampling' },
+  { id: '1', name: 'Lumbar Puncture (LP)', date: '2026-03-08', participation: 'Performed', patientName: 'Ahmed Ali', hospital: 'King Fahad Medical City', supervisor: 'Dr. Nasser', indication: 'Rule out meningitis', notes: 'Successful on first attempt' },
+  { id: '2', name: 'Peripheral IV Catheter Placement', date: '2026-03-07', participation: 'Assisted', patientName: 'Fatima Hassan', hospital: 'National Guard Hospital', indication: 'IV access for antibiotics' },
+  { id: '3', name: 'Bag-Mask Ventilation', date: '2026-03-06', participation: 'Observed', patientName: 'Omar Khalid', supervisor: 'Dr. Layla', indication: 'Respiratory distress' },
+  { id: '4', name: 'Chest Tube Placement', date: '2026-03-05', participation: 'Performed', patientName: 'Sara Mohammed', hospital: 'King Faisal Specialist Hospital', supervisor: 'Dr. Ahmed', indication: 'Pneumothorax drainage' },
+  { id: '5', name: 'Venipuncture', date: '2026-03-04', participation: 'Performed', patientName: 'Ahmed Ali', indication: 'Blood sampling' },
 ];
 
 const participationStyles: Record<ParticipationType, { bg: string; text: string }> = {
@@ -162,18 +171,94 @@ const ProcedureSearchDropdown = ({
   );
 };
 
+// ─── Hospital Search Dropdown ─────────────────────────
+const HospitalSearchDropdown = ({
+  value,
+  onChange,
+  hospitals,
+  onAddHospital,
+}: {
+  value: string;
+  onChange: (v: string) => void;
+  hospitals: string[];
+  onAddHospital: (name: string) => void;
+}) => {
+  const [query, setQuery] = useState(value);
+  const [open, setOpen] = useState(false);
+  const ref = useRef<HTMLDivElement>(null);
+
+  useEffect(() => { setQuery(value); }, [value]);
+
+  useEffect(() => {
+    const handler = (e: MouseEvent) => {
+      if (ref.current && !ref.current.contains(e.target as Node)) setOpen(false);
+    };
+    document.addEventListener('mousedown', handler);
+    return () => document.removeEventListener('mousedown', handler);
+  }, []);
+
+  const filtered = useMemo(() => {
+    if (!query.trim()) return hospitals;
+    const q = query.toLowerCase();
+    return hospitals.filter(h => h.toLowerCase().includes(q));
+  }, [query, hospitals]);
+
+  const exactMatch = hospitals.some(h => h.toLowerCase() === query.trim().toLowerCase());
+
+  return (
+    <div ref={ref} className="relative">
+      <Input
+        placeholder="Search or add hospital..."
+        value={query}
+        onChange={e => { setQuery(e.target.value); setOpen(true); }}
+        onFocus={() => setOpen(true)}
+        className="bg-card border-border"
+      />
+      {open && (
+        <div className="absolute z-50 mt-1 w-full bg-card border border-border rounded-xl shadow-elevated max-h-48 overflow-auto">
+          {filtered.map(h => (
+            <button
+              key={h}
+              type="button"
+              className="w-full text-left px-3 py-2.5 text-sm text-foreground hover:bg-muted/50 transition-colors"
+              onClick={() => { onChange(h); setQuery(h); setOpen(false); }}
+            >
+              {h}
+            </button>
+          ))}
+          {query.trim() && !exactMatch && (
+            <button
+              type="button"
+              className="w-full text-left px-3 py-2.5 text-sm text-primary font-medium hover:bg-muted/50 transition-colors border-t border-border"
+              onClick={() => { onAddHospital(query.trim()); onChange(query.trim()); setOpen(false); }}
+            >
+              + Add "{query.trim()}"
+            </button>
+          )}
+          {filtered.length === 0 && !query.trim() && (
+            <div className="px-3 py-4 text-sm text-muted-foreground text-center">No hospitals found</div>
+          )}
+        </div>
+      )}
+    </div>
+  );
+};
+
 // ─── Main Screen ────────────────────────────────────────
 const ProceduresScreen = () => {
   const navigate = useNavigate();
   const [filter, setFilter] = useState<FilterType>('All');
   const [showForm, setShowForm] = useState(false);
   const [procedures] = useState<Procedure[]>(MOCK_PROCEDURES);
+  const [hospitals, setHospitals] = useState<string[]>(EXISTING_HOSPITALS);
 
   // Form state
   const [formName, setFormName] = useState('');
   const [formDate, setFormDate] = useState<Date>(new Date());
   const [formParticipation, setFormParticipation] = useState<ParticipationType>('Performed');
   const [formPatient, setFormPatient] = useState('');
+  const [formHospital, setFormHospital] = useState('');
+  const [formSupervisor, setFormSupervisor] = useState('');
   const [formIndication, setFormIndication] = useState('');
   const [formNotes, setFormNotes] = useState('');
   const [showPatientDropdown, setShowPatientDropdown] = useState(false);
@@ -187,11 +272,15 @@ const ProceduresScreen = () => {
 
   const resetForm = () => {
     setFormName(''); setFormDate(new Date()); setFormParticipation('Performed');
-    setFormPatient(''); setFormIndication(''); setFormNotes('');
+    setFormPatient(''); setFormHospital(''); setFormSupervisor(''); setFormIndication(''); setFormNotes('');
+  };
+
+  const handleAddHospital = (name: string) => {
+    setHospitals(prev => [...prev, name]);
   };
 
   const handleSave = () => {
-    console.log('Save procedure', { formName, formDate, formParticipation, formPatient, formIndication, formNotes });
+    console.log('Save procedure', { formName, formDate, formParticipation, formPatient, formHospital, formSupervisor, formIndication, formNotes });
     resetForm();
     setShowForm(false);
   };
@@ -287,6 +376,28 @@ const ProceduresScreen = () => {
                 ))}
               </div>
             )}
+          </div>
+
+          {/* Hospital */}
+          <div className="space-y-1.5">
+            <label className="text-sm font-medium text-foreground">Hospital <span className="text-muted-foreground font-normal">(optional)</span></label>
+            <HospitalSearchDropdown
+              value={formHospital}
+              onChange={setFormHospital}
+              hospitals={hospitals}
+              onAddHospital={handleAddHospital}
+            />
+          </div>
+
+          {/* Supervisor */}
+          <div className="space-y-1.5">
+            <label className="text-sm font-medium text-foreground">Supervisor <span className="text-muted-foreground font-normal">(optional)</span></label>
+            <Input
+              placeholder="e.g. Dr. Ahmad"
+              value={formSupervisor}
+              onChange={e => setFormSupervisor(e.target.value)}
+              className="bg-card border-border"
+            />
           </div>
 
           {/* Indication */}
@@ -403,10 +514,13 @@ const ProceduresScreen = () => {
                     </span>
                   </div>
                 </div>
-                {(proc.patientName || proc.location) && (
+                {(proc.patientName || proc.hospital) && (
                   <p className="text-xs text-muted-foreground">
-                    {[proc.patientName, proc.location].filter(Boolean).join(' · ')}
+                    {[proc.patientName, proc.hospital].filter(Boolean).join(' · ')}
                   </p>
+                )}
+                {proc.supervisor && (
+                  <p className="text-xs text-muted-foreground"><span className="font-medium text-foreground/70">Supervisor:</span> {proc.supervisor}</p>
                 )}
                 {proc.indication && (
                   <p className="text-xs text-muted-foreground"><span className="font-medium text-foreground/70">Indication:</span> {proc.indication}</p>
