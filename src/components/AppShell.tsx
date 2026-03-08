@@ -54,6 +54,14 @@ const AppShell = () => {
               </div>
             </div>
             <div className="flex items-center gap-2">
+              {logbookSubScreens.some((p) => location.pathname.startsWith(p)) && (
+                <button
+                  onClick={() => window.dispatchEvent(new CustomEvent('open-export-sheet'))}
+                  className="p-2 rounded-full hover:bg-muted transition-colors text-[#2563EB]"
+                >
+                  <Upload size={20} />
+                </button>
+              )}
               <button
                 onClick={() => setIsDarkMode(!isDarkMode)}
                 className="p-2 rounded-full hover:bg-muted text-muted-foreground transition-colors"

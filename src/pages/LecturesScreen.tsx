@@ -153,16 +153,6 @@ const LecturesScreen = () => {
   return (
     <>
       <div className="px-5 py-6 space-y-5 animate-fade-in pb-24">
-        {/* Export Button */}
-        <div className="flex justify-end">
-          <button
-            onClick={() => setShowExport(true)}
-            className="inline-flex items-center gap-1.5 text-[13px] font-medium px-3.5 py-1.5 rounded-full bg-[#EFF6FF] text-[#2563EB] border border-[#2563EB] hover:bg-[#DBEAFE] transition-colors"
-          >
-            <Upload size={14} /> Export
-          </button>
-        </div>
-
         {/* Stats */}
         <div className="grid grid-cols-1 gap-3">
           <div className="rounded-2xl p-4 text-center bg-[#DBEAFE]">
