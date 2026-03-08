@@ -87,6 +87,10 @@ const SettingsScreen = () => {
   const [aiModelOpen, setAiModelOpen] = useState(false);
   const [aiLanguageOpen, setAiLanguageOpen] = useState(false);
   const [syncEnabled, setSyncEnabled] = useState(true);
+  const [syncFrequency, setSyncFrequency] = useState('daily');
+  const [syncFreqOpen, setSyncFreqOpen] = useState(false);
+  const [googleAccountOpen, setGoogleAccountOpen] = useState(false);
+  const [googleEmail, setGoogleEmail] = useState('user@gmail.com');
   const [encryptedBackup, setEncryptedBackup] = useState(true);
   const [pinLock, setPinLock] = useState(false);
   const [biometric, setBiometric] = useState(true);
