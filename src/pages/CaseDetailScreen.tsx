@@ -409,7 +409,7 @@ const CaseDetailScreen = () => {
               Order by investigation.date DESC
               Each card maps to one investigation record.
               END BACKEND LOGIC */}
-          {mockCase.investigations.map((inv) => {
+          {(mockCase.investigations || []).map((inv) => {
             const isCardExpanded = expandedSubs.includes(`inv-${inv.id}`);
             const typeIcon = inv.type === 'Lab Result' ? '🧪' : inv.type === 'Imaging' ? '🩻' : '📄';
             return (
@@ -465,13 +465,13 @@ const CaseDetailScreen = () => {
                         If investigation.images.length === 0 → hide completely
                         If investigation.images.length > 0 → show all images
                         END UI LOGIC */}
-                    {inv.images.length > 0 && (
+                    {(inv.images || []).length > 0 && (
                       <div className="space-y-1.5">
                         <span style={{ color: '#6B7C93', fontSize: '12px', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.05em' }}>
                           Attached Images
                         </span>
                         <div className="flex gap-2 overflow-x-auto no-scrollbar">
-                          {inv.images.slice(0, 3).map((_, i) => (
+                          {(inv.images || []).slice(0, 3).map((_, i) => (
                             <div key={i} style={{
                               width: '72px', height: '72px', borderRadius: '10px',
                               background: '#F1F5F9', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0,
@@ -479,13 +479,13 @@ const CaseDetailScreen = () => {
                               <Image size={24} className="text-muted-foreground" />
                             </div>
                           ))}
-                          {inv.images.length > 3 && (
+                          {(inv.images || []).length > 3 && (
                             <div style={{
                               width: '72px', height: '72px', borderRadius: '10px',
                               background: '#F1F5F9', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0,
                               fontSize: '13px', fontWeight: 700, color: '#6B7C93',
                             }}>
-                              +{inv.images.length - 3}
+                              +{(inv.images || []).length - 3}
                             </div>
                           )}
                         </div>
