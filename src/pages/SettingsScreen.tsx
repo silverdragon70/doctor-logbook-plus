@@ -99,6 +99,15 @@ const SettingsScreen = () => {
   const [confirmDialogs, setConfirmDialogs] = useState(true);
   const [autoSave, setAutoSave] = useState(true);
   const [exportOpen, setExportOpen] = useState(false);
+  const [progressOpen, setProgressOpen] = useState(false);
+  const [progressType, setProgressType] = useState<OperationType>('backup');
+  const [progressDetail, setProgressDetail] = useState('');
+
+  const startProgress = (type: OperationType, detail?: string) => {
+    setProgressType(type);
+    setProgressDetail(detail || '');
+    setProgressOpen(true);
+  };
   const [backupSheetOpen, setBackupSheetOpen] = useState(false);
   const [lastBackupInfo, setLastBackupInfo] = useState<{ date: string; size: string; destination: 'local' | 'gdrive' } | null>({ date: '2025-01-15 · 08:30', size: '245 MB', destination: 'local' });
   const [aboutOpen, setAboutOpen] = useState(false);
