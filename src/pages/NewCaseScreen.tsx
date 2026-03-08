@@ -570,8 +570,10 @@ const NewCaseScreen = () => {
             </button>
           </div>
         </CollapsibleSection>
+        </div>
 
         {/* ═══ Management ═══ */}
+        <div ref={sectionRefs.management}>
         <CollapsibleSection
           title="Management"
           icon={<span className="text-[18px]">⚕️</span>}
