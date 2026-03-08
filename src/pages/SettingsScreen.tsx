@@ -209,7 +209,7 @@ const SettingsScreen = () => {
 
         {/* ─── 7. DATA & STORAGE ─── */}
         <Section title="Data & Storage">
-          <Row icon={Download} label="Export Options" subtitle="PDF · Plain Text" right={<Chevron />} />
+          <Row icon={Download} label="Export Options" subtitle="PDF · Plain Text" right={<Chevron />} onClick={() => setExportOpen(true)} />
           <div className="px-4 py-3 flex items-center gap-3" style={{ borderBottom: '1px solid #F0F4F8' }}>
             <HardDriveDownload size={20} className="text-primary flex-shrink-0" />
             <div className="flex-1">
