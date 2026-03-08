@@ -10,6 +10,7 @@ import CaseDetailScreen from "./pages/CaseDetailScreen";
 import NewCaseScreen from "./pages/NewCaseScreen";
 import SearchScreen from "./pages/SearchScreen";
 import LogbookScreen from "./pages/LogbookScreen";
+import AddHospitalScreen from "./pages/AddHospitalScreen";
 
 import SettingsScreen from "./pages/SettingsScreen";
 import MediaGalleryScreen from "./pages/MediaGalleryScreen";
@@ -36,6 +37,7 @@ const App = () => (
           <Route path="/case/:id" element={<CaseDetailScreen />} />
           <Route path="/case/:id/media" element={<MediaGalleryScreen />} />
           <Route path="/patient/:id" element={<PatientDetailScreen />} />
+          <Route path="/hospital/new" element={<AddHospitalScreen />} />
           <Route path="/settings" element={<SettingsScreen />} />
           <Route path="*" element={<NotFound />} />
         </Routes>
