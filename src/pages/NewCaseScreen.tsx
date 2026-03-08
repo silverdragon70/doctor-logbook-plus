@@ -124,7 +124,7 @@ const NewCaseScreen = () => {
 
   const [expandedSections, setExpandedSections] = useState<Record<string, boolean>>({
     patient: true,
-    classification: true,
+    classification: false,
     history: false,
     vitals: false,
     investigations: false,
