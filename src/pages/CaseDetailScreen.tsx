@@ -38,7 +38,7 @@ const navPills = [
   { key: 'diagnosis', label: 'Class' },
   { key: 'history', label: 'History' },
   { key: 'investigations', label: 'Inv' },
-  { key: 'management', label: 'Mgmt' },
+  { key: 'management', label: 'Management' },
   { key: 'notes', label: 'Progress' },
 ];
 
