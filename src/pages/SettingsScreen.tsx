@@ -159,10 +159,10 @@ const SettingsScreen = () => {
 
         {/* ─── 4. GOOGLE DRIVE SYNC ─── */}
         <Section title="Google Drive Sync">
-          <Row icon={Cloud} iconColor="#22C55E" label="Sync Enabled" subtitle="user@gmail.com" right={sw(syncEnabled, setSyncEnabled)} />
-          <Row icon={RefreshCw} iconColor="#22C55E" label="Sync Frequency" subtitle="Daily" right={<Chevron />} />
+          <Row icon={Cloud} iconColor="#22C55E" label="Sync Enabled" subtitle={googleEmail} right={sw(syncEnabled, setSyncEnabled)} />
+          <Row icon={RefreshCw} iconColor="#22C55E" label="Sync Frequency" subtitle={syncFrequency === 'hourly' ? 'Every hour' : syncFrequency === '6hours' ? 'Every 6 hours' : syncFrequency === 'daily' ? 'Daily' : syncFrequency === 'weekly' ? 'Weekly' : 'Manual only'} right={<Chevron />} onClick={() => setSyncFreqOpen(true)} />
           <Row icon={Lock} iconColor="#22C55E" label="Encrypted Backup" subtitle="AES-256 encryption" right={sw(encryptedBackup, setEncryptedBackup)} />
-          <Row icon={UserCircle} iconColor="#22C55E" label="Change Google Account" right={<Chevron />} />
+          <Row icon={UserCircle} iconColor="#22C55E" label="Change Google Account" right={<Chevron />} onClick={() => setGoogleAccountOpen(true)} />
           <Row icon={Clock} iconColor="#22C55E" label="Last Synced" subtitle="5 Mar 2025 · 06:48"
             right={
               <button
