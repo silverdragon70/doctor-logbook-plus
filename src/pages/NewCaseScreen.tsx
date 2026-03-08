@@ -210,6 +210,7 @@ const NewCaseScreen = () => {
     return () => observers.forEach(o => o.disconnect());
   }, []);
 
+  const toggleSection = (key: string) => {
     setExpandedSections((prev) => ({ ...prev, [key]: !prev[key] }));
   };
 
