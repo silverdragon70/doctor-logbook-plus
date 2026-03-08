@@ -698,8 +698,10 @@ const NewCaseScreen = () => {
             </div>
           </div>
         </CollapsibleSection>
+        </div>
 
         {/* ═══ Progress Note ═══ */}
+        <div ref={sectionRefs.progressNote}>
         <CollapsibleSection
           title="Progress Note"
           icon={<span className="text-[18px]">📝</span>}
