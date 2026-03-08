@@ -90,6 +90,15 @@ const SettingsScreen = () => {
   const [dateSheetOpen, setDateSheetOpen] = useState(false);
   const [dateFormat, setDateFormat] = useState('DD MMM YYYY');
   const [hospitalsSheetOpen, setHospitalsSheetOpen] = useState(false);
+  const [defaultHospitalSheetOpen, setDefaultHospitalSheetOpen] = useState(false);
+  const [defaultHospitalId, setDefaultHospitalId] = useState('2');
+
+  const hospitalsList = [
+    { id: '1', name: "St. Jude Children's", department: 'Main Wing', unit: 'Central Unit' },
+    { id: '2', name: 'Cairo University', department: 'Pediatrics Dept' },
+    { id: '3', name: 'Ain Shams Hospital', department: 'Ward B' },
+  ];
+  const defaultHospitalName = hospitalsList.find(h => h.id === defaultHospitalId)?.name || 'None';
 
   const sw = (checked: boolean, onChange: (v: boolean) => void) => (
     <Switch checked={checked} onCheckedChange={onChange} />
