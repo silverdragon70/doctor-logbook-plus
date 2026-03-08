@@ -619,6 +619,19 @@ const HospitalPatientsScreen = () => {
       {/* Edit Hospital Sheet */}
       <EditHospitalSheet open={editOpen} onClose={() => setEditOpen(false)} hospital={mockHospital} />
 
+      {/* Filter Bottom Sheets */}
+      {filterOptions.map(group => (
+        <FilterSheet
+          key={group.category}
+          open={openFilter === group.category}
+          onClose={() => setOpenFilter(null)}
+          title={group.label}
+          options={group.values}
+          selected={activeFilters[group.category] || null}
+          onApply={(key) => setActiveFilters(prev => ({ ...prev, [group.category]: key }))}
+        />
+      ))}
+
       {/* Date Range Sheet */}
       <DateRangeSheet
         open={dateRangeOpen}
