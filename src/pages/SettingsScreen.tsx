@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import SettingsExportSheet from '@/components/SettingsExportSheet';
 import { useNavigate } from 'react-router-dom';
 import {
   ArrowLeft, Palette, Moon, Type, Globe, CalendarDays,
@@ -61,6 +62,7 @@ const SettingsScreen = () => {
   const [quickEntry, setQuickEntry] = useState(false);
   const [confirmDialogs, setConfirmDialogs] = useState(true);
   const [autoSave, setAutoSave] = useState(true);
+  const [exportOpen, setExportOpen] = useState(false);
 
   /* backup */
   const [isBackingUp, setIsBackingUp] = useState(false);
@@ -208,7 +210,7 @@ const SettingsScreen = () => {
 
         {/* ─── 7. DATA & STORAGE ─── */}
         <Section title="Data & Storage">
-          <Row icon={Download} label="Export Options" subtitle="PDF · Plain Text" right={<Chevron />} />
+          <Row icon={Download} label="Export Options" subtitle="PDF · Plain Text" right={<Chevron />} onClick={() => setExportOpen(true)} />
           <div className="px-4 py-3 flex items-center gap-3" style={{ borderBottom: '1px solid #F0F4F8' }}>
             <HardDriveDownload size={20} className="text-primary flex-shrink-0" />
             <div className="flex-1">
@@ -308,6 +310,8 @@ const SettingsScreen = () => {
           PediLog v1.0.0 · Built for Pediatric Physicians
         </p>
       </div>
+
+      <SettingsExportSheet open={exportOpen} onOpenChange={setExportOpen} />
     </div>
   );
 };
