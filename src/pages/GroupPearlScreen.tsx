@@ -144,7 +144,7 @@ const GroupPearlScreen = () => {
               <ArrowLeft size={22} />
             </button>
             <div>
-              <h1 className="text-[17px] font-bold text-foreground leading-tight">Group Pearl</h1>
+              <h1 className="text-[17px] font-bold text-foreground leading-tight">Clinical Pearls</h1>
               <p className="text-[11px] text-muted-foreground mt-0.5">Analyze case patterns</p>
             </div>
           </div>
@@ -285,9 +285,9 @@ const GroupPearlScreen = () => {
               {screenState === 'loading' ? (
                 <Loader2 className="animate-spin mr-2" size={16} />
               ) : (
-                <span className="mr-1.5">💡</span>
+                <span className="mr-1.5">💎</span>
               )}
-              {screenState === 'loading' ? 'Analyzing...' : 'Generate Group Pearl'}
+              {screenState === 'loading' ? 'Analyzing...' : 'Generate Clinical Pearls'}
             </Button>
           </div>
 
