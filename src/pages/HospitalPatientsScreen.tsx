@@ -94,7 +94,7 @@ const matchesDateRange = (dateStr: string, key: string) => {
   }
 };
 
-/* ── Filter Chip ── */
+/* ── Filter Chip (inline dropdown) ── */
 const FilterChip = ({ label, options, selected, onSelect, align = 'left' }: {
   label: string;
   options: { key: string; label: string }[];
@@ -120,29 +120,36 @@ const FilterChip = ({ label, options, selected, onSelect, align = 'left' }: {
     <div ref={ref} className="relative shrink-0">
       <button
         onClick={() => setOpen(prev => !prev)}
-        className={`flex items-center gap-1 px-3 py-1.5 rounded-full text-[11px] font-semibold border transition-all ${
-          isActive
-            ? 'bg-primary text-primary-foreground border-primary'
-            : 'bg-card text-muted-foreground border-border hover:border-primary/50'
-        }`}
+        className="flex items-center gap-1.5 px-3 rounded-full text-[12px] font-semibold transition-all whitespace-nowrap"
+        style={{
+          height: 36,
+          backgroundColor: isActive ? '#EFF6FF' : 'transparent',
+          border: isActive ? '1.5px solid #2563EB' : '1.5px solid hsl(214,20%,85%)',
+          color: isActive ? '#2563EB' : 'hsl(215,16%,47%)',
+          fontWeight: isActive ? 700 : 600,
+        }}
       >
         {selectedLabel || label}
-        <ChevronDown size={12} className={`transition-transform ${open ? 'rotate-180' : ''}`} />
+        <ChevronDown size={13} className={`transition-transform ${open ? 'rotate-180' : ''}`} />
       </button>
       {open && (
         <div
-          className={`absolute top-full mt-1.5 w-[200px] bg-card border border-border rounded-xl overflow-hidden ${align === 'right' ? 'right-0' : 'left-0'}`}
-          style={{ zIndex: 9999, boxShadow: '0 8px 30px rgba(0,0,0,0.12)' }}
+          className={`absolute top-full mt-1.5 w-[200px] rounded-xl overflow-hidden ${align === 'right' ? 'right-0' : 'left-0'}`}
+          style={{ zIndex: 9999, backgroundColor: '#FFFFFF', boxShadow: '0px 4px 12px rgba(0,0,0,0.10)', padding: '8px 0' }}
         >
           {options.map((o) => (
             <button
               key={o.key}
               onClick={() => { onSelect(o.key); setOpen(false); }}
-              className={`w-full px-4 py-2.5 text-left text-[12px] transition-colors ${
-                selected === o.key
-                  ? 'bg-primary/10 text-primary font-bold'
-                  : 'text-foreground hover:bg-muted/50'
-              }`}
+              className="w-full text-left text-[13px] transition-colors"
+              style={{
+                height: 40,
+                padding: '0 16px',
+                display: 'flex',
+                alignItems: 'center',
+                color: selected === o.key ? '#2563EB' : '#1A2332',
+                fontWeight: selected === o.key ? 700 : 400,
+              }}
             >
               {o.label}
             </button>
@@ -150,6 +157,101 @@ const FilterChip = ({ label, options, selected, onSelect, align = 'left' }: {
         </div>
       )}
     </div>
+  );
+};
+
+/* ── Date Range Bottom Sheet ── */
+const DateRangeSheet = ({ open, onClose, selected, onSelect }: {
+  open: boolean;
+  onClose: () => void;
+  selected: string | null;
+  onSelect: (key: string | null, fromDate?: Date, toDate?: Date) => void;
+}) => {
+  const presets = [
+    { key: 'all', label: 'All' },
+    { key: 'month', label: 'This Month' },
+    { key: '3months', label: '3M' },
+    { key: '6months', label: '6M' },
+    { key: 'year', label: 'This Year' },
+    { key: 'custom', label: 'Custom' },
+  ];
+  const [activePreset, setActivePreset] = useState(selected || 'all');
+  const [fromStr, setFromStr] = useState('');
+  const [toStr, setToStr] = useState('');
+
+  useEffect(() => {
+    if (open) {
+      setActivePreset(selected || 'all');
+      setFromStr('');
+      setToStr('');
+    }
+  }, [open, selected]);
+
+  const handleApply = () => {
+    if (activePreset === 'all') {
+      onSelect(null);
+    } else if (activePreset === 'custom') {
+      const from = fromStr ? new Date(fromStr) : undefined;
+      const to = toStr ? new Date(toStr) : undefined;
+      onSelect('custom', from, to);
+    } else {
+      onSelect(activePreset);
+    }
+    onClose();
+  };
+
+  if (!open) return null;
+
+  return (
+    <>
+      <div className="fixed inset-0 z-50 bg-black/40" onClick={onClose} />
+      <div className="fixed inset-x-0 bottom-0 z-50 max-h-[70vh] overflow-y-auto bg-background rounded-t-[24px] animate-in slide-in-from-bottom duration-300">
+        <div className="flex justify-center pt-3 pb-1">
+          <div className="w-10 h-1 rounded-full bg-muted-foreground/30" />
+        </div>
+        <div className="px-5 pb-2 flex items-center justify-between">
+          <h2 className="text-[16px] font-bold text-foreground">Select Date Range</h2>
+          <button onClick={onClose} className="p-2 rounded-full hover:bg-muted text-muted-foreground"><X size={18} /></button>
+        </div>
+        <div className="px-5 pb-4">
+          <div className="flex flex-wrap gap-2 mb-5">
+            {presets.map(p => (
+              <button
+                key={p.key}
+                onClick={() => setActivePreset(p.key)}
+                className="px-3.5 py-2 rounded-full text-[12px] font-semibold transition-all"
+                style={{
+                  backgroundColor: activePreset === p.key ? '#2563EB' : '#F8FAFC',
+                  color: activePreset === p.key ? '#FFFFFF' : '#64748B',
+                  border: activePreset === p.key ? '1.5px solid #2563EB' : '1.5px solid #E2E8F0',
+                }}
+              >
+                {p.label}
+              </button>
+            ))}
+          </div>
+          {activePreset === 'custom' && (
+            <div className="flex gap-3 mb-5">
+              <div className="flex-1 space-y-1">
+                <label className="text-[11px] font-semibold text-muted-foreground uppercase">From</label>
+                <input type="date" value={fromStr} onChange={e => setFromStr(e.target.value)}
+                  className="w-full h-10 px-3 bg-card border border-border rounded-xl text-[13px] text-foreground focus:outline-none focus:border-primary" />
+              </div>
+              <div className="flex-1 space-y-1">
+                <label className="text-[11px] font-semibold text-muted-foreground uppercase">To</label>
+                <input type="date" value={toStr} onChange={e => setToStr(e.target.value)}
+                  className="w-full h-10 px-3 bg-card border border-border rounded-xl text-[13px] text-foreground focus:outline-none focus:border-primary" />
+              </div>
+            </div>
+          )}
+          <button onClick={handleApply}
+            className="w-full h-[48px] rounded-xl font-semibold text-[14px] text-white"
+            style={{ backgroundColor: '#2563EB' }}>
+            Apply
+          </button>
+        </div>
+      </div>
+    </>
   );
 };
 
