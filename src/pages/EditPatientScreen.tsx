@@ -13,8 +13,6 @@ const mockPatient = {
   name: 'Lucas Miller',
   dob: new Date('2018-03-12'),
   gender: 'male' as 'male' | 'female',
-  bloodType: 'A+',
-  phone: '+1 555-0123',
   notes: 'No known allergies. Vaccinations up to date.',
 };
 
@@ -25,12 +23,10 @@ const EditPatientScreen = () => {
   const [name, setName] = useState(mockPatient.name);
   const [dob, setDob] = useState<Date | undefined>(mockPatient.dob);
   const [gender, setGender] = useState<'male' | 'female'>(mockPatient.gender);
-  const [bloodType, setBloodType] = useState(mockPatient.bloodType);
-  const [phone, setPhone] = useState(mockPatient.phone);
   const [notes, setNotes] = useState(mockPatient.notes);
 
   const handleSave = () => {
-    console.log('save patient', { id, name, dob, gender, bloodType, phone, notes });
+    console.log('save patient', { id, name, dob, gender, notes });
     navigate(-1);
   };
 
@@ -102,29 +98,6 @@ const EditPatientScreen = () => {
           </div>
         </div>
 
-        {/* Blood Type */}
-        <div className="space-y-1.5">
-          <label className="text-[13px] font-semibold text-foreground">Blood Type <span className="text-muted-foreground font-normal">(optional)</span></label>
-          <input
-            type="text"
-            value={bloodType}
-            onChange={(e) => setBloodType(e.target.value)}
-            placeholder="e.g. A+, B-, O+"
-            className="w-full h-11 px-4 bg-card border border-border rounded-xl text-[14px] text-foreground placeholder:text-muted-foreground focus:outline-none focus:border-primary transition-colors"
-          />
-        </div>
-
-        {/* Phone Number */}
-        <div className="space-y-1.5">
-          <label className="text-[13px] font-semibold text-foreground">Phone Number <span className="text-muted-foreground font-normal">(optional)</span></label>
-          <input
-            type="tel"
-            value={phone}
-            onChange={(e) => setPhone(e.target.value)}
-            placeholder="+1 555-0000"
-            className="w-full h-11 px-4 bg-card border border-border rounded-xl text-[14px] text-foreground placeholder:text-muted-foreground focus:outline-none focus:border-primary transition-colors"
-          />
-        </div>
 
         {/* Notes */}
         <div className="space-y-1.5">
