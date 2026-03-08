@@ -1,6 +1,11 @@
 import React, { useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
-import { ArrowLeft, Edit2, Trash2, Camera, Image, ChevronDown, ChevronUp, Save } from 'lucide-react';
+import { ArrowLeft, Edit2, Trash2, Camera, Image, ChevronDown, ChevronUp, Save, Upload, Lightbulb } from 'lucide-react';
+import ExportSheet from '@/components/ExportSheet';
+import {
+  AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent,
+  AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle,
+} from '@/components/ui/alert-dialog';
 
 const mockCase = {
   caseId: '1',
@@ -28,16 +33,36 @@ const sections = [
   { key: 'notes', label: 'Notes', icon: '📝' },
 ] as const;
 
+const exportColumns = [
+  { header: 'Field', key: 'field' },
+  { header: 'Value', key: 'value' },
+];
+
 const CaseDetailScreen = () => {
   const navigate = useNavigate();
   const { id } = useParams();
   const [expandedSections, setExpandedSections] = useState<string[]>(['complaint', 'diagnosis', 'management']);
   const [isEditing, setIsEditing] = useState(false);
+  const [showExport, setShowExport] = useState(false);
+  const [showDeleteDialog, setShowDeleteDialog] = useState(false);
 
   const toggleSection = (key: string) => {
     setExpandedSections(prev =>
       prev.includes(key) ? prev.filter(s => s !== key) : [...prev, key]
     );
+  };
+
+  // Prepare export data: each clinical section as a row
+  const exportData = sections.map(({ key, label }) => ({
+    field: label,
+    value: mockCase[key as keyof typeof mockCase] as string,
+    date: mockCase.date,
+  }));
+
+  const handleDelete = () => {
+    console.log('delete case', id);
+    setShowDeleteDialog(false);
+    navigate(-1);
   };
 
   return (
@@ -49,13 +74,31 @@ const CaseDetailScreen = () => {
         </button>
         <h1 className="text-[16px] font-bold text-foreground">Case Details</h1>
         <div className="flex gap-1">
+          {/* Export */}
+          <button
+            onClick={() => setShowExport(true)}
+            className="p-2 rounded-full hover:bg-muted transition-colors"
+            style={{ color: '#2563EB' }}
+          >
+            <Upload size={18} />
+          </button>
+          {/* CasePearl */}
+          <button
+            onClick={() => navigate(`/case/${id}/pearl`, { state: { caseData: mockCase } })}
+            className="p-2 rounded-full hover:bg-muted transition-colors"
+            style={{ color: '#D97706' }}
+          >
+            <Lightbulb size={18} />
+          </button>
+          {/* Edit */}
           <button
             onClick={() => setIsEditing(!isEditing)}
             className={`p-2 rounded-full transition-colors ${isEditing ? 'bg-primary text-primary-foreground' : 'hover:bg-muted text-muted-foreground'}`}
           >
             {isEditing ? <Save size={18} /> : <Edit2 size={18} />}
           </button>
-          <button onClick={() => console.log('delete case')} className="p-2 rounded-full hover:bg-muted text-destructive">
+          {/* Delete */}
+          <button onClick={() => setShowDeleteDialog(true)} className="p-2 rounded-full hover:bg-muted text-destructive">
             <Trash2 size={18} />
           </button>
         </div>
@@ -142,6 +185,34 @@ const CaseDetailScreen = () => {
           </div>
         </div>
       </div>
+
+      {/* Export Sheet */}
+      <ExportSheet
+        open={showExport}
+        onOpenChange={setShowExport}
+        title="Case"
+        data={exportData}
+        columns={exportColumns}
+        dateKey="date"
+      />
+
+      {/* Delete Confirmation */}
+      <AlertDialog open={showDeleteDialog} onOpenChange={setShowDeleteDialog}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Delete Case</AlertDialogTitle>
+            <AlertDialogDescription>
+              Are you sure you want to delete this case? This action cannot be undone.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogAction onClick={handleDelete} className="bg-destructive text-destructive-foreground hover:bg-destructive/90">
+              Delete
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 };
