@@ -9,6 +9,7 @@ import {
   Drawer, DrawerContent, DrawerHeader, DrawerTitle, DrawerDescription,
 } from '@/components/ui/drawer';
 import jsPDF from 'jspdf';
+// @ts-ignore
 import autoTable from 'jspdf-autotable';
 import * as XLSX from 'xlsx';
 
