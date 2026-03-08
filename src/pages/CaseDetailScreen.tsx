@@ -6,6 +6,9 @@ import {
   AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent,
   AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle,
 } from '@/components/ui/alert-dialog';
+import AddInvestigationSheet from '@/components/case-detail/AddInvestigationSheet';
+import AddManagementSheet from '@/components/case-detail/AddManagementSheet';
+import AddProgressNoteSheet from '@/components/case-detail/AddProgressNoteSheet';
 
 // Mock data
 const mockCase = {
@@ -198,6 +201,9 @@ const CaseDetailScreen = () => {
   const [expandedSubs, setExpandedSubs] = useState<string[]>([]);
   const [editingSections, setEditingSections] = useState<string[]>([]);
   const [deleteTarget, setDeleteTarget] = useState<string | null>(null);
+  const [showAddInvestigation, setShowAddInvestigation] = useState(false);
+  const [showAddManagement, setShowAddManagement] = useState(false);
+  const [showAddProgress, setShowAddProgress] = useState(false);
 
   const toggleEdit = (key: string) => {
     setEditingSections(prev => prev.includes(key) ? prev.filter(s => s !== key) : [...prev, key]);
@@ -396,7 +402,7 @@ const CaseDetailScreen = () => {
           isExpanded={expandedSections.includes('investigations')}
           onToggle={() => toggleSection('investigations')}
           sectionRef={sectionRefs.investigations}
-          onAdd={() => console.log('add investigation')}
+          onAdd={() => setShowAddInvestigation(true)}
         >
           {/* UI LOGIC — Investigation Cards
               Render one card per investigation record.
@@ -513,7 +519,7 @@ const CaseDetailScreen = () => {
           isExpanded={expandedSections.includes('management')}
           onToggle={() => toggleSection('management')}
           sectionRef={sectionRefs.management}
-          onAdd={() => console.log('add management')}
+          onAdd={() => setShowAddManagement(true)}
         >
           {/* UI LOGIC — Management Cards
               Render one card per management entry.
@@ -631,7 +637,7 @@ const CaseDetailScreen = () => {
           isExpanded={expandedSections.includes('progress')}
           onToggle={() => toggleSection('progress')}
           sectionRef={sectionRefs.progress}
-          onAdd={() => console.log('add progress note')}
+          onAdd={() => setShowAddProgress(true)}
         >
           {/* UI LOGIC — Progress Note Cards
               Render one card per progress note entry.
@@ -778,23 +784,36 @@ const CaseDetailScreen = () => {
         </AlertDialogContent>
       </AlertDialog>
 
-      {/* Delete Card Confirmation */}
-      <AlertDialog open={!!deleteTarget} onOpenChange={(open) => { if (!open) setDeleteTarget(null); }}>
-        <AlertDialogContent>
-          <AlertDialogHeader>
-            <AlertDialogTitle>Delete Entry</AlertDialogTitle>
-            <AlertDialogDescription>
-              Are you sure you want to delete this? This action cannot be undone.
-            </AlertDialogDescription>
-          </AlertDialogHeader>
-          <AlertDialogFooter>
-            <AlertDialogCancel>Cancel</AlertDialogCancel>
-            <AlertDialogAction onClick={() => { console.log('delete card', deleteTarget); setDeleteTarget(null); }} className="bg-destructive text-destructive-foreground hover:bg-destructive/90">
-              Delete
-            </AlertDialogAction>
-          </AlertDialogFooter>
-        </AlertDialogContent>
-      </AlertDialog>
+      {/* Delete Card Confirmation — Custom styled */}
+      {!!deleteTarget && (
+        <div className="fixed inset-0 z-[60]">
+          <div className="absolute inset-0 bg-black/40" onClick={() => setDeleteTarget(null)} />
+          <div className="absolute inset-0 flex items-center justify-center px-8">
+            <div style={{ background: '#FFFFFF', borderRadius: '18px', padding: '24px', width: '100%', maxWidth: '340px' }}>
+              <div className="flex flex-col items-center text-center space-y-2">
+                <Trash2 size={28} style={{ color: '#EF4444' }} />
+                <span style={{ fontSize: '16px', fontWeight: 700, color: '#1A2332' }}>Delete this record?</span>
+                <span style={{ fontSize: '13px', color: '#6B7C93' }}>This action cannot be undone.</span>
+              </div>
+              <div className="flex gap-3 mt-6">
+                <button onClick={() => setDeleteTarget(null)}
+                  style={{ flex: 1, height: '48px', borderRadius: '12px', border: '1.5px solid #6B7C93', background: '#FFFFFF', color: '#6B7C93', fontSize: '15px', fontWeight: 600 }}>
+                  Cancel
+                </button>
+                <button onClick={() => { console.log('delete card', deleteTarget); setDeleteTarget(null); }}
+                  style={{ flex: 1, height: '48px', borderRadius: '12px', border: 'none', background: '#EF4444', color: '#FFFFFF', fontSize: '15px', fontWeight: 600 }}>
+                  Delete
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Bottom Sheets */}
+      <AddInvestigationSheet open={showAddInvestigation} onClose={() => setShowAddInvestigation(false)} onSave={(data) => console.log('save investigation', data)} />
+      <AddManagementSheet open={showAddManagement} onClose={() => setShowAddManagement(false)} onSave={(data) => console.log('save management', data)} />
+      <AddProgressNoteSheet open={showAddProgress} onClose={() => setShowAddProgress(false)} onSave={(data) => console.log('save progress', data)} />
     </div>
   );
 };
