@@ -435,6 +435,61 @@ const NewCaseScreen = () => {
           </div>
         </div>
 
+        {/* Add Vital Signs */}
+        <div className="space-y-4">
+          <div className="flex items-center justify-between">
+            <h2 className="text-[17px] font-bold" style={{ color: '#1A2332' }}>Add Vital Signs</h2>
+            <span className="text-[12px]" style={{ color: '#6B7C93' }}>Today · Now</span>
+          </div>
+
+          {/* HR + SPO2 */}
+          <div className="grid grid-cols-2 gap-3">
+            <div className="space-y-1.5">
+              <label className={labelClass} style={{ color: '#6B7C93' }}>HR (BPM)</label>
+              <input type="text" inputMode="numeric" pattern="[0-9]*" value={hr} onChange={(e) => setHr(e.target.value.replace(/\D/g, ''))} placeholder="128" className={cn(inputClass, 'h-12')} />
+            </div>
+            <div className="space-y-1.5">
+              <label className={labelClass} style={{ color: '#6B7C93' }}>SPO₂ (%)</label>
+              <input type="text" inputMode="numeric" pattern="[0-9]*" value={spo2} onChange={(e) => setSpo2(e.target.value.replace(/\D/g, ''))} placeholder="94" className={cn(inputClass, 'h-12')} />
+            </div>
+          </div>
+
+          {/* Temp + RR */}
+          <div className="grid grid-cols-2 gap-3">
+            <div className="space-y-1.5">
+              <label className={labelClass} style={{ color: '#6B7C93' }}>Temp (°C)</label>
+              <input type="text" inputMode="decimal" value={temp} onChange={(e) => setTemp(e.target.value.replace(/[^0-9.]/g, ''))} placeholder="38.6" className={cn(inputClass, 'h-12')} />
+            </div>
+            <div className="space-y-1.5">
+              <label className={labelClass} style={{ color: '#6B7C93' }}>RR (/Min)</label>
+              <input type="text" inputMode="numeric" pattern="[0-9]*" value={rr} onChange={(e) => setRr(e.target.value.replace(/\D/g, ''))} placeholder="46" className={cn(inputClass, 'h-12')} />
+            </div>
+          </div>
+
+          {/* BP + Weight */}
+          <div className="grid grid-cols-2 gap-3">
+            <div className="space-y-1.5">
+              <label className={labelClass} style={{ color: '#6B7C93' }}>BP (mmHg)</label>
+              <input type="text" inputMode="numeric" value={bp} onChange={(e) => setBp(e.target.value.replace(/[^0-9/]/g, ''))} placeholder="88/55" className={cn(inputClass, 'h-12')} />
+            </div>
+            <div className="space-y-1.5">
+              <label className={labelClass} style={{ color: '#6B7C93' }}>Weight (kg)</label>
+              <input type="text" inputMode="decimal" value={weight} onChange={(e) => setWeight(e.target.value.replace(/[^0-9.]/g, ''))} placeholder="13.2" className={cn(inputClass, 'h-12')} />
+            </div>
+          </div>
+
+          {/* Date & Time */}
+          <div className="space-y-1.5">
+            <label className={labelClass} style={{ color: '#6B7C93' }}>Date & Time</label>
+            <input
+              type="datetime-local"
+              value={vitalDateTime}
+              onChange={(e) => setVitalDateTime(e.target.value)}
+              className={cn(inputClass, 'h-12')}
+            />
+          </div>
+        </div>
+
         {/* Media */}
         <div className="bg-card border border-border rounded-xl p-4">
           <span className="text-[12px] font-bold text-foreground block mb-3">Attach Images</span>
