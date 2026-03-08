@@ -534,7 +534,7 @@ const ProceduresScreen = () => {
         {/* FAB */}
         <button
           onClick={() => setShowForm(true)}
-          className="fixed bottom-6 right-6 w-14 h-14 rounded-full bg-primary text-primary-foreground shadow-brand flex items-center justify-center active:scale-95 transition-transform z-40"
+          className="fixed bottom-[84px] left-1/2 translate-x-[110px] w-14 h-14 bg-primary rounded-[18px] flex items-center justify-center text-primary-foreground shadow-brand active:scale-90 transition-all z-50 group overflow-hidden"
         >
           <Plus size={26} />
         </button>
