@@ -458,7 +458,7 @@ const ProceduresScreen = () => {
       {/* Header */}
       <div className="sticky top-0 z-30 bg-background/95 backdrop-blur-md border-b border-border px-4 py-3">
         <div className="flex items-center gap-3">
-          <button onClick={() => navigate(-1)} className="p-1.5 -ml-1.5 rounded-xl hover:bg-muted/50 transition-colors">
+          <button onClick={handleBackNavigation} className="p-1.5 -ml-1.5 rounded-xl hover:bg-muted/50 transition-colors">
             <ArrowLeft size={22} className="text-foreground" />
           </button>
           <div>
