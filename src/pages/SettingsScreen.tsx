@@ -178,10 +178,10 @@ const SettingsScreen = () => {
           <Row icon={RefreshCw} iconColor="#22C55E" label="Sync Frequency" subtitle={syncFrequency === 'hourly' ? 'Every hour' : syncFrequency === '6hours' ? 'Every 6 hours' : syncFrequency === 'daily' ? 'Daily' : syncFrequency === 'weekly' ? 'Weekly' : 'Manual only'} right={<Chevron />} onClick={() => setSyncFreqOpen(true)} />
           <Row icon={Lock} iconColor="#22C55E" label="Encrypted Backup" subtitle="AES-256 encryption" right={sw(encryptedBackup, setEncryptedBackup)} />
           <Row icon={UserCircle} iconColor="#22C55E" label="Change Google Account" right={<Chevron />} onClick={() => setGoogleAccountOpen(true)} />
-          <Row icon={Clock} iconColor="#22C55E" label="Last Synced" subtitle="5 Mar 2025 · 06:48"
+          <Row icon={Clock} iconColor="#22C55E" label="Last Synced" subtitle={lastSyncedText}
             right={
               <button
-                onClick={(e) => { e.stopPropagation(); console.log('sync now'); }}
+                onClick={(e) => { e.stopPropagation(); setSyncProgressOpen(true); }}
                 className="text-[12px] font-bold rounded-lg px-3 py-1.5"
                 style={{ background: 'hsl(213,78%,95%)', color: 'hsl(213,78%,48%)' }}
               >
