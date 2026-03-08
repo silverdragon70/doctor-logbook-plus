@@ -141,24 +141,8 @@ const SettingsScreen = () => {
 
         {/* ─── 5. BACKUP & RESTORE ─── */}
         <Section title="Backup & Restore">
-          <Row icon={Database} label="Full Backup" subtitle="Database + All Images" lastBackup={{ date: '2025-01-15', size: '245 MB' }} right={<Upload size={16} style={{ color: '#6B7C93' }} />} onClick={() => simulateBackup('Full')} />
-          <Row icon={Zap} label="Incremental" subtitle="Only new changes since last backup (faster)" lastBackup={{ date: '2025-01-13', size: '5 MB' }} right={<Upload size={16} style={{ color: '#6B7C93' }} />} onClick={() => simulateBackup('Incremental')} />
-          <Row icon={FileText} label="Data Only" subtitle="Database only, no images" lastBackup={{ date: '2025-01-14', size: '12 MB' }} right={<Upload size={16} style={{ color: '#6B7C93' }} />} onClick={() => simulateBackup('Data')} />
           <Row icon={Download} label="Restore from Backup" subtitle="Select a backup file" right={<Chevron />} noBorder />
         </Section>
-
-        {/* Progress bar */}
-        {isBackingUp && (
-          <div className="bg-card border border-border rounded-2xl p-4 space-y-3" style={{ boxShadow: '0px 1px 4px rgba(0,0,0,0.06)' }}>
-            <div className="flex items-center justify-between">
-              <span className="text-[13px] font-bold text-foreground">Backing up...</span>
-              <span className="text-[12px] font-mono font-bold text-primary">{progress}%</span>
-            </div>
-            <div className="h-2 bg-muted rounded-full overflow-hidden">
-              <div className="h-full bg-primary rounded-full transition-all duration-300" style={{ width: `${progress}%` }} />
-            </div>
-          </div>
-        )}
 
         {/* ─── STORAGE & EXPORTING ─── */}
         <Section title="Storage & Exporting">
