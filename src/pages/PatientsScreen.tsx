@@ -1,6 +1,6 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useRef, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Search, ChevronRight, Plus } from 'lucide-react';
+import { Search, ChevronRight, Plus, ChevronDown } from 'lucide-react';
 
 const mockPatients = [
   { patientId: '1', name: 'Lucas Miller', age: 7, gender: 'male' as const, caseCount: 4, lastVisit: '2025-01-15', specialty: 'Respiratory', dateAdded: '2025-01-10' },
