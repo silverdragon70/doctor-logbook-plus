@@ -662,9 +662,14 @@ const CaseDetailScreen = () => {
                     <span style={{ fontSize: '14px', fontWeight: 700, color: '#1A2332' }}>Progress Note</span>
                   </div>
                   {isCardExpanded && (
-                    <button onClick={(e) => { e.stopPropagation(); toggleEdit(`prog-${note.id}`); }} className="p-1 rounded-full hover:bg-muted/50">
-                      <Pencil size={14} style={{ color: '#2563EB' }} />
-                    </button>
+                    <div className="flex items-center gap-1">
+                      <button onClick={(e) => { e.stopPropagation(); toggleEdit(`prog-${note.id}`); }} className="p-1 rounded-full hover:bg-muted/50">
+                        <Pencil size={14} style={{ color: '#2563EB' }} />
+                      </button>
+                      <button onClick={(e) => { e.stopPropagation(); setDeleteTarget(`prog-${note.id}`); }} className="p-1 rounded-full hover:bg-muted/50">
+                        <Trash2 size={14} style={{ color: '#EF4444' }} />
+                      </button>
+                    </div>
                   )}
                 </div>
                 <div className="flex items-center justify-between mt-1">
