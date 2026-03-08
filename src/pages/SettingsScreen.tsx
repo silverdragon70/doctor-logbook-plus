@@ -13,6 +13,7 @@ import AIModelSheet from '@/components/AIModelSheet';
 import AILanguageSheet from '@/components/AILanguageSheet';
 import SyncFrequencySheet from '@/components/SyncFrequencySheet';
 import GoogleAccountSheet from '@/components/GoogleAccountSheet';
+import ProgressSheet, { OperationType } from '@/components/ProgressSheet';
 import { useNavigate } from 'react-router-dom';
 import {
   ArrowLeft, Palette, Moon, Type, Globe, CalendarDays,
