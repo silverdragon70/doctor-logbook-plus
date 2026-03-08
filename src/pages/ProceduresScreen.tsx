@@ -559,11 +559,33 @@ const ProceduresScreen = () => {
                 {proc.notes && (
                   <p className="text-xs text-muted-foreground"><span className="font-medium text-foreground/70">Notes:</span> {proc.notes}</p>
                 )}
+                <div className="flex gap-2 pt-1">
+                  <button onClick={() => handleEdit(proc)} className="inline-flex items-center gap-1 text-xs font-medium px-3 py-1 rounded-full bg-[#EFF6FF] text-[#2563EB] hover:bg-[#DBEAFE] transition-colors">
+                    <Pencil size={12} /> Edit
+                  </button>
+                  <button onClick={() => setDeleteId(proc.id)} className="inline-flex items-center gap-1 text-xs font-medium px-3 py-1 rounded-full bg-[#FEE2E2] text-[#DC2626] hover:bg-[#FECACA] transition-colors">
+                    <Trash2 size={12} /> Delete
+                  </button>
+                </div>
               </div>
             ))}
           </div>
         )}
       </div>
+
+      {/* Delete Confirmation */}
+      <AlertDialog open={!!deleteId} onOpenChange={(open) => !open && setDeleteId(null)}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Are you sure you want to delete this?</AlertDialogTitle>
+            <AlertDialogDescription>This action cannot be undone.</AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogAction onClick={handleDelete} className="bg-[#DC2626] hover:bg-[#B91C1C] text-white">Delete</AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
 
       {/* FAB — outside animate-fade-in so it's visible immediately */}
       <button
