@@ -69,10 +69,10 @@ const AboutSheet = ({ open, onOpenChange }: AboutSheetProps) => {
 
           {/* App Info */}
           <SectionHeader icon={FileText} label="App Info" />
-          <InfoRow label="App Version" value="2.1.0" />
+          <InfoRow label="App Version" value="1.0.0" />
           <InfoRow label="Schema Version" value="3" />
           <InfoRow label="Encryption" value={<span className="flex items-center gap-1"><Shield size={12} /> AES-256</span>} />
-          <InfoRow label="Platform" value="iOS / Android" />
+          <InfoRow label="Platform" value="Android" />
 
           <Divider />
 
