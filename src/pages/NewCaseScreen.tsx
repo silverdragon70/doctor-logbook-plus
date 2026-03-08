@@ -135,6 +135,7 @@ const NewCaseScreen = () => {
 
   const [medications, setMedications] = useState('');
   const [respiratorySupport, setRespiratorySupport] = useState('');
+  const [respiratoryType, setRespiratoryType] = useState('');
   const [feeding, setFeeding] = useState('');
 
   const toggleSection = (key: string) => {
@@ -501,7 +502,7 @@ const NewCaseScreen = () => {
                 className="w-full px-3 py-3 flex items-center justify-between"
               >
                 <div className="flex items-center gap-2">
-                  <span className="text-[16px]">🫁</span>
+                  <span className="text-[16px]">😷</span>
                   <span className="text-[15px] font-bold" style={{ color: '#1A2332' }}>Respiratory Support</span>
                 </div>
                 <ChevronDown
@@ -512,12 +513,41 @@ const NewCaseScreen = () => {
               </button>
               <div className={cn(
                 'overflow-hidden transition-all duration-300 ease-in-out',
-                expandedSections.respiratory ? 'max-h-[500px] opacity-100' : 'max-h-0 opacity-0'
+                expandedSections.respiratory ? 'max-h-[800px] opacity-100' : 'max-h-0 opacity-0'
               )}>
                 <div className="px-3 pb-3 pt-1 border-t border-[hsl(216,20%,90%)]">
-                  <div className="space-y-1.5">
-                    <label className={labelClass} style={{ color: '#6B7C93' }}>Respiratory Support Details</label>
-                    <textarea value={respiratorySupport} onChange={(e) => setRespiratorySupport(e.target.value)} placeholder="Type, mode, FiO₂, settings..." rows={3} className={cn(inputClass, 'h-auto py-3 resize-none')} />
+                  <div className="space-y-3">
+                    <div className="space-y-1.5">
+                      <label className={labelClass} style={{ color: '#6B7C93' }}>Type</label>
+                      <div className="grid grid-cols-3 gap-2">
+                        {([
+                          { value: 'room-air', label: 'Room Air', emoji: '💨' },
+                          { value: 'nasal-o2', label: 'Nasal O₂', emoji: '👃' },
+                          { value: 'mask', label: 'Mask', emoji: '😷' },
+                          { value: 'hfnc', label: 'HFNC', emoji: '🌬️' },
+                          { value: 'cpap', label: 'CPAP', emoji: '⚙️' },
+                          { value: 'mv', label: 'MV', emoji: '🫁' },
+                        ] as const).map((opt) => (
+                          <button
+                            key={opt.value}
+                            type="button"
+                            onClick={() => setRespiratoryType(opt.value)}
+                            className={cn(
+                              'h-11 rounded-[12px] text-[13px] font-medium border-[1.5px] transition-colors flex items-center justify-center gap-1.5',
+                              respiratoryType === opt.value
+                                ? 'bg-primary text-primary-foreground border-primary'
+                                : 'bg-[hsl(210,40%,98%)] text-muted-foreground border-[hsl(216,20%,90%)] hover:bg-muted/50'
+                            )}
+                          >
+                            <span>{opt.emoji}</span> {opt.label}
+                          </button>
+                        ))}
+                      </div>
+                    </div>
+                    <div className="space-y-1.5">
+                      <label className={labelClass} style={{ color: '#6B7C93' }}>Details</label>
+                      <textarea value={respiratorySupport} onChange={(e) => setRespiratorySupport(e.target.value)} placeholder="Mode, FiO₂, settings..." rows={3} className={cn(inputClass, 'h-auto py-3 resize-none')} />
+                    </div>
                   </div>
                 </div>
               </div>
