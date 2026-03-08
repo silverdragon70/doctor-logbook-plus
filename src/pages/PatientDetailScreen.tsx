@@ -95,16 +95,16 @@ const PatientDetailScreen = () => {
                      END BACKEND LOGIC */}
                   <div>
                     <div className="flex items-center gap-2">
-                      <h4 className="text-[15px] font-bold" style={{ color: '#1A2332' }}>{c.diagnosis}</h4>
                       {c.status === 'active' ? (
-                        <span className="text-[10px] font-bold uppercase" style={{ borderRadius: 20, padding: '2px 8px', backgroundColor: '#DCFCE7', color: '#16A34A', verticalAlign: 'middle' }}>
+                        <span className="text-[10px] font-bold uppercase flex-shrink-0" style={{ borderRadius: 20, padding: '2px 8px', backgroundColor: '#DCFCE7', color: '#16A34A' }}>
                           Hospitalized
                         </span>
                       ) : c.outcome && outcomeBadgeMap[c.outcome] ? (
-                        <span className="text-[10px] font-bold uppercase" style={{ borderRadius: 20, padding: '2px 8px', backgroundColor: outcomeBadgeMap[c.outcome].bg, color: outcomeBadgeMap[c.outcome].color, verticalAlign: 'middle' }}>
+                        <span className="text-[10px] font-bold uppercase flex-shrink-0" style={{ borderRadius: 20, padding: '2px 8px', backgroundColor: outcomeBadgeMap[c.outcome].bg, color: outcomeBadgeMap[c.outcome].color }}>
                           {outcomeBadgeMap[c.outcome].label}
                         </span>
                       ) : null}
+                      <h4 className="text-[15px] font-bold" style={{ color: '#1A2332' }}>{c.diagnosis}</h4>
                     </div>
                     <p className="text-[13px] mt-1" style={{ color: '#6B7C93' }}>{c.complaint}</p>
                     <span className="text-[13px]" style={{ color: '#6B7C93' }}>{c.date}</span>
