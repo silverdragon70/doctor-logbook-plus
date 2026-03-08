@@ -30,7 +30,7 @@ const mockCase = {
   investigationType: '',
   investigationDate: '',
   investigationResult: '',
-  investigationImages: [] as string[],
+  investigationImages: ['preview1.jpg', 'preview2.jpg', 'preview3.jpg', 'preview4.jpg', 'preview5.jpg'] as string[],
   medications: ['Cefotaxime 1g IV q8h', 'Salbutamol nebulization q6h', 'Oral prednisolone 1mg/kg x 3 days'],
   medicationChartImage: '',
   respiratorySupport: 'Nasal O₂',
