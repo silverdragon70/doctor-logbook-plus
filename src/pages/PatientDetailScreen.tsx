@@ -94,14 +94,14 @@ const PatientDetailScreen = () => {
                      All fields come from the same case record in the database
                      END BACKEND LOGIC */}
                   <div>
-                    <h4 className="text-[15px] font-bold" style={{ color: '#1A2332' }}>{c.diagnosis}</h4>
-                    <div className="mt-0.5">
+                    <div className="flex items-center gap-2">
+                      <h4 className="text-[15px] font-bold" style={{ color: '#1A2332' }}>{c.diagnosis}</h4>
                       {c.status === 'active' ? (
-                        <span className="text-[10px] font-bold uppercase" style={{ borderRadius: 20, padding: '3px 10px', backgroundColor: '#DCFCE7', color: '#16A34A' }}>
+                        <span className="text-[10px] font-bold uppercase" style={{ borderRadius: 20, padding: '2px 8px', backgroundColor: '#DCFCE7', color: '#16A34A', verticalAlign: 'middle' }}>
                           Hospitalized
                         </span>
                       ) : c.outcome && outcomeBadgeMap[c.outcome] ? (
-                        <span className="text-[10px] font-bold uppercase" style={{ borderRadius: 20, padding: '3px 10px', backgroundColor: outcomeBadgeMap[c.outcome].bg, color: outcomeBadgeMap[c.outcome].color }}>
+                        <span className="text-[10px] font-bold uppercase" style={{ borderRadius: 20, padding: '2px 8px', backgroundColor: outcomeBadgeMap[c.outcome].bg, color: outcomeBadgeMap[c.outcome].color, verticalAlign: 'middle' }}>
                           {outcomeBadgeMap[c.outcome].label}
                         </span>
                       ) : null}
@@ -110,12 +110,7 @@ const PatientDetailScreen = () => {
                     <span className="text-[13px]" style={{ color: '#6B7C93' }}>{c.date}</span>
                   </div>
                 </div>
-                <div className="flex items-center gap-2">
-                  {c.mediaCount > 0 && (
-                    <span className="text-[10px] bg-accent text-accent-foreground px-2 py-0.5 rounded-full font-bold">{c.mediaCount} 📷</span>
-                  )}
-                  <ChevronRight size={16} className="text-muted-foreground" />
-                </div>
+                <ChevronRight size={16} className="text-muted-foreground flex-shrink-0" />
               </div>
             </div>
           ))}
