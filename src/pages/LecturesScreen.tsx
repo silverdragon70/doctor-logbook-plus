@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Plus, X, BookOpen, CalendarIcon, Pencil, Trash2, Upload } from 'lucide-react';
+import { Plus, X, BookOpen, CalendarIcon, Pencil, Trash2 } from 'lucide-react';
 import { format } from 'date-fns';
 import { cn } from '@/lib/utils';
 import { Calendar } from '@/components/ui/calendar';
