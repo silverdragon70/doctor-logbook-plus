@@ -1,6 +1,6 @@
 import React, { useState, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { ArrowLeft, Save, Camera, User, Calendar, Search, X, CalendarIcon, ChevronDown, ClipboardList, Stethoscope, ScrollText, Activity } from 'lucide-react';
+import { ArrowLeft, Save, Camera, User, Calendar, Search, X, CalendarIcon, ChevronDown, ClipboardList, Stethoscope, ScrollText, Activity, Pill, Wind, Baby } from 'lucide-react';
 import { format } from 'date-fns';
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
@@ -127,7 +127,15 @@ const NewCaseScreen = () => {
     classification: true,
     history: false,
     vitals: false,
+    management: false,
+    medications: false,
+    respiratory: false,
+    feeding: false,
   });
+
+  const [medications, setMedications] = useState('');
+  const [respiratorySupport, setRespiratorySupport] = useState('');
+  const [feeding, setFeeding] = useState('');
 
   const toggleSection = (key: string) => {
     setExpandedSections((prev) => ({ ...prev, [key]: !prev[key] }));
@@ -449,7 +457,104 @@ const NewCaseScreen = () => {
           </div>
         </CollapsibleSection>
 
-        {/* Media */}
+        {/* ═══ Management ═══ */}
+        <CollapsibleSection
+          title="Management"
+          icon={<span className="text-[18px]">⚕️</span>}
+          isExpanded={expandedSections.management}
+          onToggle={() => toggleSection('management')}
+        >
+          <div className="space-y-2 pt-2">
+            {/* Nested: Medications */}
+            <div className="rounded-[14px] border border-[hsl(216,20%,90%)] bg-[hsl(210,40%,98%)] overflow-hidden">
+              <button
+                onClick={() => toggleSection('medications')}
+                className="w-full px-3 py-3 flex items-center justify-between"
+              >
+                <div className="flex items-center gap-2">
+                  <span className="text-[16px]">💊</span>
+                  <span className="text-[15px] font-bold" style={{ color: '#1A2332' }}>Medications</span>
+                </div>
+                <ChevronDown
+                  size={16}
+                  style={{ color: '#6B7C93' }}
+                  className={cn('transition-transform duration-300', expandedSections.medications && 'rotate-180')}
+                />
+              </button>
+              <div className={cn(
+                'overflow-hidden transition-all duration-300 ease-in-out',
+                expandedSections.medications ? 'max-h-[500px] opacity-100' : 'max-h-0 opacity-0'
+              )}>
+                <div className="px-3 pb-3 pt-1 border-t border-[hsl(216,20%,90%)]">
+                  <div className="space-y-1.5">
+                    <label className={labelClass} style={{ color: '#6B7C93' }}>Current Medications</label>
+                    <textarea value={medications} onChange={(e) => setMedications(e.target.value)} placeholder="List medications, doses, and routes..." rows={3} className={cn(inputClass, 'h-auto py-3 resize-none')} />
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Nested: Respiratory Support */}
+            <div className="rounded-[14px] border border-[hsl(216,20%,90%)] bg-[hsl(210,40%,98%)] overflow-hidden">
+              <button
+                onClick={() => toggleSection('respiratory')}
+                className="w-full px-3 py-3 flex items-center justify-between"
+              >
+                <div className="flex items-center gap-2">
+                  <span className="text-[16px]">🫁</span>
+                  <span className="text-[15px] font-bold" style={{ color: '#1A2332' }}>Respiratory Support</span>
+                </div>
+                <ChevronDown
+                  size={16}
+                  style={{ color: '#6B7C93' }}
+                  className={cn('transition-transform duration-300', expandedSections.respiratory && 'rotate-180')}
+                />
+              </button>
+              <div className={cn(
+                'overflow-hidden transition-all duration-300 ease-in-out',
+                expandedSections.respiratory ? 'max-h-[500px] opacity-100' : 'max-h-0 opacity-0'
+              )}>
+                <div className="px-3 pb-3 pt-1 border-t border-[hsl(216,20%,90%)]">
+                  <div className="space-y-1.5">
+                    <label className={labelClass} style={{ color: '#6B7C93' }}>Respiratory Support Details</label>
+                    <textarea value={respiratorySupport} onChange={(e) => setRespiratorySupport(e.target.value)} placeholder="Type, mode, FiO₂, settings..." rows={3} className={cn(inputClass, 'h-auto py-3 resize-none')} />
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Nested: Feeding */}
+            <div className="rounded-[14px] border border-[hsl(216,20%,90%)] bg-[hsl(210,40%,98%)] overflow-hidden">
+              <button
+                onClick={() => toggleSection('feeding')}
+                className="w-full px-3 py-3 flex items-center justify-between"
+              >
+                <div className="flex items-center gap-2">
+                  <span className="text-[16px]">🍼</span>
+                  <span className="text-[15px] font-bold" style={{ color: '#1A2332' }}>Feeding</span>
+                </div>
+                <ChevronDown
+                  size={16}
+                  style={{ color: '#6B7C93' }}
+                  className={cn('transition-transform duration-300', expandedSections.feeding && 'rotate-180')}
+                />
+              </button>
+              <div className={cn(
+                'overflow-hidden transition-all duration-300 ease-in-out',
+                expandedSections.feeding ? 'max-h-[500px] opacity-100' : 'max-h-0 opacity-0'
+              )}>
+                <div className="px-3 pb-3 pt-1 border-t border-[hsl(216,20%,90%)]">
+                  <div className="space-y-1.5">
+                    <label className={labelClass} style={{ color: '#6B7C93' }}>Feeding Details</label>
+                    <textarea value={feeding} onChange={(e) => setFeeding(e.target.value)} placeholder="Type, volume, frequency..." rows={3} className={cn(inputClass, 'h-auto py-3 resize-none')} />
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </CollapsibleSection>
+
+        {/* ═══ Attach Images ═══ */}
         <div className="bg-card border border-border rounded-[18px] p-4">
           <span className="text-[12px] font-bold text-foreground block mb-3">Attach Images</span>
           <div className="flex gap-3">
