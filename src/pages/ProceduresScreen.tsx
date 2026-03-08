@@ -449,21 +449,7 @@ const ProceduresScreen = () => {
 
   // ─── Main List View ───
   return (
-    <div className="min-h-screen bg-background">
-      {/* Header */}
-      <div className="sticky top-0 z-30 bg-background/95 backdrop-blur-md border-b border-border px-4 py-3">
-        <div className="flex items-center gap-3">
-          <button onClick={handleBackNavigation} className="p-1.5 -ml-1.5 rounded-xl hover:bg-muted/50 transition-colors">
-            <ArrowLeft size={22} className="text-foreground" />
-          </button>
-          <div>
-            <h1 className="text-lg font-bold text-foreground">Procedures</h1>
-            <p className="text-xs text-muted-foreground">Track your clinical activities</p>
-          </div>
-        </div>
-      </div>
-
-      <div className="px-5 py-5 space-y-5 max-w-[430px] mx-auto pb-24">
+    <div className="px-5 py-6 space-y-5 animate-fade-in pb-24">
         {/* Stats Row */}
         <div className="grid grid-cols-3 gap-3">
           {statCards.map(s => (
