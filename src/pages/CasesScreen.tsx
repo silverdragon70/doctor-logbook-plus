@@ -3,11 +3,30 @@ import { useNavigate } from 'react-router-dom';
 import { Search, TrendingUp, Users, Activity, Hospital, Stethoscope } from 'lucide-react';
 
 const mockCases = [
-  { caseId: '1', patientName: 'Lucas Miller', initials: 'LM', department: 'Respiratory', tagColor: 'bg-accent text-accent-foreground', complaint: 'Persistent cough', diagnosis: 'Bronchitis', meta: 'Room 402 • 4h ago', mediaCount: 2 },
-  { caseId: '2', patientName: 'Sophia Chen', initials: 'SC', department: 'Cardiology', tagColor: 'bg-destructive/10 text-destructive', complaint: 'Chest pain', diagnosis: 'Arrhythmia', meta: 'Room 215 • 12h ago', mediaCount: 5 },
-  { caseId: '3', patientName: 'Ethan Wright', initials: 'EW', department: 'General', tagColor: 'bg-secondary/20 text-secondary', complaint: 'Fever & fatigue', diagnosis: 'Viral infection', meta: 'Room 108 • 1d ago', mediaCount: 0 },
-  { caseId: '4', patientName: 'Maya Johnson', initials: 'MJ', department: 'Neurology', tagColor: 'bg-purple-100 text-purple-700 dark:bg-purple-900/40 dark:text-purple-300', complaint: 'Headache', diagnosis: 'Migraine', meta: 'Room 303 • 2d ago', mediaCount: 1 },
+  { caseId: '1', patientName: 'Lucas Miller', initials: 'LM', gender: 'male' as const, department: 'Respiratory', tagColor: 'bg-accent text-accent-foreground', complaint: 'Persistent cough', diagnosis: 'Bronchitis', room: 'Room 402', lastModified: Date.now() - 4 * 60 * 60 * 1000, mediaCount: 2 },
+  { caseId: '2', patientName: 'Sophia Chen', initials: 'SC', gender: 'female' as const, department: 'Cardiology', tagColor: 'bg-destructive/10 text-destructive', complaint: 'Chest pain', diagnosis: 'Arrhythmia', room: 'Room 215', lastModified: Date.now() - 12 * 60 * 60 * 1000, mediaCount: 5 },
+  { caseId: '3', patientName: 'Ethan Wright', initials: 'EW', gender: 'male' as const, department: 'General', tagColor: 'bg-secondary/20 text-secondary', complaint: 'Fever & fatigue', diagnosis: 'Viral infection', room: 'Room 108', lastModified: Date.now() - 24 * 60 * 60 * 1000, mediaCount: 0 },
+  { caseId: '4', patientName: 'Maya Johnson', initials: 'MJ', gender: 'female' as const, department: 'Neurology', tagColor: 'bg-purple-100 text-purple-700 dark:bg-purple-900/40 dark:text-purple-300', complaint: 'Headache', diagnosis: 'Migraine', room: 'Room 303', lastModified: Date.now() - 2 * 24 * 60 * 60 * 1000, mediaCount: 1 },
 ];
+
+const formatTimeAgo = (timestamp: number) => {
+  const diff = Date.now() - timestamp;
+  const minutes = Math.floor(diff / 60000);
+  if (minutes < 60) return `${minutes}m ago`;
+  const hours = Math.floor(minutes / 60);
+  if (hours < 24) return `${hours}h ago`;
+  const days = Math.floor(hours / 24);
+  return `${days}d ago`;
+};
+
+const GenderIcon = ({ gender, size = 13 }: { gender: 'male' | 'female'; size?: number }) => (
+  <span
+    className={`font-bold ${gender === 'male' ? 'text-blue-500' : 'text-rose-400'}`}
+    style={{ fontSize: size, lineHeight: 1 }}
+  >
+    {gender === 'male' ? '♂' : '♀'}
+  </span>
+);
 
 const stats = [
   { label: 'TOTAL', value: '142', className: 'text-primary' },
