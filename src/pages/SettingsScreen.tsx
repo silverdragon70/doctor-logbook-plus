@@ -101,11 +101,10 @@ const SettingsScreen = () => {
 
         {/* ─── 1. APP APPEARANCE ─── */}
         <Section title="App Appearance">
-          <Row icon={Palette} label="Theme Color" subtitle="Medical Blue (Default)" right={<Chevron />} />
+          <Row icon={Palette} label="Theme Color" subtitle={themeColor === 'blue' ? 'Medical Blue (Default)' : themeColor === 'green' ? 'Forest Green' : themeColor === 'purple' ? 'Warm Purple' : 'Teal'} right={<Chevron />} onClick={() => setThemeSheetOpen(true)} />
           <Row icon={Moon} label="Dark Mode" subtitle="Easier on eyes at night" right={sw(darkMode, setDarkMode)} />
-          <Row icon={Type} label="Font Size" subtitle="Medium" right={<Chevron />} />
-          <Row icon={Globe} label="Language" subtitle="English" right={<Chevron />} />
-          <Row icon={CalendarDays} label="Date & Time Format" subtitle="DD MMM YYYY" right={<Chevron />} noBorder />
+          <Row icon={Type} label="Font Size" subtitle={fontSize === 'small' ? 'Small' : fontSize === 'medium' ? 'Medium' : 'Large'} right={<Chevron />} onClick={() => setFontSheetOpen(true)} />
+          <Row icon={CalendarDays} label="Date & Time Format" subtitle={dateFormat} right={<Chevron />} onClick={() => setDateSheetOpen(true)} noBorder />
         </Section>
 
         {/* ─── 2. HOSPITAL MANAGEMENT ─── */}
