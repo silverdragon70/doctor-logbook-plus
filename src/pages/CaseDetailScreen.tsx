@@ -416,11 +416,14 @@ const CaseDetailScreen = () => {
             const isCardExpanded = expandedSubs.includes(`inv-${inv.id}`);
             const typeIcon = inv.type === 'Lab Result' ? '🧪' : inv.type === 'Imaging' ? '🩻' : '📄';
             return (
-              <div key={inv.id} style={{
-                background: '#FFFFFF', borderRadius: '14px', border: '1px solid #DDE3EA',
-                padding: '12px 16px', marginBottom: '10px',
-                boxShadow: '0px 1px 4px rgba(0,0,0,0.06)',
-              }}>
+              <div key={inv.id}
+                onClick={() => toggleSub(`inv-${inv.id}`)}
+                className="cursor-pointer active:opacity-95 transition-opacity"
+                style={{
+                  background: '#FFFFFF', borderRadius: '14px', border: '1px solid #DDE3EA',
+                  padding: '12px 16px', marginBottom: '10px',
+                  boxShadow: '0px 1px 4px rgba(0,0,0,0.06)',
+                }}>
                 {/* Card header */}
                 <div className="flex items-center justify-between">
                   <span style={{ fontSize: '14px', fontWeight: 700, color: '#1A2332' }}>{inv.name}</span>
@@ -431,26 +434,26 @@ const CaseDetailScreen = () => {
                 </div>
                 <div className="flex items-center justify-between mt-1">
                   <span style={{ fontSize: '12px', color: '#6B7C93' }}>{inv.date}</span>
-                  {isCardExpanded && (
-                    <button onClick={() => toggleEdit(`inv-${inv.id}`)} className="p-1 rounded-full hover:bg-muted/50">
-                      <Pencil size={14} style={{ color: '#2563EB' }} />
-                    </button>
-                  )}
+                  <div className="flex items-center gap-1">
+                    {isCardExpanded && (
+                      <button onClick={(e) => { e.stopPropagation(); toggleEdit(`inv-${inv.id}`); }} className="p-1 rounded-full hover:bg-muted/50">
+                        <Pencil size={14} style={{ color: '#2563EB' }} />
+                      </button>
+                    )}
+                  </div>
                 </div>
 
-                {/* Divider */}
                 <div style={{ borderTop: '1px solid #DDE3EA', margin: '8px 0' }} />
 
-                {/* Result preview / full */}
                 {!isCardExpanded ? (
-                  <button onClick={() => toggleSub(`inv-${inv.id}`)} className="w-full flex items-center justify-between">
-                    <span style={{ fontSize: '13px', color: '#1A2332', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', flex: 1, textAlign: 'left' }}>
+                  <div className="flex items-center justify-between">
+                    <span style={{ fontSize: '13px', color: '#1A2332', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', flex: 1 }}>
                       {inv.result || '—'}
                     </span>
                     <ChevronDown size={14} className="text-muted-foreground ml-2 flex-shrink-0" />
-                  </button>
+                  </div>
                 ) : (
-                  <div className="space-y-3">
+                  <div className="space-y-3" onClick={(e) => e.stopPropagation()}>
                     <div className="space-y-1.5">
                       <span style={{ color: '#6B7C93', fontSize: '12px', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.05em' }}>
                         Result
@@ -463,11 +466,6 @@ const CaseDetailScreen = () => {
                       </div>
                     </div>
 
-                    {/* UI LOGIC — Investigations Image Thumbnails
-                        Show thumbnails ONLY if investigation has attached images.
-                        If investigation.images.length === 0 → hide completely
-                        If investigation.images.length > 0 → show all images
-                        END UI LOGIC */}
                     {(inv.images || []).length > 0 && (
                       <div className="space-y-1.5">
                         <span style={{ color: '#6B7C93', fontSize: '12px', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.05em' }}>
@@ -495,9 +493,9 @@ const CaseDetailScreen = () => {
                       </div>
                     )}
 
-                    <button onClick={() => toggleSub(`inv-${inv.id}`)} className="w-full flex justify-end">
-                      <ChevronUp size={14} className="text-muted-foreground" />
-                    </button>
+                    <div className="flex justify-end" onClick={() => toggleSub(`inv-${inv.id}`)}>
+                      <ChevronUp size={14} className="text-muted-foreground cursor-pointer" />
+                    </div>
                   </div>
                 )}
               </div>
