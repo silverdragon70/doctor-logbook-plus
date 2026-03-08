@@ -21,7 +21,7 @@ const PatientDetailScreen = () => {
   const { data: patientData, isLoading: patientLoading } = usePatient(id!);
   const { data: cases = [] } = usePatientCases(id!);
 
-  const patient = patientData?.patient || patientData;
+  const patient = (patientData as any)?.patient || patientData;
 
   if (patientLoading) {
     return (
