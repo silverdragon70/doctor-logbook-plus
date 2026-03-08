@@ -294,6 +294,7 @@ const ProceduresScreen = () => {
   const [hospitals, setHospitals] = useState<string[]>(EXISTING_HOSPITALS);
   const [editingId, setEditingId] = useState<string | null>(null);
   const [deleteId, setDeleteId] = useState<string | null>(null);
+  const [showExport, setShowExport] = useState(false);
 
   // Form state
   const [formName, setFormName] = useState('');
