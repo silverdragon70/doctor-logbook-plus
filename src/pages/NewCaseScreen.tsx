@@ -3,11 +3,20 @@ import { useNavigate } from 'react-router-dom';
 import { ArrowLeft, Save, Camera, User, Calendar, Search, X } from 'lucide-react';
 
 const existingPatients = [
-  { patientId: '1', name: 'Lucas Miller', fileNumber: 'PED-2024-001', age: '4 years' },
-  { patientId: '2', name: 'Sophia Chen', fileNumber: 'PED-2024-002', age: '7 years' },
-  { patientId: '3', name: 'Ethan Wright', fileNumber: 'PED-2024-003', age: '2 years' },
-  { patientId: '4', name: 'Maya Johnson', fileNumber: 'PED-2024-004', age: '5 years' },
+  { patientId: '1', name: 'Lucas Miller', fileNumber: 'PED-2024-001', age: '4 years', gender: 'male' as const },
+  { patientId: '2', name: 'Sophia Chen', fileNumber: 'PED-2024-002', age: '7 years', gender: 'female' as const },
+  { patientId: '3', name: 'Ethan Wright', fileNumber: 'PED-2024-003', age: '2 years', gender: 'male' as const },
+  { patientId: '4', name: 'Maya Johnson', fileNumber: 'PED-2024-004', age: '5 years', gender: 'female' as const },
 ];
+
+const GenderIcon = ({ gender, size = 13 }: { gender: 'male' | 'female'; size?: number }) => (
+  <span
+    className={`font-bold ${gender === 'male' ? 'text-blue-500' : 'text-rose-400'}`}
+    style={{ fontSize: size, lineHeight: 1 }}
+  >
+    {gender === 'male' ? '♂' : '♀'}
+  </span>
+);
 
 const formFields = [
   { key: 'complaint', label: 'Chief Complaint', placeholder: 'What brought the patient in?', lines: 2 },
