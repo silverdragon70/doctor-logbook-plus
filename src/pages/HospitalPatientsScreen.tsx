@@ -86,10 +86,11 @@ const matchesDateRange = (dateStr: string, key: string) => {
   const date = new Date(dateStr);
   const diffDays = (now.getTime() - date.getTime()) / (1000 * 60 * 60 * 24);
   switch (key) {
-    case 'week': return diffDays <= 7;
     case 'month': return diffDays <= 30;
     case '3months': return diffDays <= 90;
+    case '6months': return diffDays <= 180;
     case 'year': return diffDays <= 365;
+    case 'custom': return true; // custom handled separately
     default: return true;
   }
 };
