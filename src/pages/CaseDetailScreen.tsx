@@ -402,7 +402,7 @@ const CaseDetailScreen = () => {
           isExpanded={expandedSections.includes('investigations')}
           onToggle={() => toggleSection('investigations')}
           sectionRef={sectionRefs.investigations}
-          onAdd={() => console.log('add investigation')}
+          onAdd={() => setShowAddInvestigation(true)}
         >
           {/* UI LOGIC — Investigation Cards
               Render one card per investigation record.
