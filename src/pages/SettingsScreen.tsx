@@ -11,6 +11,8 @@ import AIProviderSheet from '@/components/AIProviderSheet';
 import APIKeySheet from '@/components/APIKeySheet';
 import AIModelSheet from '@/components/AIModelSheet';
 import AILanguageSheet from '@/components/AILanguageSheet';
+import SyncFrequencySheet from '@/components/SyncFrequencySheet';
+import GoogleAccountSheet from '@/components/GoogleAccountSheet';
 import { useNavigate } from 'react-router-dom';
 import {
   ArrowLeft, Palette, Moon, Type, Globe, CalendarDays,
@@ -85,6 +87,10 @@ const SettingsScreen = () => {
   const [aiModelOpen, setAiModelOpen] = useState(false);
   const [aiLanguageOpen, setAiLanguageOpen] = useState(false);
   const [syncEnabled, setSyncEnabled] = useState(true);
+  const [syncFrequency, setSyncFrequency] = useState('daily');
+  const [syncFreqOpen, setSyncFreqOpen] = useState(false);
+  const [googleAccountOpen, setGoogleAccountOpen] = useState(false);
+  const [googleEmail, setGoogleEmail] = useState('user@gmail.com');
   const [encryptedBackup, setEncryptedBackup] = useState(true);
   const [pinLock, setPinLock] = useState(false);
   const [biometric, setBiometric] = useState(true);
@@ -153,10 +159,10 @@ const SettingsScreen = () => {
 
         {/* ─── 4. GOOGLE DRIVE SYNC ─── */}
         <Section title="Google Drive Sync">
-          <Row icon={Cloud} iconColor="#22C55E" label="Sync Enabled" subtitle="user@gmail.com" right={sw(syncEnabled, setSyncEnabled)} />
-          <Row icon={RefreshCw} iconColor="#22C55E" label="Sync Frequency" subtitle="Daily" right={<Chevron />} />
+          <Row icon={Cloud} iconColor="#22C55E" label="Sync Enabled" subtitle={googleEmail} right={sw(syncEnabled, setSyncEnabled)} />
+          <Row icon={RefreshCw} iconColor="#22C55E" label="Sync Frequency" subtitle={syncFrequency === 'hourly' ? 'Every hour' : syncFrequency === '6hours' ? 'Every 6 hours' : syncFrequency === 'daily' ? 'Daily' : syncFrequency === 'weekly' ? 'Weekly' : 'Manual only'} right={<Chevron />} onClick={() => setSyncFreqOpen(true)} />
           <Row icon={Lock} iconColor="#22C55E" label="Encrypted Backup" subtitle="AES-256 encryption" right={sw(encryptedBackup, setEncryptedBackup)} />
-          <Row icon={UserCircle} iconColor="#22C55E" label="Change Google Account" right={<Chevron />} />
+          <Row icon={UserCircle} iconColor="#22C55E" label="Change Google Account" right={<Chevron />} onClick={() => setGoogleAccountOpen(true)} />
           <Row icon={Clock} iconColor="#22C55E" label="Last Synced" subtitle="5 Mar 2025 · 06:48"
             right={
               <button
@@ -313,6 +319,8 @@ const SettingsScreen = () => {
       <APIKeySheet open={apiKeyOpen} onOpenChange={setApiKeyOpen} value={apiKey} onSave={setApiKey} onRemove={() => setApiKey('')} />
       <AIModelSheet open={aiModelOpen} onOpenChange={setAiModelOpen} value={aiModel} onApply={setAiModel} />
       <AILanguageSheet open={aiLanguageOpen} onOpenChange={setAiLanguageOpen} value={aiLanguage} onApply={setAiLanguage} />
+      <SyncFrequencySheet open={syncFreqOpen} onOpenChange={setSyncFreqOpen} value={syncFrequency} onApply={setSyncFrequency} />
+      <GoogleAccountSheet open={googleAccountOpen} onOpenChange={setGoogleAccountOpen} email={googleEmail} onSwitch={() => console.log('switch account')} onDisconnect={() => { setGoogleEmail(''); setSyncEnabled(false); }} />
     </div>
   );
 };
