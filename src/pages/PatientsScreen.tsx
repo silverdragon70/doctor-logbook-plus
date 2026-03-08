@@ -1,6 +1,6 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useRef, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Search, ChevronRight, Plus } from 'lucide-react';
+import { Search, ChevronRight, Plus, ChevronDown } from 'lucide-react';
 
 const mockPatients = [
   { patientId: '1', name: 'Lucas Miller', age: 7, gender: 'male' as const, caseCount: 4, lastVisit: '2025-01-15', specialty: 'Respiratory', dateAdded: '2025-01-10' },
@@ -70,6 +70,60 @@ const matchesDateAdded = (dateStr: string, key: string) => {
   }
 };
 
+const FilterChip = ({ label, options, selected, onSelect }: {
+  label: string;
+  options: { key: string; label: string }[];
+  selected: string | null;
+  onSelect: (key: string) => void;
+}) => {
+  const [open, setOpen] = useState(false);
+  const ref = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const handler = (e: MouseEvent) => {
+      if (ref.current && !ref.current.contains(e.target as Node)) setOpen(false);
+    };
+    if (open) document.addEventListener('mousedown', handler);
+    return () => document.removeEventListener('mousedown', handler);
+  }, [open]);
+
+  const selectedLabel = options.find(o => o.key === selected)?.label;
+  const isActive = !!selected;
+
+  return (
+    <div ref={ref} className="relative shrink-0">
+      <button
+        onClick={() => setOpen(prev => !prev)}
+        className={`flex items-center gap-1 px-3 py-1.5 rounded-full text-[11px] font-semibold border transition-all ${
+          isActive
+            ? 'bg-primary text-primary-foreground border-primary'
+            : 'bg-card text-muted-foreground border-border hover:border-primary/50'
+        }`}
+      >
+        {selectedLabel || label}
+        <ChevronDown size={12} className={`transition-transform ${open ? 'rotate-180' : ''}`} />
+      </button>
+      {open && (
+        <div className="absolute top-full left-0 mt-1 z-50 min-w-[180px] bg-card border border-border rounded-xl shadow-lg overflow-hidden animate-fade-in">
+          {options.map((o) => (
+            <button
+              key={o.key}
+              onClick={() => { onSelect(o.key); setOpen(false); }}
+              className={`w-full px-4 py-2.5 text-left text-[12px] transition-colors ${
+                selected === o.key
+                  ? 'bg-primary/10 text-primary font-bold'
+                  : 'text-foreground hover:bg-muted/50'
+              }`}
+            >
+              {o.label}
+            </button>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+};
+
 const PatientsScreen = () => {
   const [searchQuery, setSearchQuery] = useState('');
   const [activeFilters, setActiveFilters] = useState<Record<string, string | null>>({});
@@ -111,29 +165,20 @@ const PatientsScreen = () => {
       </div>
 
       {/* Filter Chips */}
-      <div className="space-y-2">
-        <div className="flex overflow-x-auto gap-2 pb-1 scrollbar-hide" style={{ scrollbarWidth: 'none' }}>
-          {filterOptions.map((group) =>
-            group.values.map((v) => {
-              const isActive = activeFilters[group.category] === v.key;
-              return (
-                <button
-                  key={`${group.category}-${v.key}`}
-                  onClick={() => toggleFilter(group.category, v.key)}
-                  className={`shrink-0 px-3 py-1.5 rounded-full text-[11px] font-semibold border transition-all ${
-                    isActive
-                      ? 'bg-primary text-primary-foreground border-primary'
-                      : 'bg-card text-muted-foreground border-border hover:border-primary/50'
-                  }`}
-                >
-                  {v.label}
-                </button>
-              );
-            })
-          )}
+      <div className="flex items-center gap-2">
+        <div className="flex overflow-x-auto gap-2 pb-1 flex-1" style={{ scrollbarWidth: 'none' }}>
+          {filterOptions.map((group) => (
+            <FilterChip
+              key={group.category}
+              label={group.label}
+              options={group.values}
+              selected={activeFilters[group.category] || null}
+              onSelect={(key) => toggleFilter(group.category, key)}
+            />
+          ))}
         </div>
         {hasActiveFilters && (
-          <button onClick={clearAll} className="text-[11px] text-primary font-semibold">
+          <button onClick={clearAll} className="shrink-0 text-[11px] text-primary font-semibold">
             Clear All
           </button>
         )}
