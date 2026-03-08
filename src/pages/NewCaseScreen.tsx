@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useRef, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { ArrowLeft, Save, Camera, User, Calendar, Search, X, CalendarIcon, ChevronDown, ClipboardList, Stethoscope, ScrollText, Activity, Pill, Wind, Baby, AirVent, Upload, FlaskConical, HeartPulse } from 'lucide-react';
 import { format } from 'date-fns';
@@ -146,6 +146,70 @@ const NewCaseScreen = () => {
   const [progressNoteDate, setProgressNoteDate] = useState<Date | undefined>(undefined);
   const [progressNoteAssessment, setProgressNoteAssessment] = useState('');
 
+  // Section refs for quick nav
+  const sectionRefs = {
+    patient: useRef<HTMLDivElement>(null),
+    classification: useRef<HTMLDivElement>(null),
+    history: useRef<HTMLDivElement>(null),
+    investigations: useRef<HTMLDivElement>(null),
+    management: useRef<HTMLDivElement>(null),
+    progressNote: useRef<HTMLDivElement>(null),
+    attachImages: useRef<HTMLDivElement>(null),
+  };
+
+  const navPills = [
+    { key: 'patient', label: 'Info' },
+    { key: 'classification', label: 'Class' },
+    { key: 'history', label: 'History' },
+    { key: 'investigations', label: 'Inv' },
+    { key: 'management', label: 'Mgmt' },
+    { key: 'progressNote', label: 'Progress' },
+    { key: 'attachImages', label: 'Notes' },
+  ];
+
+  const [activePill, setActivePill] = useState('patient');
+  const pillBarRef = useRef<HTMLDivElement>(null);
+
+  const handlePillClick = useCallback((key: string) => {
+    const ref = sectionRefs[key as keyof typeof sectionRefs];
+    if (ref.current) {
+      // Expand section if collapsed
+      if (key === 'attachImages') {
+        // no accordion to expand
+      } else if (key === 'progressNote') {
+        setExpandedSections(prev => ({ ...prev, progressNote: true }));
+      } else {
+        setExpandedSections(prev => ({ ...prev, [key]: true }));
+      }
+      
+      setTimeout(() => {
+        ref.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }, 100);
+    }
+    setActivePill(key);
+  }, []);
+
+  useEffect(() => {
+    const observers: IntersectionObserver[] = [];
+    const entries = Object.entries(sectionRefs);
+    
+    entries.forEach(([key, ref]) => {
+      if (!ref.current) return;
+      const observer = new IntersectionObserver(
+        ([entry]) => {
+          if (entry.isIntersecting) {
+            setActivePill(key);
+          }
+        },
+        { rootMargin: '-100px 0px -60% 0px', threshold: 0 }
+      );
+      observer.observe(ref.current);
+      observers.push(observer);
+    });
+
+    return () => observers.forEach(o => o.disconnect());
+  }, []);
+
   const toggleSection = (key: string) => {
     setExpandedSections((prev) => ({ ...prev, [key]: !prev[key] }));
   };
@@ -185,9 +249,34 @@ const NewCaseScreen = () => {
         </button>
       </header>
 
+      {/* Quick Navigation Bar */}
+      <div className="sticky top-[52px] z-40" style={{ background: '#F0F4F8' }}>
+        <div ref={pillBarRef} className="flex gap-2 overflow-x-auto no-scrollbar" style={{ padding: '10px 16px' }}>
+          {navPills.map((pill) => (
+            <button
+              key={pill.key}
+              onClick={() => handlePillClick(pill.key)}
+              className={cn(
+                'whitespace-nowrap text-[13px] font-semibold rounded-[20px] transition-colors shrink-0',
+                activePill === pill.key
+                  ? 'text-white'
+                  : 'text-[hsl(215,15%,50%)] border-[1.5px] border-[hsl(216,20%,90%)] bg-white'
+              )}
+              style={{
+                padding: '8px 14px',
+                ...(activePill === pill.key ? { backgroundColor: '#2563EB' } : {}),
+              }}
+            >
+              {pill.label}
+            </button>
+          ))}
+        </div>
+      </div>
+
       <div className="px-5 py-5 space-y-5 pb-10">
 
         {/* ═══ Patient Information ═══ */}
+        <div ref={sectionRefs.patient}>
         <CollapsibleSection
           title="Patient Information"
           icon={<ClipboardList size={18} className="text-primary" />}
@@ -347,8 +436,10 @@ const NewCaseScreen = () => {
             )}
           </div>
         </CollapsibleSection>
+        </div>
 
         {/* ═══ Initial Classification ═══ */}
+        <div ref={sectionRefs.classification}>
         <CollapsibleSection
           title="Classification"
           icon={<Stethoscope size={18} className="text-primary" />}
@@ -381,8 +472,10 @@ const NewCaseScreen = () => {
             </div>
           </div>
         </CollapsibleSection>
+        </div>
 
         {/* ═══ Patient History ═══ */}
+        <div ref={sectionRefs.history}>
         <CollapsibleSection
           title="Patient History"
           icon={<ScrollText size={18} className="text-primary" />}
@@ -416,9 +509,11 @@ const NewCaseScreen = () => {
             </div>
           </div>
         </CollapsibleSection>
+        </div>
 
 
         {/* ═══ Investigations ═══ */}
+        <div ref={sectionRefs.investigations}>
         <CollapsibleSection
           title="Investigations"
           icon={<span className="text-[18px]">🔬</span>}
@@ -475,8 +570,10 @@ const NewCaseScreen = () => {
             </button>
           </div>
         </CollapsibleSection>
+        </div>
 
         {/* ═══ Management ═══ */}
+        <div ref={sectionRefs.management}>
         <CollapsibleSection
           title="Management"
           icon={<span className="text-[18px]">⚕️</span>}
@@ -601,8 +698,10 @@ const NewCaseScreen = () => {
             </div>
           </div>
         </CollapsibleSection>
+        </div>
 
         {/* ═══ Progress Note ═══ */}
+        <div ref={sectionRefs.progressNote}>
         <CollapsibleSection
           title="Progress Note"
           icon={<span className="text-[18px]">📝</span>}
@@ -700,8 +799,10 @@ const NewCaseScreen = () => {
             </div>
           </div>
         </CollapsibleSection>
+        </div>
 
         {/* ═══ Attach Images ═══ */}
+        <div ref={sectionRefs.attachImages}>
         <div className="bg-card border border-border rounded-[18px] p-4">
           <span className="text-[12px] font-bold text-foreground block mb-3">Attach Images</span>
           <div className="flex gap-3">
@@ -713,6 +814,7 @@ const NewCaseScreen = () => {
               <span className="text-[9px] font-bold mt-1">CAPTURE</span>
             </button>
           </div>
+        </div>
         </div>
       </div>
     </div>
