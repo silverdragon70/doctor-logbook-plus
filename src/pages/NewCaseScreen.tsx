@@ -1,6 +1,6 @@
 import React, { useState, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { ArrowLeft, Save, Camera, User, Calendar, Search, X, CalendarIcon, ChevronDown, ClipboardList, Stethoscope, ScrollText, Activity, Pill, Wind, Baby, AirVent, Upload, FlaskConical } from 'lucide-react';
+import { ArrowLeft, Save, Camera, User, Calendar, Search, X, CalendarIcon, ChevronDown, ClipboardList, Stethoscope, ScrollText, Activity, Pill, Wind, Baby, AirVent, Upload, FlaskConical, HeartPulse } from 'lucide-react';
 import { format } from 'date-fns';
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
