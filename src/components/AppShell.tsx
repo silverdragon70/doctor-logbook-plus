@@ -18,7 +18,7 @@ const AppShell = () => {
     { icon: Search, label: 'Search', path: '/search' },
   ];
 
-  const logbookSubScreens = ['/procedures', '/group-pearl'];
+  const logbookSubScreens = ['/procedures', '/lectures', '/courses', '/group-pearl'];
   const isMainTabScreen = navItems.some((item) => item.path === location.pathname) || logbookSubScreens.some((p) => location.pathname.startsWith(p));
 
   const isActive = (path: string) => {
@@ -27,8 +27,7 @@ const AppShell = () => {
       return (
         location.pathname === '/logbook' ||
         location.pathname.startsWith('/logbook/') ||
-        location.pathname.startsWith('/procedures') ||
-        location.pathname.startsWith('/group-pearl')
+        logbookSubScreens.some((p) => location.pathname.startsWith(p))
       );
     }
 
@@ -96,8 +95,8 @@ const AppShell = () => {
           </nav>
         )}
 
-        {/* FAB — hidden on /procedures since it has its own */}
-        {!isDetailPage && !location.pathname.startsWith('/procedures') && (
+        {/* FAB — hidden on logbook sub-screens since they have their own */}
+        {!isDetailPage && !logbookSubScreens.some((p) => location.pathname.startsWith(p)) && (
           <button
             onClick={() => navigate('/case/new')}
             className="fixed bottom-[84px] left-1/2 translate-x-[110px] w-14 h-14 bg-primary rounded-[18px] flex items-center justify-center text-primary-foreground shadow-brand active:scale-90 transition-all z-50 group overflow-hidden"

@@ -18,6 +18,8 @@ import PatientDetailScreen from "./pages/PatientDetailScreen";
 import NotFound from "./pages/NotFound";
 import GroupPearlScreen from "./pages/GroupPearlScreen";
 import ProceduresScreen from "./pages/ProceduresScreen";
+import LecturesScreen from "./pages/LecturesScreen";
+import CoursesScreen from "./pages/CoursesScreen";
 
 const queryClient = new QueryClient();
 
@@ -34,6 +36,8 @@ const App = () => (
             <Route path="/search" element={<SearchScreen />} />
             <Route path="/logbook" element={<LogbookScreen />} />
             <Route path="/procedures" element={<ProceduresScreen />} />
+            <Route path="/lectures" element={<LecturesScreen />} />
+            <Route path="/courses" element={<CoursesScreen />} />
           </Route>
           <Route path="/case/new" element={<NewCaseScreen />} />
           <Route path="/case/:id" element={<CaseDetailScreen />} />
