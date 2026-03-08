@@ -62,8 +62,8 @@ const MediaGalleryScreen = () => {
                 onClick={() => setSelectedId(m.id || m.mediaId)}
                 className="aspect-square bg-muted rounded-xl flex items-center justify-center cursor-pointer hover:ring-2 hover:ring-primary transition-all relative group overflow-hidden"
               >
-                {m.thumbnailUrl || m.file_path ? (
-                  <img src={m.thumbnailUrl || m.file_path} alt="" className="w-full h-full object-cover" loading="lazy" />
+                {m.thumbnailUrl || m.filePath ? (
+                  <img src={m.thumbnailUrl || m.filePath} alt="" className="w-full h-full object-cover" loading="lazy" />
                 ) : (
                   <ImageIcon size={28} className="text-muted-foreground" />
                 )}

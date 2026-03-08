@@ -41,8 +41,8 @@ const PatientDetailScreen = () => {
   }
 
   const initials = (patient.name || '').split(' ').map((n: string) => n[0]).join('').slice(0, 2);
-  const imageCount = patientData?.stats?.images ?? cases.reduce((sum: number, c: any) => sum + (c.mediaCount || 0), 0);
-  const lastVisit = patientData?.stats?.lastVisit || (cases.length > 0 ? cases[0].date || cases[0].admission_date : '—');
+  const imageCount = (patientData as any)?.stats?.images ?? cases.reduce((sum: number, c: any) => sum + (c.mediaCount || 0), 0);
+  const lastVisit = (patientData as any)?.stats?.lastVisit || (cases.length > 0 ? cases[0].date || cases[0].admissionDate : '—');
 
   return (
     <div className="min-h-screen bg-background animate-fade-in">
