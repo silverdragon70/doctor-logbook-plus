@@ -1,22 +1,68 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { ArrowLeft, Lock, Timer, Database, HardDrive, Cloud, Shield, ChevronRight, ChevronDown, ChevronUp, Clock, Download, Upload, CheckCircle } from 'lucide-react';
+import {
+  ArrowLeft, Palette, Moon, Type, Globe, CalendarDays,
+  Building2, Home, Bot, KeyRound, Brain, Languages, Zap,
+  RefreshCw, Lock, UserCircle, Clock,
+  Database, HardDrive, Cloud, Download, Upload, CheckCircle,
+  Shield, FileText, HardDriveDownload, Image, ToggleLeft,
+  MessageSquare, Save, Eye, Trash2, Info
+} from 'lucide-react';
+import { Switch } from '@/components/ui/switch';
+import { Progress } from '@/components/ui/progress';
+import {
+  AlertDialog, AlertDialogAction, AlertDialogCancel,
+  AlertDialogContent, AlertDialogDescription, AlertDialogFooter,
+  AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger,
+} from '@/components/ui/alert-dialog';
 
-const backupHistory = [
-  { id: '1', type: 'Full Backup', date: '2025-01-15 08:30', size: '245 MB', status: 'success' },
-  { id: '2', type: 'Data Only', date: '2025-01-14 14:20', size: '12 MB', status: 'success' },
-  { id: '3', type: 'Incremental', date: '2025-01-13 09:00', size: '5 MB', status: 'success' },
-];
+/* ── helpers ── */
+const Section = ({ title, children }: { title: string; children: React.ReactNode }) => (
+  <div className="space-y-2">
+    <h3 className="text-[12px] font-bold uppercase tracking-wider px-1" style={{ color: '#6B7C93' }}>{title}</h3>
+    <div className="rounded-2xl overflow-hidden" style={{ background: '#fff', boxShadow: '0px 1px 4px rgba(0,0,0,0.06)' }}>
+      {children}
+    </div>
+  </div>
+);
 
-const backupOptions = [
-  { label: 'Full Backup', desc: 'Database + All Images', icon: Database, time: '< 5 min' },
-  { label: 'Incremental', desc: 'Changes since last backup', icon: Clock, time: '< 30 sec' },
-  { label: 'Data Only', desc: 'Database only, no images', icon: HardDrive, time: '< 1 min' },
-];
+const Row = ({
+  icon: Icon, iconColor, label, subtitle, right, onClick, noBorder,
+}: {
+  icon: any; iconColor?: string; label: string; subtitle?: string;
+  right?: React.ReactNode; onClick?: () => void; noBorder?: boolean;
+}) => (
+  <button
+    onClick={onClick}
+    className="w-full flex items-center gap-3 text-left transition-colors hover:bg-muted/40"
+    style={{ height: 56, padding: '0 16px', borderBottom: noBorder ? 'none' : '1px solid #F0F4F8' }}
+  >
+    <Icon size={20} style={{ color: iconColor || 'hsl(213,78%,48%)' }} className="flex-shrink-0" />
+    <div className="flex-1 min-w-0">
+      <div className="text-[15px] font-medium truncate" style={{ color: '#1A2332' }}>{label}</div>
+      {subtitle && <div className="text-[12px] truncate" style={{ color: '#6B7C93' }}>{subtitle}</div>}
+    </div>
+    {right}
+  </button>
+);
+
+const Chevron = () => <span className="text-[16px]" style={{ color: '#6B7C93' }}>›</span>;
 
 const SettingsScreen = () => {
   const navigate = useNavigate();
-  const [backupExpanded, setBackupExpanded] = useState(false);
+
+  /* toggles */
+  const [darkMode, setDarkMode] = useState(false);
+  const [aiFeatures, setAiFeatures] = useState(true);
+  const [syncEnabled, setSyncEnabled] = useState(true);
+  const [encryptedBackup, setEncryptedBackup] = useState(true);
+  const [pinLock, setPinLock] = useState(false);
+  const [biometric, setBiometric] = useState(true);
+  const [quickEntry, setQuickEntry] = useState(false);
+  const [confirmDialogs, setConfirmDialogs] = useState(true);
+  const [autoSave, setAutoSave] = useState(true);
+
+  /* backup */
   const [isBackingUp, setIsBackingUp] = useState(false);
   const [progress, setProgress] = useState(0);
 
@@ -32,20 +78,19 @@ const SettingsScreen = () => {
     }, 300);
   };
 
-  const securityItems = [
-    { icon: Lock, label: 'Change Encryption Password', desc: 'AES-256 SQLCipher', action: () => console.log('change password') },
-    { icon: Timer, label: 'Auto-Lock Timer', desc: '5 minutes', action: () => console.log('auto-lock') },
+  const backupHistory = [
+    { id: '1', type: 'Full Backup', date: '2025-01-15 · 08:30', size: '245 MB' },
+    { id: '2', type: 'Data Only', date: '2025-01-14 · 14:20', size: '12 MB' },
+    { id: '3', type: 'Incremental', date: '2025-01-13 · 09:00', size: '5 MB' },
   ];
 
-  const statistics = [
-    { label: 'Patients', value: '142' },
-    { label: 'Cases', value: '387' },
-    { label: 'Images', value: '1,204' },
-    { label: 'Storage Used', value: '2.4 GB' },
-  ];
+  const sw = (checked: boolean, onChange: (v: boolean) => void) => (
+    <Switch checked={checked} onCheckedChange={onChange} />
+  );
 
   return (
     <div className="min-h-screen bg-background animate-fade-in">
+      {/* Sub-header */}
       <header className="sticky top-0 z-50 px-4 py-3 flex items-center gap-3 border-b border-border bg-background/80 backdrop-blur-md">
         <button onClick={() => navigate(-1)} className="p-2 rounded-full hover:bg-muted text-muted-foreground">
           <ArrowLeft size={20} />
@@ -53,207 +98,215 @@ const SettingsScreen = () => {
         <h1 className="text-[16px] font-bold text-foreground">Settings</h1>
       </header>
 
-      <div className="px-5 py-5 space-y-6 pb-10">
-        {/* Security */}
-        <div className="space-y-2">
-          <h3 className="text-[12px] font-bold text-muted-foreground uppercase tracking-wider px-1">Security</h3>
-          <div className="bg-card border border-border rounded-xl overflow-hidden divide-y divide-border">
-            {securityItems.map((item) => (
+      <div className="px-5 py-5 space-y-6 pb-28">
+
+        {/* ─── 1. APP APPEARANCE ─── */}
+        <Section title="App Appearance">
+          <Row icon={Palette} label="Theme Color" subtitle="Medical Blue (Default)" right={<Chevron />} />
+          <Row icon={Moon} label="Dark Mode" subtitle="Easier on eyes at night" right={sw(darkMode, setDarkMode)} />
+          <Row icon={Type} label="Font Size" subtitle="Medium" right={<Chevron />} />
+          <Row icon={Globe} label="Language" subtitle="English" right={<Chevron />} />
+          <Row icon={CalendarDays} label="Date & Time Format" subtitle="DD MMM YYYY" right={<Chevron />} noBorder />
+        </Section>
+
+        {/* ─── 2. HOSPITAL MANAGEMENT ─── */}
+        <Section title="Hospital Management">
+          <Row icon={Building2} iconColor="#0EA5E9" label="Manage Hospitals" subtitle="Add, edit or remove" right={<Chevron />} />
+          <Row icon={Home} iconColor="#0EA5E9" label="Default Hospital" subtitle="Cairo University" right={<Chevron />} noBorder />
+        </Section>
+
+        {/* ─── 3. AI INTEGRATION ─── */}
+        <Section title="AI Integration">
+          <Row icon={Bot} iconColor="#8B5CF6" label="AI Provider" subtitle="Anthropic (Claude)" right={<Chevron />} />
+          <Row icon={KeyRound} iconColor="#8B5CF6" label="API Key" subtitle="sk-ant-••••••••••••" right={<Chevron />} />
+          <Row icon={Brain} iconColor="#8B5CF6" label="AI Model" subtitle="Claude Sonnet" right={<Chevron />} />
+          <Row icon={Languages} iconColor="#8B5CF6" label="AI Response Language" subtitle="Arabic" right={<Chevron />} />
+          <Row icon={Zap} iconColor="#8B5CF6" label="AI Features" subtitle="Insights, CasePearl, GroupPearl" right={sw(aiFeatures, setAiFeatures)} noBorder />
+        </Section>
+
+        {/* ─── 4. GOOGLE DRIVE SYNC ─── */}
+        <Section title="Google Drive Sync">
+          <Row icon={Cloud} iconColor="#22C55E" label="Sync Enabled" subtitle="user@gmail.com" right={sw(syncEnabled, setSyncEnabled)} />
+          <Row icon={RefreshCw} iconColor="#22C55E" label="Sync Frequency" subtitle="Daily" right={<Chevron />} />
+          <Row icon={Lock} iconColor="#22C55E" label="Encrypted Backup" subtitle="AES-256 encryption" right={sw(encryptedBackup, setEncryptedBackup)} />
+          <Row icon={UserCircle} iconColor="#22C55E" label="Change Google Account" right={<Chevron />} />
+          <Row icon={Clock} iconColor="#22C55E" label="Last Synced" subtitle="5 Mar 2025 · 06:48"
+            right={
               <button
-                key={item.label}
-                onClick={item.action}
-                className="w-full p-4 flex items-center gap-3 hover:bg-muted/50 transition-colors text-left"
+                onClick={(e) => { e.stopPropagation(); console.log('sync now'); }}
+                className="text-[12px] font-bold rounded-lg px-3 py-1.5"
+                style={{ background: 'hsl(213,78%,95%)', color: 'hsl(213,78%,48%)' }}
               >
-                <div className="w-9 h-9 bg-accent rounded-lg flex items-center justify-center text-primary">
-                  <item.icon size={18} />
-                </div>
-                <div className="flex-1">
-                  <h4 className="text-[13px] font-semibold text-foreground">{item.label}</h4>
-                  <p className="text-[11px] text-muted-foreground">{item.desc}</p>
-                </div>
-                <ChevronRight size={16} className="text-muted-foreground" />
+                Sync Now
               </button>
-            ))}
+            }
+            noBorder
+          />
+        </Section>
+
+        {/* ─── 5. BACKUP & RESTORE ─── */}
+        <Section title="Backup & Restore">
+          <Row icon={Database} label="Full Backup" subtitle="Database + All Images" right={<Upload size={16} style={{ color: '#6B7C93' }} />} onClick={() => simulateBackup('Full')} />
+          <Row icon={Zap} label="Incremental" subtitle="Only new changes since last backup (faster)" right={<Upload size={16} style={{ color: '#6B7C93' }} />} onClick={() => simulateBackup('Incremental')} />
+          <Row icon={FileText} label="Data Only" subtitle="Database only, no images" right={<Upload size={16} style={{ color: '#6B7C93' }} />} onClick={() => simulateBackup('Data')} />
+          <Row icon={Download} label="Restore from Backup" subtitle="Select a backup file" right={<Chevron />} noBorder />
+        </Section>
+
+        {/* Progress bar */}
+        {isBackingUp && (
+          <div className="bg-card border border-border rounded-2xl p-4 space-y-3" style={{ boxShadow: '0px 1px 4px rgba(0,0,0,0.06)' }}>
+            <div className="flex items-center justify-between">
+              <span className="text-[13px] font-bold text-foreground">Backing up...</span>
+              <span className="text-[12px] font-mono font-bold text-primary">{progress}%</span>
+            </div>
+            <div className="h-2 bg-muted rounded-full overflow-hidden">
+              <div className="h-full bg-primary rounded-full transition-all duration-300" style={{ width: `${progress}%` }} />
+            </div>
           </div>
-        </div>
+        )}
 
-        {/* Backup & Restore */}
+        {/* Storage Options */}
         <div className="space-y-2">
-          <button
-            onClick={() => setBackupExpanded(!backupExpanded)}
-            className="w-full flex items-center justify-between px-1"
-          >
-            <h3 className="text-[12px] font-bold text-muted-foreground uppercase tracking-wider">Backup & Restore</h3>
-            {backupExpanded ? <ChevronUp size={14} className="text-muted-foreground" /> : <ChevronDown size={14} className="text-muted-foreground" />}
-          </button>
-
-          {!backupExpanded ? (
-            <div className="bg-card border border-border rounded-xl overflow-hidden divide-y divide-border">
-              <button
-                onClick={() => setBackupExpanded(true)}
-                className="w-full p-4 flex items-center gap-3 hover:bg-muted/50 transition-colors text-left"
-              >
-                <div className="w-9 h-9 bg-accent rounded-lg flex items-center justify-center text-primary">
-                  <Database size={18} />
-                </div>
-                <div className="flex-1">
-                  <h4 className="text-[13px] font-semibold text-foreground">Create Backup</h4>
-                  <p className="text-[11px] text-muted-foreground">Last: Jan 15, 2025</p>
-                </div>
-                <ChevronRight size={16} className="text-muted-foreground" />
-              </button>
-              <button
-                onClick={() => console.log('restore')}
-                className="w-full p-4 flex items-center gap-3 hover:bg-muted/50 transition-colors text-left"
-              >
-                <div className="w-9 h-9 bg-accent rounded-lg flex items-center justify-center text-primary">
-                  <Download size={18} />
-                </div>
-                <div className="flex-1">
-                  <h4 className="text-[13px] font-semibold text-foreground">Restore from Backup</h4>
-                  <p className="text-[11px] text-muted-foreground">Select backup file</p>
-                </div>
-                <ChevronRight size={16} className="text-muted-foreground" />
-              </button>
-              <button
-                onClick={() => console.log('gdrive')}
-                className="w-full p-4 flex items-center gap-3 hover:bg-muted/50 transition-colors text-left"
-              >
-                <div className="w-9 h-9 bg-accent rounded-lg flex items-center justify-center text-primary">
-                  <Cloud size={18} />
-                </div>
-                <div className="flex-1">
-                  <h4 className="text-[13px] font-semibold text-foreground">Google Drive Setup</h4>
-                  <p className="text-[11px] text-muted-foreground">Not connected</p>
-                </div>
-                <ChevronRight size={16} className="text-muted-foreground" />
-              </button>
-            </div>
-          ) : (
-            <div className="space-y-3 animate-fade-in">
-              {/* Backup Options */}
-              {backupOptions.map((opt) => (
-                <button
-                  key={opt.label}
-                  onClick={() => simulateBackup(opt.label)}
-                  disabled={isBackingUp}
-                  className="w-full p-4 bg-card border border-border rounded-xl flex items-center gap-4 active:scale-[0.98] transition-all hover:shadow-card text-left disabled:opacity-50"
-                >
-                  <div className="w-10 h-10 bg-accent rounded-xl flex items-center justify-center text-primary">
-                    <opt.icon size={20} />
-                  </div>
-                  <div className="flex-1">
-                    <h4 className="text-[14px] font-bold text-foreground">{opt.label}</h4>
-                    <p className="text-[11px] text-muted-foreground">{opt.desc} • {opt.time}</p>
-                  </div>
-                  <Upload size={16} className="text-muted-foreground" />
-                </button>
-              ))}
-
-              {/* Progress */}
-              {isBackingUp && (
-                <div className="bg-card border border-border rounded-xl p-4 space-y-3">
-                  <div className="flex items-center justify-between">
-                    <span className="text-[13px] font-bold text-foreground">Backing up...</span>
-                    <span className="text-[12px] font-mono font-bold text-primary">{progress}%</span>
-                  </div>
-                  <div className="h-2 bg-muted rounded-full overflow-hidden">
-                    <div className="h-full bg-primary rounded-full transition-all duration-300" style={{ width: `${progress}%` }} />
-                  </div>
-                </div>
-              )}
-
-              {/* Restore */}
-              <div className="bg-card border border-border rounded-xl p-4">
-                <button onClick={() => console.log('restore')} className="w-full flex items-center gap-3 text-left">
-                  <div className="w-10 h-10 bg-amber-100 dark:bg-amber-900/20 rounded-xl flex items-center justify-center text-amber-600">
-                    <Download size={20} />
-                  </div>
-                  <div>
-                    <h4 className="text-[14px] font-bold text-foreground">Restore from Backup</h4>
-                    <p className="text-[11px] text-muted-foreground">Select a backup file to restore</p>
-                  </div>
-                </button>
-              </div>
-
-              {/* Storage Options */}
-              <div className="space-y-2">
-                <h4 className="text-[11px] font-bold text-muted-foreground uppercase tracking-wider px-1">Storage Options</h4>
-                <div className="grid grid-cols-2 gap-3">
-                  <div className="p-4 bg-card border border-border rounded-xl text-center">
-                    <HardDrive size={20} className="text-primary mx-auto mb-2" />
-                    <div className="text-[12px] font-bold text-foreground">Local</div>
-                    <div className="text-[10px] text-muted-foreground">Device storage</div>
-                  </div>
-                  <div className="p-4 bg-card border border-border rounded-xl text-center opacity-60">
-                    <Cloud size={20} className="text-primary mx-auto mb-2" />
-                    <div className="text-[12px] font-bold text-foreground">Google Drive</div>
-                    <div className="text-[10px] text-muted-foreground">Not connected</div>
-                  </div>
-                </div>
-              </div>
-
-              {/* History */}
-              <div className="space-y-2">
-                <h4 className="text-[11px] font-bold text-muted-foreground uppercase tracking-wider px-1">Backup History</h4>
-                {backupHistory.map((b) => (
-                  <div key={b.id} className="p-3 bg-card border border-border rounded-xl flex items-center justify-between">
-                    <div className="flex items-center gap-3">
-                      <CheckCircle size={16} className="text-secondary" />
-                      <div>
-                        <h4 className="text-[13px] font-bold text-foreground">{b.type}</h4>
-                        <p className="text-[10px] text-muted-foreground">{b.date} • {b.size}</p>
-                      </div>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </div>
-          )}
-        </div>
-
-        {/* Statistics */}
-        <div className="space-y-2">
-          <h3 className="text-[12px] font-bold text-muted-foreground uppercase tracking-wider px-1">Statistics</h3>
+          <h4 className="text-[11px] font-bold uppercase tracking-wider px-1" style={{ color: '#6B7C93' }}>Storage Options</h4>
           <div className="grid grid-cols-2 gap-3">
-            {statistics.map((stat) => (
-              <div key={stat.label} className="p-4 bg-card border border-border rounded-xl">
-                <div className="text-[18px] font-mono font-bold text-primary">{stat.value}</div>
-                <div className="text-[10px] text-muted-foreground uppercase font-bold mt-1">{stat.label}</div>
+            <div className="p-4 rounded-2xl text-center" style={{ background: '#fff', boxShadow: '0px 1px 4px rgba(0,0,0,0.06)' }}>
+              <HardDrive size={20} className="text-primary mx-auto mb-2" />
+              <div className="text-[12px] font-bold" style={{ color: '#1A2332' }}>Local</div>
+              <div className="text-[10px]" style={{ color: '#6B7C93' }}>Device storage</div>
+            </div>
+            <div className="p-4 rounded-2xl text-center" style={{ background: '#fff', boxShadow: '0px 1px 4px rgba(0,0,0,0.06)' }}>
+              <Cloud size={20} className="text-primary mx-auto mb-2" />
+              <div className="text-[12px] font-bold" style={{ color: '#1A2332' }}>Google Drive</div>
+              <div className="text-[10px]" style={{ color: '#6B7C93' }}>Connected</div>
+            </div>
+          </div>
+        </div>
+
+        {/* Backup History */}
+        <div className="space-y-2">
+          <h4 className="text-[11px] font-bold uppercase tracking-wider px-1" style={{ color: '#6B7C93' }}>Backup History</h4>
+          <div className="rounded-2xl overflow-hidden" style={{ background: '#fff', boxShadow: '0px 1px 4px rgba(0,0,0,0.06)' }}>
+            {backupHistory.map((b, i) => (
+              <div key={b.id} className="flex items-center gap-3 px-4" style={{ height: 56, borderBottom: i < backupHistory.length - 1 ? '1px solid #F0F4F8' : 'none' }}>
+                <CheckCircle size={16} className="text-secondary flex-shrink-0" />
+                <div className="flex-1 min-w-0">
+                  <div className="text-[13px] font-bold" style={{ color: '#1A2332' }}>{b.type}</div>
+                  <div className="text-[10px]" style={{ color: '#6B7C93' }}>{b.date} · {b.size}</div>
+                </div>
               </div>
             ))}
           </div>
         </div>
 
-        {/* About */}
+        {/* ─── 6. SECURITY ─── */}
+        <Section title="Security">
+          <Row icon={Lock} iconColor="#EF4444" label="App PIN Lock" subtitle="Require PIN on open" right={sw(pinLock, setPinLock)} />
+          <Row icon={Shield} iconColor="#EF4444" label="Biometric Authentication" subtitle="Fingerprint / Face ID" right={sw(biometric, setBiometric)} />
+          <Row icon={Clock} iconColor="#EF4444" label="Auto-Lock Timeout" subtitle="5 min" right={<Chevron />} />
+          <Row icon={KeyRound} iconColor="#EF4444" label="Change Encryption Password" subtitle="AES-256 SQLCipher" right={<Chevron />} noBorder />
+        </Section>
+
+        {/* ─── 7. DATA & STORAGE ─── */}
+        <Section title="Data & Storage">
+          <Row icon={Download} label="Export Options" subtitle="PDF · Plain Text" right={<Chevron />} />
+          <div className="px-4 py-3 flex items-center gap-3" style={{ borderBottom: '1px solid #F0F4F8' }}>
+            <HardDriveDownload size={20} className="text-primary flex-shrink-0" />
+            <div className="flex-1">
+              <div className="text-[15px] font-medium" style={{ color: '#1A2332' }}>Storage Used</div>
+              <div className="text-[12px] mb-1.5" style={{ color: '#6B7C93' }}>142 MB / ~500 MB available</div>
+              <div className="h-2 bg-muted rounded-full overflow-hidden">
+                <div className="h-full bg-primary rounded-full" style={{ width: '28%' }} />
+              </div>
+            </div>
+          </div>
+          <Row icon={Image} label="Image Handling" subtitle="Lazy Load" right={<Chevron />} noBorder />
+        </Section>
+
+        {/* ─── 8. BEHAVIOR ─── */}
+        <Section title="Behavior">
+          <Row icon={Zap} label="Quick Entry Mode" subtitle="Minimal fields on new entry" right={sw(quickEntry, setQuickEntry)} />
+          <Row icon={MessageSquare} label="Confirmation Dialogs" subtitle="Ask before deleting" right={sw(confirmDialogs, setConfirmDialogs)} />
+          <Row icon={Save} label="Auto-Save" subtitle="Save drafts automatically" right={sw(autoSave, setAutoSave)} />
+          <Row icon={Eye} label="Default View Mode" subtitle="Display" right={<Chevron />} noBorder />
+        </Section>
+
+        {/* ─── 9. DANGER ZONE ─── */}
         <div className="space-y-2">
-          <h3 className="text-[12px] font-bold text-muted-foreground uppercase tracking-wider px-1">About</h3>
-          <div className="bg-card border border-border rounded-xl p-4 space-y-3">
+          <h3 className="text-[12px] font-bold uppercase tracking-wider px-1" style={{ color: '#6B7C93' }}>Danger Zone</h3>
+          <div className="space-y-3">
+            <AlertDialog>
+              <AlertDialogTrigger asChild>
+                <button className="w-full flex items-center gap-3 rounded-2xl text-left" style={{ height: 56, padding: '0 16px', background: '#FEE2E2' }}>
+                  <Trash2 size={20} style={{ color: '#DC2626' }} />
+                  <span className="text-[15px] font-medium" style={{ color: '#DC2626' }}>Delete All Cloud Data</span>
+                </button>
+              </AlertDialogTrigger>
+              <AlertDialogContent>
+                <AlertDialogHeader>
+                  <AlertDialogTitle>Delete All Cloud Data?</AlertDialogTitle>
+                  <AlertDialogDescription>This will permanently delete all your cloud-synced data. This action cannot be undone.</AlertDialogDescription>
+                </AlertDialogHeader>
+                <AlertDialogFooter>
+                  <AlertDialogCancel>Cancel</AlertDialogCancel>
+                  <AlertDialogAction className="bg-destructive text-destructive-foreground hover:bg-destructive/90" onClick={() => console.log('delete cloud')}>Delete</AlertDialogAction>
+                </AlertDialogFooter>
+              </AlertDialogContent>
+            </AlertDialog>
+
+            <AlertDialog>
+              <AlertDialogTrigger asChild>
+                <button className="w-full flex items-center gap-3 rounded-2xl border text-left" style={{ height: 56, padding: '0 16px', background: '#fff', borderColor: '#FCA5A5' }}>
+                  <Trash2 size={20} style={{ color: '#DC2626' }} />
+                  <span className="text-[15px] font-medium" style={{ color: '#DC2626' }}>Clear All Local Data</span>
+                </button>
+              </AlertDialogTrigger>
+              <AlertDialogContent>
+                <AlertDialogHeader>
+                  <AlertDialogTitle>Clear All Local Data?</AlertDialogTitle>
+                  <AlertDialogDescription>This will permanently delete all local data including patients, cases, and images. This action cannot be undone.</AlertDialogDescription>
+                </AlertDialogHeader>
+                <AlertDialogFooter>
+                  <AlertDialogCancel>Cancel</AlertDialogCancel>
+                  <AlertDialogAction className="bg-destructive text-destructive-foreground hover:bg-destructive/90" onClick={() => console.log('clear local')}>Clear</AlertDialogAction>
+                </AlertDialogFooter>
+              </AlertDialogContent>
+            </AlertDialog>
+          </div>
+        </div>
+
+        {/* ─── 10. ABOUT ─── */}
+        <Section title="About">
+          <div className="p-4 space-y-3">
             <div className="flex items-center gap-3">
               <div className="w-10 h-10 bg-primary rounded-xl flex items-center justify-center shadow-brand">
                 <span className="text-primary-foreground font-bold text-lg">P</span>
               </div>
               <div>
-                <h4 className="text-[14px] font-bold text-foreground">PediLog</h4>
-                <p className="text-[11px] text-muted-foreground">Medical Logbook v2.1</p>
+                <div className="text-[14px] font-bold" style={{ color: '#1A2332' }}>PediLog</div>
+                <div className="text-[11px]" style={{ color: '#6B7C93' }}>Medical Logbook</div>
               </div>
             </div>
-            <div className="space-y-1 pt-2 border-t border-border">
+            <div className="space-y-1 pt-2" style={{ borderTop: '1px solid #F0F4F8' }}>
               <div className="flex justify-between text-[11px]">
-                <span className="text-muted-foreground">App Version</span>
-                <span className="text-foreground font-medium">2.1.0</span>
+                <span style={{ color: '#6B7C93' }}>App Version</span>
+                <span className="font-medium" style={{ color: '#1A2332' }}>2.1.0</span>
               </div>
               <div className="flex justify-between text-[11px]">
-                <span className="text-muted-foreground">Schema Version</span>
-                <span className="text-foreground font-medium">3</span>
+                <span style={{ color: '#6B7C93' }}>Schema Version</span>
+                <span className="font-medium" style={{ color: '#1A2332' }}>3</span>
               </div>
               <div className="flex justify-between text-[11px]">
-                <span className="text-muted-foreground">Encryption</span>
-                <span className="text-foreground font-medium flex items-center gap-1"><Shield size={10} /> AES-256</span>
+                <span style={{ color: '#6B7C93' }}>Encryption</span>
+                <span className="font-medium flex items-center gap-1" style={{ color: '#1A2332' }}><Shield size={10} /> AES-256</span>
               </div>
             </div>
           </div>
-        </div>
+        </Section>
+
+        {/* Footer */}
+        <p className="text-center text-[11px] pb-4" style={{ color: '#6B7C93' }}>
+          PediLog v1.0.0 · Built for Pediatric Physicians
+        </p>
       </div>
     </div>
   );
