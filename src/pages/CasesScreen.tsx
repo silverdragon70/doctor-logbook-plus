@@ -37,7 +37,7 @@ const CasesScreen = () => {
       {/* Add Hospital */}
       <div className="flex justify-end -mb-4">
         <button
-          onClick={() => console.log('add new hospital')}
+          onClick={() => navigate('/hospital/new')}
           className="text-[13px] text-primary font-semibold active:opacity-70 transition-opacity"
         >
           + Add New Hospital
