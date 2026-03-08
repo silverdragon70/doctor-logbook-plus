@@ -289,8 +289,10 @@ const ProceduresScreen = () => {
   const navigate = useNavigate();
   const [filter, setFilter] = useState<FilterType>('All');
   const [showForm, setShowForm] = useState(false);
-  const [procedures] = useState<Procedure[]>(MOCK_PROCEDURES);
+  const [procedures, setProcedures] = useState<Procedure[]>(MOCK_PROCEDURES);
   const [hospitals, setHospitals] = useState<string[]>(EXISTING_HOSPITALS);
+  const [editingId, setEditingId] = useState<string | null>(null);
+  const [deleteId, setDeleteId] = useState<string | null>(null);
 
   // Form state
   const [formName, setFormName] = useState('');
@@ -313,6 +315,7 @@ const ProceduresScreen = () => {
   const resetForm = () => {
     setFormName(''); setFormDate(new Date()); setFormParticipation('Performed');
     setFormPatient(''); setFormHospital(''); setFormSupervisor(''); setFormIndication(''); setFormNotes('');
+    setEditingId(null);
   };
 
   const handleAddHospital = (name: string) => {
@@ -323,8 +326,36 @@ const ProceduresScreen = () => {
     navigate('/');
   };
 
+  const handleEdit = (proc: Procedure) => {
+    setEditingId(proc.id);
+    setFormName(proc.name);
+    setFormDate(new Date(proc.date));
+    setFormParticipation(proc.participation);
+    setFormPatient(proc.patientName || '');
+    setFormHospital(proc.hospital || '');
+    setFormSupervisor(proc.supervisor || '');
+    setFormIndication(proc.indication || '');
+    setFormNotes(proc.notes || '');
+    setShowForm(true);
+  };
+
+  const handleDelete = () => {
+    if (deleteId) {
+      setProcedures(prev => prev.filter(p => p.id !== deleteId));
+      setDeleteId(null);
+    }
+  };
+
   const handleSave = () => {
-    console.log('Save procedure', { formName, formDate, formParticipation, formPatient, formHospital, formSupervisor, formIndication, formNotes });
+    if (editingId) {
+      setProcedures(prev => prev.map(p => p.id === editingId ? {
+        ...p, name: formName, date: format(formDate, 'yyyy-MM-dd'), participation: formParticipation,
+        patientName: formPatient || undefined, hospital: formHospital || undefined,
+        supervisor: formSupervisor || undefined, indication: formIndication || undefined, notes: formNotes || undefined,
+      } : p));
+    } else {
+      console.log('Save procedure', { formName, formDate, formParticipation, formPatient, formHospital, formSupervisor, formIndication, formNotes });
+    }
     resetForm();
     setShowForm(false);
   };
