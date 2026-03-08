@@ -465,7 +465,7 @@ const CaseDetailScreen = () => {
                         If investigation.images.length === 0 → hide completely
                         If investigation.images.length > 0 → show all images
                         END UI LOGIC */}
-                    {inv.images.length > 0 && (
+                    {(inv.images || []).length > 0 && (
                       <div className="space-y-1.5">
                         <span style={{ color: '#6B7C93', fontSize: '12px', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.05em' }}>
                           Attached Images
