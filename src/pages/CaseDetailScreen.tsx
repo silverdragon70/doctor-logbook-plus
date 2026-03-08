@@ -528,28 +528,29 @@ const CaseDetailScreen = () => {
             const isCardExpanded = expandedSubs.includes(`mgmt-${entry.id}`);
             const typeIcon = entry.type === 'Medications' ? '💊' : entry.type === 'Respiratory Support' ? '🫁' : '🍼';
             return (
-              <div key={entry.id} style={{
-                background: '#FFFFFF', borderRadius: '14px', border: '1px solid #DDE3EA',
-                padding: '12px 16px', marginBottom: '10px',
-                boxShadow: '0px 1px 4px rgba(0,0,0,0.06)',
-              }}>
+              <div key={entry.id}
+                onClick={() => toggleSub(`mgmt-${entry.id}`)}
+                className="cursor-pointer active:opacity-95 transition-opacity"
+                style={{
+                  background: '#FFFFFF', borderRadius: '14px', border: '1px solid #DDE3EA',
+                  padding: '12px 16px', marginBottom: '10px',
+                  boxShadow: '0px 1px 4px rgba(0,0,0,0.06)',
+                }}>
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-2">
                     <span style={{ fontSize: '16px' }}>{typeIcon}</span>
                     <span style={{ fontSize: '14px', fontWeight: 700, color: '#1A2332' }}>{entry.type}</span>
                   </div>
                   {isCardExpanded && (
-                    <button onClick={() => toggleEdit(`mgmt-${entry.id}`)} className="p-1 rounded-full hover:bg-muted/50">
+                    <button onClick={(e) => { e.stopPropagation(); toggleEdit(`mgmt-${entry.id}`); }} className="p-1 rounded-full hover:bg-muted/50">
                       <Pencil size={14} style={{ color: '#2563EB' }} />
                     </button>
                   )}
                 </div>
                 <div className="flex items-center justify-between mt-1">
                   <span style={{ fontSize: '12px', color: '#6B7C93' }}>{entry.date}</span>
-                  <button onClick={() => toggleSub(`mgmt-${entry.id}`)} className="p-1">
-                    <ChevronDown size={14} className="text-muted-foreground transition-transform duration-300"
-                      style={{ transform: isCardExpanded ? 'rotate(180deg)' : 'rotate(0deg)' }} />
-                  </button>
+                  <ChevronDown size={14} className="text-muted-foreground transition-transform duration-300"
+                    style={{ transform: isCardExpanded ? 'rotate(180deg)' : 'rotate(0deg)' }} />
                 </div>
 
                 {isCardExpanded && (
