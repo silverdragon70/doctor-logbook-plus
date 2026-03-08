@@ -47,7 +47,7 @@ const AboutSheet = ({ open, onOpenChange }: AboutSheetProps) => {
     <Drawer open={open} onOpenChange={onOpenChange}>
       <DrawerContent className="max-h-[90vh]">
         <DrawerHeader className="flex items-center justify-between px-5 pb-2">
-          <DrawerTitle className="text-[17px] font-bold" style={{ color: '#1A2332' }}>About PediLog</DrawerTitle>
+          <DrawerTitle className="text-[17px] font-bold" style={{ color: '#1A2332' }}>About Medora</DrawerTitle>
           <DrawerClose asChild>
             <button className="p-1.5 rounded-full hover:bg-muted"><X size={20} style={{ color: '#6B7C93' }} /></button>
           </DrawerClose>
@@ -57,10 +57,10 @@ const AboutSheet = ({ open, onOpenChange }: AboutSheetProps) => {
           {/* Logo */}
           <div className="flex items-center gap-3 mb-4">
             <div className="w-12 h-12 bg-primary rounded-xl flex items-center justify-center shadow-brand">
-              <span className="text-primary-foreground font-bold text-xl">P</span>
+              <span className="text-primary-foreground font-bold text-xl">M</span>
             </div>
             <div>
-              <div className="text-[16px] font-bold" style={{ color: '#1A2332' }}>PediLog</div>
+              <div className="text-[16px] font-bold" style={{ color: '#1A2332' }}>Medora</div>
               <div className="text-[12px]" style={{ color: '#6B7C93' }}>Medical Logbook</div>
             </div>
           </div>
@@ -78,7 +78,7 @@ const AboutSheet = ({ open, onOpenChange }: AboutSheetProps) => {
 
           {/* Privacy & Data Security */}
           <SectionHeader icon={Lock} label="Privacy & Data Security" />
-          <BodyText>All data entered into PediLog is stored locally on the user's device unless the user explicitly chooses to export, sync, or back up the data using optional features.</BodyText>
+          <BodyText>All data entered into Medora is stored locally on the user's device unless the user explicitly chooses to export, sync, or back up the data using optional features.</BodyText>
           <div className="h-3" />
           <BodyText>The developer does not collect, monitor, or store patient data.</BodyText>
           <div className="h-3" />
@@ -104,7 +104,7 @@ const AboutSheet = ({ open, onOpenChange }: AboutSheetProps) => {
 
           {/* Encryption Disclaimer */}
           <SectionHeader icon={Lock} label="Encryption Disclaimer" />
-          <BodyText>PediLog may implement encryption technologies such as AES-256 as a best-effort security measure.</BodyText>
+          <BodyText>Medora may implement encryption technologies such as AES-256 as a best-effort security measure.</BodyText>
           <div className="h-3" />
           <BodyText>However, encryption is provided <B>WITHOUT ANY GUARANTEE</B> of absolute security.</BodyText>
           <div className="h-3" />
@@ -164,7 +164,7 @@ const AboutSheet = ({ open, onOpenChange }: AboutSheetProps) => {
 
           {/* AI Disclaimer */}
           <SectionHeader icon={Bot} label="Artificial Intelligence Disclaimer" />
-          <BodyText>AI features within PediLog may send de-identified or processed data to third-party AI providers.</BodyText>
+          <BodyText>AI features within Medora may send de-identified or processed data to third-party AI providers.</BodyText>
           <div className="h-3" />
           <BodyText>AI-generated content is produced by automated machine learning systems and may contain:</BodyText>
           <BulletList items={[
@@ -189,7 +189,7 @@ const AboutSheet = ({ open, onOpenChange }: AboutSheetProps) => {
 
           {/* Medical Disclaimer */}
           <SectionHeader icon={AlertTriangle} label="Medical Disclaimer" />
-          <BodyText>PediLog is a documentation tool only. It is <B>NOT</B> a medical device and is <B>NOT</B> intended for diagnosis, treatment, monitoring, or clinical decision making.</BodyText>
+          <BodyText>Medora is a documentation tool only. It is <B>NOT</B> a medical device and is <B>NOT</B> intended for diagnosis, treatment, monitoring, or clinical decision making.</BodyText>
           <div className="h-3" />
           <BodyText>All clinical decisions must be made solely by qualified healthcare professionals using their own professional judgment.</BodyText>
           <div className="h-3" />
@@ -208,7 +208,7 @@ const AboutSheet = ({ open, onOpenChange }: AboutSheetProps) => {
 
           {/* Software Warranty Disclaimer */}
           <SectionHeader icon={Settings} label="Software Warranty Disclaimer" />
-          <BodyText>PediLog is provided strictly <B>"AS IS"</B> and <B>"AS AVAILABLE"</B>.</BodyText>
+          <BodyText>Medora is provided strictly <B>"AS IS"</B> and <B>"AS AVAILABLE"</B>.</BodyText>
           <div className="h-3" />
           <BodyText>The developer makes <B>NO</B> warranties, express or implied, including but not limited to:</BodyText>
           <BulletList items={[
@@ -227,7 +227,7 @@ const AboutSheet = ({ open, onOpenChange }: AboutSheetProps) => {
 
           {/* User Responsibility */}
           <SectionHeader icon={Users} label="User Responsibility" />
-          <BodyText>By using PediLog, you acknowledge and agree that:</BodyText>
+          <BodyText>By using Medora, you acknowledge and agree that:</BodyText>
           <BulletList items={[
             'You are solely responsible for all data entered into the app',
             'You are responsible for ensuring compliance with all applicable medical privacy laws and institutional policies',

@@ -299,10 +299,10 @@ const SettingsScreen = () => {
             className="w-full flex items-center gap-3 p-4 text-left transition-colors hover:bg-muted/40"
           >
             <div className="w-10 h-10 bg-primary rounded-xl flex items-center justify-center shadow-brand">
-              <span className="text-primary-foreground font-bold text-lg">P</span>
+              <span className="text-primary-foreground font-bold text-lg">M</span>
             </div>
             <div className="flex-1">
-              <div className="text-[14px] font-bold" style={{ color: '#1A2332' }}>PediLog</div>
+              <div className="text-[14px] font-bold" style={{ color: '#1A2332' }}>Medora</div>
               <div className="text-[11px]" style={{ color: '#6B7C93' }}>Medical Logbook</div>
             </div>
             <Chevron />
@@ -311,7 +311,7 @@ const SettingsScreen = () => {
 
         {/* Footer */}
         <p className="text-center text-[11px] pb-4" style={{ color: '#6B7C93' }}>
-          PediLog v1.0.0 · Built for Pediatric Physicians
+          Medora v1.0.0 · Built for Pediatric Physicians
         </p>
       </div>
 
