@@ -378,6 +378,28 @@ const ProceduresScreen = () => {
             )}
           </div>
 
+          {/* Hospital */}
+          <div className="space-y-1.5">
+            <label className="text-sm font-medium text-foreground">Hospital <span className="text-muted-foreground font-normal">(optional)</span></label>
+            <HospitalSearchDropdown
+              value={formHospital}
+              onChange={setFormHospital}
+              hospitals={hospitals}
+              onAddHospital={handleAddHospital}
+            />
+          </div>
+
+          {/* Supervisor */}
+          <div className="space-y-1.5">
+            <label className="text-sm font-medium text-foreground">Supervisor <span className="text-muted-foreground font-normal">(optional)</span></label>
+            <Input
+              placeholder="e.g. Dr. Ahmad"
+              value={formSupervisor}
+              onChange={e => setFormSupervisor(e.target.value)}
+              className="bg-card border-border"
+            />
+          </div>
+
           {/* Indication */}
           <div className="space-y-1.5">
             <label className="text-sm font-medium text-foreground">Indication</label>
