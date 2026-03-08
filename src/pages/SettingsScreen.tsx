@@ -105,6 +105,8 @@ const SettingsScreen = () => {
   const [progressOpen, setProgressOpen] = useState(false);
   const [progressType, setProgressType] = useState<OperationType>('backup');
   const [progressDetail, setProgressDetail] = useState('');
+  const [syncProgressOpen, setSyncProgressOpen] = useState(false);
+  const [lastSyncedText, setLastSyncedText] = useState('5 Mar 2025 · 06:48');
 
   const startProgress = (type: OperationType, detail?: string) => {
     setProgressType(type);
