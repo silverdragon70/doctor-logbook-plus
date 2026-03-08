@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useRef, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { ArrowLeft, Save, Camera, User, Calendar, Search, X, CalendarIcon, ChevronDown, ClipboardList, Stethoscope, ScrollText, Activity, Pill, Wind, Baby, AirVent, Upload, FlaskConical, HeartPulse } from 'lucide-react';
 import { format } from 'date-fns';
