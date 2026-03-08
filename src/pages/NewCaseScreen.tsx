@@ -127,6 +127,7 @@ const NewCaseScreen = () => {
     classification: true,
     history: false,
     vitals: false,
+    investigations: false,
     management: false,
     medications: false,
     respiratory: false,
@@ -137,6 +138,10 @@ const NewCaseScreen = () => {
   const [respiratorySupport, setRespiratorySupport] = useState('');
   const [respiratoryType, setRespiratoryType] = useState('');
   const [feeding, setFeeding] = useState('');
+  const [investigationName, setInvestigationName] = useState('');
+  const [investigationType, setInvestigationType] = useState('');
+  const [investigationDate, setInvestigationDate] = useState<Date | undefined>(undefined);
+  const [investigationResult, setInvestigationResult] = useState('');
 
   const toggleSection = (key: string) => {
     setExpandedSections((prev) => ({ ...prev, [key]: !prev[key] }));
