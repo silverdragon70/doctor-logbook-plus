@@ -38,6 +38,7 @@ const App = () => (
             <Route path="/procedures" element={<ProceduresScreen />} />
             <Route path="/lectures" element={<LecturesScreen />} />
             <Route path="/courses" element={<CoursesScreen />} />
+            <Route path="/group-pearl" element={<GroupPearlScreen />} />
           </Route>
           <Route path="/case/new" element={<NewCaseScreen />} />
           <Route path="/case/:id" element={<CaseDetailScreen />} />
@@ -45,7 +46,6 @@ const App = () => (
           <Route path="/patient/:id" element={<PatientDetailScreen />} />
           <Route path="/hospital/new" element={<AddHospitalScreen />} />
           <Route path="/settings" element={<SettingsScreen />} />
-          <Route path="/group-pearl" element={<GroupPearlScreen />} />
           <Route path="*" element={<NotFound />} />
         </Routes>
       </BrowserRouter>
