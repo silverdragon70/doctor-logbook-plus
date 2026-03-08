@@ -34,6 +34,16 @@ const CasesScreen = () => {
         />
       </div>
 
+      {/* Add Hospital */}
+      <div className="flex justify-end">
+        <button
+          onClick={() => console.log('add new hospital')}
+          className="text-[13px] text-primary font-semibold active:opacity-70 transition-opacity"
+        >
+          + Add New Hospital
+        </button>
+      </div>
+
       {/* Hospital Overview Card */}
       <section className="relative overflow-hidden bg-card border border-border rounded-2xl shadow-card">
         <div className="h-1 w-full gradient-brand" />
