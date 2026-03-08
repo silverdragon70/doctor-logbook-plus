@@ -348,6 +348,18 @@ const NewCaseScreen = () => {
             />
           </div>
 
+          {/* Final Diagnosis */}
+          <div className="space-y-1.5">
+            <label className={labelClass} style={{ color: '#6B7C93' }}>Final Diagnosis</label>
+            <textarea
+              value={finalDiagnosis}
+              onChange={(e) => setFinalDiagnosis(e.target.value)}
+              placeholder="Enter final diagnosis..."
+              rows={3}
+              className={cn(inputClass, 'h-auto py-3 resize-none')}
+            />
+          </div>
+
 
         </div>
 
