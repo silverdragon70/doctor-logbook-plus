@@ -16,6 +16,7 @@ import GoogleAccountSheet from '@/components/GoogleAccountSheet';
 import ProgressSheet, { OperationType } from '@/components/ProgressSheet';
 import SyncProgressSheet from '@/components/SyncProgressSheet';
 import RestoreBackupSheet from '@/components/RestoreBackupSheet';
+import ImageHandlingSheet from '@/components/ImageHandlingSheet';
 import { useNavigate } from 'react-router-dom';
 import {
   ArrowLeft, Palette, Moon, Type, Globe, CalendarDays,
