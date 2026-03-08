@@ -95,69 +95,81 @@ const matchesDateRange = (dateStr: string, key: string) => {
   }
 };
 
-/* ── Filter Chip (inline dropdown) ── */
-const FilterChip = ({ label, options, selected, onSelect, align = 'left' }: {
-  label: string;
+/* ── Generic Filter Bottom Sheet ── */
+const FilterSheet = ({ open, onClose, title, options, selected, onApply }: {
+  open: boolean;
+  onClose: () => void;
+  title: string;
   options: { key: string; label: string }[];
   selected: string | null;
-  onSelect: (key: string) => void;
-  align?: 'left' | 'right';
+  onApply: (key: string | null) => void;
 }) => {
-  const [open, setOpen] = useState(false);
-  const ref = useRef<HTMLDivElement>(null);
+  const [localSelected, setLocalSelected] = useState<string | null>(selected);
 
   useEffect(() => {
-    const handler = (e: MouseEvent) => {
-      if (ref.current && !ref.current.contains(e.target as Node)) setOpen(false);
-    };
-    if (open) document.addEventListener('mousedown', handler);
-    return () => document.removeEventListener('mousedown', handler);
-  }, [open]);
+    if (open) setLocalSelected(selected);
+  }, [open, selected]);
 
-  const selectedLabel = options.find(o => o.key === selected)?.label;
-  const isActive = !!selected;
+  if (!open) return null;
 
   return (
-    <div ref={ref} className="relative shrink-0">
-      <button
-        onClick={() => setOpen(prev => !prev)}
-        className="flex items-center gap-1.5 px-3 rounded-full text-[12px] font-semibold transition-all whitespace-nowrap"
-        style={{
-          height: 36,
-          backgroundColor: isActive ? '#EFF6FF' : 'transparent',
-          border: isActive ? '1.5px solid #2563EB' : '1.5px solid hsl(214,20%,85%)',
-          color: isActive ? '#2563EB' : 'hsl(215,16%,47%)',
-          fontWeight: isActive ? 700 : 600,
-        }}
-      >
-        {selectedLabel || label}
-        <ChevronDown size={13} className={`transition-transform ${open ? 'rotate-180' : ''}`} />
-      </button>
-      {open && (
-        <div
-          className={`absolute top-full mt-1.5 w-[200px] rounded-xl overflow-hidden ${align === 'right' ? 'right-0' : 'left-0'}`}
-          style={{ zIndex: 9999, backgroundColor: '#FFFFFF', boxShadow: '0px 4px 12px rgba(0,0,0,0.10)', padding: '8px 0' }}
-        >
-          {options.map((o) => (
+    <>
+      <div className="fixed inset-0 z-50 bg-black/40" onClick={onClose} />
+      <div className="fixed inset-x-0 bottom-0 z-50 max-h-[70vh] overflow-y-auto bg-background rounded-t-[24px] animate-in slide-in-from-bottom duration-300">
+        <div className="flex justify-center pt-3 pb-1">
+          <div className="w-10 h-1 rounded-full bg-muted-foreground/30" />
+        </div>
+        <div className="px-5 pb-2 flex items-center justify-between">
+          <h2 className="text-[16px] font-bold text-foreground">{title}</h2>
+          <button onClick={onClose} className="p-2 rounded-full hover:bg-muted text-muted-foreground"><X size={18} /></button>
+        </div>
+        <div className="px-5 pb-4 space-y-2">
+          {/* All option */}
+          <button
+            onClick={() => setLocalSelected(null)}
+            className="w-full flex items-center gap-3 px-4 py-3 rounded-xl border transition-all"
+            style={{
+              borderColor: localSelected === null ? '#2563EB' : '#E2E8F0',
+              backgroundColor: localSelected === null ? '#EFF6FF' : '#FFFFFF',
+            }}
+          >
+            <div className="w-5 h-5 rounded-full border-2 flex items-center justify-center"
+              style={{ borderColor: localSelected === null ? '#2563EB' : '#CBD5E1' }}>
+              {localSelected === null && <div className="w-2.5 h-2.5 rounded-full" style={{ backgroundColor: '#2563EB' }} />}
+            </div>
+            <span className="text-[14px]" style={{ color: localSelected === null ? '#2563EB' : '#1A2332', fontWeight: localSelected === null ? 700 : 400 }}>
+              {title === 'Age Group' ? 'All Ages' : 'All'}
+            </span>
+          </button>
+          {options.map(o => (
             <button
               key={o.key}
-              onClick={() => { onSelect(o.key); setOpen(false); }}
-              className="w-full text-left text-[13px] transition-colors"
+              onClick={() => setLocalSelected(o.key)}
+              className="w-full flex items-center gap-3 px-4 py-3 rounded-xl border transition-all"
               style={{
-                height: 40,
-                padding: '0 16px',
-                display: 'flex',
-                alignItems: 'center',
-                color: selected === o.key ? '#2563EB' : '#1A2332',
-                fontWeight: selected === o.key ? 700 : 400,
+                borderColor: localSelected === o.key ? '#2563EB' : '#E2E8F0',
+                backgroundColor: localSelected === o.key ? '#EFF6FF' : '#FFFFFF',
               }}
             >
-              {o.label}
+              <div className="w-5 h-5 rounded-full border-2 flex items-center justify-center"
+                style={{ borderColor: localSelected === o.key ? '#2563EB' : '#CBD5E1' }}>
+                {localSelected === o.key && <div className="w-2.5 h-2.5 rounded-full" style={{ backgroundColor: '#2563EB' }} />}
+              </div>
+              <span className="text-[14px]" style={{ color: localSelected === o.key ? '#2563EB' : '#1A2332', fontWeight: localSelected === o.key ? 700 : 400 }}>
+                {o.label}
+              </span>
             </button>
           ))}
+          <button
+            onClick={() => { onApply(localSelected); onClose(); }}
+            className="w-full h-[48px] rounded-xl font-semibold text-[14px] text-white mt-3"
+            style={{ backgroundColor: '#2563EB' }}
+          >
+            Apply
+          </button>
         </div>
-      )}
-    </div>
+      </div>
+    </>
   );
 };
 
