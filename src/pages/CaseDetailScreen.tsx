@@ -377,6 +377,8 @@ const CaseDetailScreen = () => {
           isExpanded={expandedSections.includes('history')}
           onToggle={() => toggleSection('history')}
           sectionRef={sectionRefs.history}
+          onEdit={() => toggleEdit('history')}
+          isEditing={editingSections.includes('history')}
         >
           <DisplayField label="Chief Complaint" value={mockCase.historyComplaint} isMultiLine />
           <DisplayField label="Present History" value={mockCase.presentHistory} isMultiLine />
