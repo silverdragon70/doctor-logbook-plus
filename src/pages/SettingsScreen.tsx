@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import SettingsExportSheet from '@/components/SettingsExportSheet';
+import CreateBackupSheet from '@/components/CreateBackupSheet';
 import { useNavigate } from 'react-router-dom';
 import {
   ArrowLeft, Palette, Moon, Type, Globe, CalendarDays,
@@ -73,23 +74,9 @@ const SettingsScreen = () => {
   const [confirmDialogs, setConfirmDialogs] = useState(true);
   const [autoSave, setAutoSave] = useState(true);
   const [exportOpen, setExportOpen] = useState(false);
+  const [backupSheetOpen, setBackupSheetOpen] = useState(false);
   const [backupLocation, setBackupLocation] = useState<'local' | 'gdrive'>('local');
-
-  /* backup */
-  const [isBackingUp, setIsBackingUp] = useState(false);
-  const [progress, setProgress] = useState(0);
-
-  const simulateBackup = (type: string) => {
-    console.log('backup', type);
-    setIsBackingUp(true);
-    setProgress(0);
-    const interval = setInterval(() => {
-      setProgress(prev => {
-        if (prev >= 100) { clearInterval(interval); setIsBackingUp(false); return 100; }
-        return prev + 10;
-      });
-    }, 300);
-  };
+  const [lastBackupInfo, setLastBackupInfo] = useState({ date: '2025-01-15 · 08:30', size: '245 MB' });
 
 
   const sw = (checked: boolean, onChange: (v: boolean) => void) => (
@@ -154,24 +141,8 @@ const SettingsScreen = () => {
 
         {/* ─── 5. BACKUP & RESTORE ─── */}
         <Section title="Backup & Restore">
-          <Row icon={Database} label="Full Backup" subtitle="Database + All Images" lastBackup={{ date: '2025-01-15', size: '245 MB' }} right={<Upload size={16} style={{ color: '#6B7C93' }} />} onClick={() => simulateBackup('Full')} />
-          <Row icon={Zap} label="Incremental" subtitle="Only new changes since last backup (faster)" lastBackup={{ date: '2025-01-13', size: '5 MB' }} right={<Upload size={16} style={{ color: '#6B7C93' }} />} onClick={() => simulateBackup('Incremental')} />
-          <Row icon={FileText} label="Data Only" subtitle="Database only, no images" lastBackup={{ date: '2025-01-14', size: '12 MB' }} right={<Upload size={16} style={{ color: '#6B7C93' }} />} onClick={() => simulateBackup('Data')} />
           <Row icon={Download} label="Restore from Backup" subtitle="Select a backup file" right={<Chevron />} noBorder />
         </Section>
-
-        {/* Progress bar */}
-        {isBackingUp && (
-          <div className="bg-card border border-border rounded-2xl p-4 space-y-3" style={{ boxShadow: '0px 1px 4px rgba(0,0,0,0.06)' }}>
-            <div className="flex items-center justify-between">
-              <span className="text-[13px] font-bold text-foreground">Backing up...</span>
-              <span className="text-[12px] font-mono font-bold text-primary">{progress}%</span>
-            </div>
-            <div className="h-2 bg-muted rounded-full overflow-hidden">
-              <div className="h-full bg-primary rounded-full transition-all duration-300" style={{ width: `${progress}%` }} />
-            </div>
-          </div>
-        )}
 
         {/* ─── STORAGE & EXPORTING ─── */}
         <Section title="Storage & Exporting">
@@ -213,6 +184,21 @@ const SettingsScreen = () => {
                 </button>
               </div>
             </div>
+          </div>
+          {/* Last Backup */}
+          <div className="px-4 py-3 flex items-center gap-3" style={{ borderBottom: '1px solid #F0F4F8' }}>
+            <Clock size={20} className="text-primary flex-shrink-0" />
+            <div className="flex-1">
+              <div className="text-[15px] font-medium" style={{ color: '#1A2332' }}>Last Backup</div>
+              <div className="text-[12px]" style={{ color: '#6B7C93' }}>{lastBackupInfo.date} · {lastBackupInfo.size}</div>
+            </div>
+            <button
+              onClick={() => setBackupSheetOpen(true)}
+              className="text-[13px] font-bold rounded-[10px] px-3.5 py-1.5"
+              style={{ background: '#2563EB', color: '#fff' }}
+            >
+              Backup Now
+            </button>
           </div>
           <Row icon={Upload} label="Export Data" subtitle="Export your records" right={<Chevron />} onClick={() => setExportOpen(true)} noBorder />
         </Section>
@@ -305,6 +291,18 @@ const SettingsScreen = () => {
       </div>
 
       <SettingsExportSheet open={exportOpen} onOpenChange={setExportOpen} />
+      <CreateBackupSheet
+        open={backupSheetOpen}
+        onOpenChange={setBackupSheetOpen}
+        defaultLocation={backupLocation}
+        onBackupComplete={() => {
+          const now = new Date();
+          setLastBackupInfo({
+            date: now.toISOString().slice(0, 10) + ' · ' + now.toTimeString().slice(0, 5),
+            size: 'calculating...',
+          });
+        }}
+      />
     </div>
   );
 };
