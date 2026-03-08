@@ -201,6 +201,9 @@ const CaseDetailScreen = () => {
   const [expandedSubs, setExpandedSubs] = useState<string[]>([]);
   const [editingSections, setEditingSections] = useState<string[]>([]);
   const [deleteTarget, setDeleteTarget] = useState<string | null>(null);
+  const [showAddInvestigation, setShowAddInvestigation] = useState(false);
+  const [showAddManagement, setShowAddManagement] = useState(false);
+  const [showAddProgress, setShowAddProgress] = useState(false);
 
   const toggleEdit = (key: string) => {
     setEditingSections(prev => prev.includes(key) ? prev.filter(s => s !== key) : [...prev, key]);
