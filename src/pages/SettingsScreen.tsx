@@ -309,6 +309,10 @@ const SettingsScreen = () => {
       <DateFormatSheet open={dateSheetOpen} onOpenChange={setDateSheetOpen} value={dateFormat} onApply={setDateFormat} />
       <ManageHospitalsSheet open={hospitalsSheetOpen} onOpenChange={setHospitalsSheetOpen} />
       <DefaultHospitalSheet open={defaultHospitalSheetOpen} onOpenChange={setDefaultHospitalSheetOpen} hospitals={hospitalsList} value={defaultHospitalId} onApply={setDefaultHospitalId} />
+      <AIProviderSheet open={aiProviderOpen} onOpenChange={setAiProviderOpen} value={aiProvider} onApply={setAiProvider} />
+      <APIKeySheet open={apiKeyOpen} onOpenChange={setApiKeyOpen} value={apiKey} onSave={setApiKey} onRemove={() => setApiKey('')} />
+      <AIModelSheet open={aiModelOpen} onOpenChange={setAiModelOpen} value={aiModel} onApply={setAiModel} />
+      <AILanguageSheet open={aiLanguageOpen} onOpenChange={setAiLanguageOpen} value={aiLanguage} onApply={setAiLanguage} />
     </div>
   );
 };
