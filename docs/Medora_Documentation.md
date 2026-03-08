@@ -1252,6 +1252,7 @@ interface GoogleAccount {
 
 #### PUT /courses/:id
 #### DELETE /courses/:id
+| Response 200 | `{ success: true }` |
 
 ### Hospitals
 
