@@ -1,5 +1,5 @@
 import React, { useState, useMemo } from 'react';
-import { Upload, CalendarIcon } from 'lucide-react';
+import { Upload, CalendarIcon, ChevronDown } from 'lucide-react';
 import { format, subMonths, subYears, isAfter, isBefore, startOfDay, endOfDay } from 'date-fns';
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
