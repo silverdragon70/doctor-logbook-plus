@@ -296,7 +296,7 @@ const ExportSheet: React.FC<ExportSheetProps> = ({ open, onOpenChange, title, da
             disabled={filtered.length === 0 || (cases && selectedCaseIds.length === 0)}
             className="w-full h-11 rounded-xl text-sm font-semibold gap-2"
           >
-            <Upload size={16} /> Export
+            <Upload size={16} /> Export{cases ? ` (${selectedCaseIds.length} case${selectedCaseIds.length !== 1 ? 's' : ''} selected)` : ''}
           </Button>
         </div>
       </DrawerContent>
