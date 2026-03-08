@@ -193,7 +193,7 @@ const PatientsScreen = () => {
       <div className="flex items-center justify-between">
         <h3 className="text-[14px] font-bold text-foreground">{filtered.length} Patients</h3>
         <button
-          onClick={() => console.log('add patient')}
+          onClick={() => navigate('/case/new')}
           className="flex items-center gap-1 text-[12px] text-primary font-semibold"
         >
           <Plus size={14} /> Add New
