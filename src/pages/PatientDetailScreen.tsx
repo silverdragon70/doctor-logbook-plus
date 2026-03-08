@@ -1,6 +1,6 @@
 import React from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
-import { ArrowLeft, Edit2, ChevronRight, FileText } from 'lucide-react';
+import { ArrowLeft, Edit2, ChevronRight, FileText, Plus } from 'lucide-react';
 
 const mockPatient = {
   patientId: '1', name: 'Lucas Miller', age: 7, gender: 'male',
@@ -91,6 +91,32 @@ const PatientDetailScreen = () => {
           ))}
         </div>
       </div>
+
+      {/* FAB — Add New Case */}
+      <button
+        onClick={() => {
+          // BACKEND LOGIC — Pre-fill Patient in New Case
+          // When navigating to New Case from Patient Profile:
+          // 1. Pass the current patient's ID to New Case screen
+          // 2. New Case screen opens with "Existing Patient"
+          //    option already selected
+          // 3. Patient field is auto-filled with the current
+          //    patient's data (name, ID)
+          // 4. User skips the patient search step entirely
+          // 5. Patient field should be read-only in this context
+          //    since the patient is already known
+          //
+          // Source: pass patient.id as a navigation parameter
+          // e.g. navigate('NewCase', { patientId: patient.id })
+          // END BACKEND LOGIC
+          navigate('/case/new');
+        }}
+        className="fixed bottom-[84px] right-1/2 translate-x-[195px] w-14 h-14 bg-primary rounded-[18px] flex items-center justify-center text-primary-foreground shadow-brand active:scale-90 transition-all z-50 group overflow-hidden"
+        aria-label="Add Case"
+      >
+        <div className="absolute inset-0 bg-primary-foreground/10 group-active:bg-transparent" />
+        <Plus size={28} />
+      </button>
     </div>
   );
 };
