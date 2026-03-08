@@ -3,12 +3,12 @@ import { useNavigate } from 'react-router-dom';
 import { Search, ChevronRight, Plus, ChevronDown } from 'lucide-react';
 
 const mockPatients = [
-  { patientId: '1', name: 'Lucas Miller', age: 7, gender: 'male' as const, caseCount: 4, lastVisit: '2025-01-15', specialty: 'Respiratory', dateAdded: '2025-01-10' },
-  { patientId: '2', name: 'Sophia Chen', age: 3, gender: 'female' as const, caseCount: 2, lastVisit: '2025-01-14', specialty: 'Cardiology', dateAdded: '2025-01-05' },
-  { patientId: '3', name: 'Ethan Wright', age: 12, gender: 'male' as const, caseCount: 6, lastVisit: '2025-01-10', specialty: 'Neurology', dateAdded: '2024-12-20' },
-  { patientId: '4', name: 'Maya Johnson', age: 5, gender: 'female' as const, caseCount: 1, lastVisit: '2025-01-08', specialty: 'General', dateAdded: '2024-11-15' },
-  { patientId: '5', name: 'Noah Davis', age: 9, gender: 'male' as const, caseCount: 3, lastVisit: '2025-01-05', specialty: 'Gastroenterology', dateAdded: '2024-10-01' },
-  { patientId: '6', name: 'Ava Thompson', age: 0.08, gender: 'female' as const, caseCount: 8, lastVisit: '2025-01-03', specialty: 'Cardiology', dateAdded: '2025-01-01' },
+  { patientId: '1', name: 'Lucas Miller', age: 7, gender: 'male' as const, caseCount: 4, lastVisit: '2025-01-15', specialty: 'Respiratory', dateAdded: '2025-01-10', status: 'active' as const },
+  { patientId: '2', name: 'Sophia Chen', age: 3, gender: 'female' as const, caseCount: 2, lastVisit: '2025-01-14', specialty: 'Cardiology', dateAdded: '2025-01-05', status: 'active' as const },
+  { patientId: '3', name: 'Ethan Wright', age: 12, gender: 'male' as const, caseCount: 6, lastVisit: '2025-01-10', specialty: 'Neurology', dateAdded: '2024-12-20', status: 'discharged' as const },
+  { patientId: '4', name: 'Maya Johnson', age: 5, gender: 'female' as const, caseCount: 1, lastVisit: '2025-01-08', specialty: 'General', dateAdded: '2024-11-15', status: 'discharged' as const },
+  { patientId: '5', name: 'Noah Davis', age: 9, gender: 'male' as const, caseCount: 3, lastVisit: '2025-01-05', specialty: 'Gastroenterology', dateAdded: '2024-10-01', status: 'active' as const },
+  { patientId: '6', name: 'Ava Thompson', age: 0.08, gender: 'female' as const, caseCount: 8, lastVisit: '2025-01-03', specialty: 'Cardiology', dateAdded: '2025-01-01', status: 'discharged' as const },
 ];
 
 const getInitials = (name: string) => name.split(' ').map(n => n[0]).join('');
@@ -206,20 +206,35 @@ const PatientsScreen = () => {
           <div
             key={patient.patientId}
             onClick={() => navigate(`/patient/${patient.patientId}`)}
-            className="group flex items-center justify-between p-3 bg-card border border-border rounded-xl active:scale-[0.98] transition-all cursor-pointer hover:shadow-card"
+            className="group p-3 bg-card border border-border rounded-xl active:scale-[0.98] transition-all cursor-pointer hover:shadow-card"
           >
-            <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-xl gradient-avatar flex items-center justify-center text-primary-foreground font-bold text-[14px] shadow-sm">
-                {getInitials(patient.name)}
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 rounded-xl gradient-avatar flex items-center justify-center text-primary-foreground font-bold text-[14px] shadow-sm">
+                  {getInitials(patient.name)}
+                </div>
+                <div>
+                  <h4 className="text-[14px] font-bold text-foreground">{patient.name}</h4>
+                  <p className="text-[11px] text-muted-foreground">
+                    {patient.age >= 1 ? `${Math.floor(patient.age)}y` : `${Math.round(patient.age * 12)}m`} • {patient.gender} • {patient.caseCount} cases
+                  </p>
+                </div>
               </div>
-              <div>
-                <h4 className="text-[14px] font-bold text-foreground">{patient.name}</h4>
-                <p className="text-[11px] text-muted-foreground">
-                  {patient.age >= 1 ? `${Math.floor(patient.age)}y` : `${Math.round(patient.age * 12)}m`} • {patient.gender} • {patient.caseCount} cases
-                </p>
-              </div>
+              <ChevronRight size={18} className="text-muted-foreground group-hover:text-primary transition-colors" />
             </div>
-            <ChevronRight size={18} className="text-muted-foreground group-hover:text-primary transition-colors" />
+            <div className="flex justify-end mt-1">
+              <span
+                className="text-[11px] font-bold"
+                style={{
+                  borderRadius: 20,
+                  padding: '3px 10px',
+                  backgroundColor: patient.status === 'active' ? '#DCFCE7' : '#F1F5F9',
+                  color: patient.status === 'active' ? '#16A34A' : '#64748B',
+                }}
+              >
+                {patient.status === 'active' ? 'Active' : 'Discharged'}
+              </span>
+            </div>
           </div>
         ))}
         {filtered.length === 0 && (
