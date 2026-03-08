@@ -637,7 +637,7 @@ const CaseDetailScreen = () => {
           isExpanded={expandedSections.includes('progress')}
           onToggle={() => toggleSection('progress')}
           sectionRef={sectionRefs.progress}
-          onAdd={() => console.log('add progress note')}
+          onAdd={() => setShowAddProgress(true)}
         >
           {/* UI LOGIC — Progress Note Cards
               Render one card per progress note entry.
