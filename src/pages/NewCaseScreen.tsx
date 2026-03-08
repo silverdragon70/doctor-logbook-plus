@@ -1,12 +1,12 @@
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { ArrowLeft, Save, Camera, User, Calendar } from 'lucide-react';
+import { ArrowLeft, Save, Camera, User, Calendar, Search, X } from 'lucide-react';
 
 const existingPatients = [
-  { patientId: '1', name: 'Lucas Miller' },
-  { patientId: '2', name: 'Sophia Chen' },
-  { patientId: '3', name: 'Ethan Wright' },
-  { patientId: '4', name: 'Maya Johnson' },
+  { patientId: '1', name: 'Lucas Miller', fileNumber: 'PED-2024-001', age: '4 years' },
+  { patientId: '2', name: 'Sophia Chen', fileNumber: 'PED-2024-002', age: '7 years' },
+  { patientId: '3', name: 'Ethan Wright', fileNumber: 'PED-2024-003', age: '2 years' },
+  { patientId: '4', name: 'Maya Johnson', fileNumber: 'PED-2024-004', age: '5 years' },
 ];
 
 const formFields = [
@@ -21,8 +21,29 @@ const formFields = [
 
 const NewCaseScreen = () => {
   const navigate = useNavigate();
-  const [patientMode, setPatientMode] = useState<'existing' | 'new'>('existing');
-  const [selectedPatient, setSelectedPatient] = useState('');
+  const [patientMode, setPatientMode] = useState<'new' | 'existing'>('new');
+  const [selectedPatient, setSelectedPatient] = useState<typeof existingPatients[0] | null>(null);
+  const [searchQuery, setSearchQuery] = useState('');
+  const [isSearchFocused, setIsSearchFocused] = useState(false);
+
+  const filteredPatients = useMemo(() => {
+    if (!searchQuery.trim()) return [];
+    const q = searchQuery.toLowerCase();
+    return existingPatients.filter(
+      (p) => p.name.toLowerCase().includes(q) || p.fileNumber.toLowerCase().includes(q)
+    );
+  }, [searchQuery]);
+
+  const handleSelectPatient = (patient: typeof existingPatients[0]) => {
+    setSelectedPatient(patient);
+    setSearchQuery('');
+    setIsSearchFocused(false);
+  };
+
+  const handleClearPatient = () => {
+    setSelectedPatient(null);
+    setSearchQuery('');
+  };
 
   return (
     <div className="min-h-screen bg-background animate-fade-in">
@@ -45,14 +66,6 @@ const NewCaseScreen = () => {
         <div className="space-y-3">
           <div className="p-1 bg-muted rounded-xl flex gap-1">
             <button
-              onClick={() => setPatientMode('existing')}
-              className={`flex-1 py-2 text-[13px] font-semibold rounded-lg transition-all ${
-                patientMode === 'existing' ? 'bg-card text-primary shadow-sm' : 'text-muted-foreground'
-              }`}
-            >
-              Existing Patient
-            </button>
-            <button
               onClick={() => setPatientMode('new')}
               className={`flex-1 py-2 text-[13px] font-semibold rounded-lg transition-all ${
                 patientMode === 'new' ? 'bg-card text-primary shadow-sm' : 'text-muted-foreground'
@@ -60,47 +73,85 @@ const NewCaseScreen = () => {
             >
               New Patient
             </button>
+            <button
+              onClick={() => setPatientMode('existing')}
+              className={`flex-1 py-2 text-[13px] font-semibold rounded-lg transition-all ${
+                patientMode === 'existing' ? 'bg-card text-primary shadow-sm' : 'text-muted-foreground'
+              }`}
+            >
+              Existing Patient
+            </button>
           </div>
 
           {patientMode === 'existing' ? (
             <div className="bg-card border border-border rounded-xl overflow-hidden">
-              <div className="px-4 py-3 flex items-center gap-2 border-b border-border">
-                <User size={16} className="text-primary" />
-                <span className="text-[13px] font-bold text-foreground">Select Patient</span>
-              </div>
-              <div className="max-h-[180px] overflow-y-auto divide-y divide-border">
-                {existingPatients.map((p) => (
+              {selectedPatient ? (
+                <div className="p-4 flex items-start gap-3">
+                  <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center shrink-0">
+                    <User size={18} className="text-primary" />
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <p className="text-[14px] font-bold text-foreground">{selectedPatient.name}</p>
+                    <p className="text-[12px] text-muted-foreground mt-0.5">{selectedPatient.fileNumber}</p>
+                    <p className="text-[12px] text-muted-foreground">{selectedPatient.age}</p>
+                  </div>
                   <button
-                    key={p.patientId}
-                    onClick={() => setSelectedPatient(p.patientId)}
-                    className={`w-full px-4 py-3 text-left text-[13px] transition-colors ${
-                      selectedPatient === p.patientId
-                        ? 'bg-accent text-primary font-bold'
-                        : 'text-foreground hover:bg-muted/50'
-                    }`}
+                    onClick={handleClearPatient}
+                    className="p-1.5 rounded-full hover:bg-muted text-muted-foreground transition-colors"
                   >
-                    {p.name}
+                    <X size={16} />
                   </button>
-                ))}
-              </div>
+                </div>
+              ) : (
+                <div className="relative">
+                  <div className="px-4 py-3 flex items-center gap-2 border-b border-border">
+                    <Search size={16} className="text-muted-foreground" />
+                    <input
+                      value={searchQuery}
+                      onChange={(e) => setSearchQuery(e.target.value)}
+                      onFocus={() => setIsSearchFocused(true)}
+                      onBlur={() => setTimeout(() => setIsSearchFocused(false), 150)}
+                      placeholder="Search by name or file number..."
+                      className="flex-1 text-[13px] text-foreground placeholder:text-muted-foreground bg-transparent focus:outline-none"
+                    />
+                  </div>
+                  {searchQuery.trim() && (
+                    <div className="max-h-[200px] overflow-y-auto divide-y divide-border">
+                      {filteredPatients.length > 0 ? (
+                        filteredPatients.map((p) => (
+                          <button
+                            key={p.patientId}
+                            onMouseDown={() => handleSelectPatient(p)}
+                            className="w-full px-4 py-3 text-left hover:bg-muted/50 transition-colors flex items-center justify-between"
+                          >
+                            <span className="text-[13px] font-medium text-foreground">{p.name}</span>
+                            <span className="text-[11px] text-muted-foreground">{p.fileNumber}</span>
+                          </button>
+                        ))
+                      ) : (
+                        <div className="px-4 py-4 text-center text-[13px] text-muted-foreground">
+                          No patients found
+                        </div>
+                      )}
+                    </div>
+                  )}
+                </div>
+              )}
             </div>
           ) : (
             <div className="bg-card border border-border rounded-xl p-4 space-y-3">
               <input
                 placeholder="Patient Name *"
                 className="w-full h-10 px-3 bg-muted/50 border border-border rounded-lg text-[13px] text-foreground placeholder:text-muted-foreground focus:outline-none focus:border-primary"
-                onChange={() => console.log('name')}
               />
               <div className="grid grid-cols-2 gap-3">
                 <input
                   placeholder="Age"
                   type="number"
                   className="h-10 px-3 bg-muted/50 border border-border rounded-lg text-[13px] text-foreground placeholder:text-muted-foreground focus:outline-none focus:border-primary"
-                  onChange={() => console.log('age')}
                 />
                 <select
                   className="h-10 px-3 bg-muted/50 border border-border rounded-lg text-[13px] text-foreground focus:outline-none focus:border-primary"
-                  onChange={() => console.log('gender')}
                   defaultValue=""
                 >
                   <option value="" disabled>Gender</option>
@@ -121,7 +172,6 @@ const NewCaseScreen = () => {
               type="date"
               defaultValue={new Date().toISOString().split('T')[0]}
               className="block w-full text-[14px] font-semibold text-foreground bg-transparent focus:outline-none"
-              onChange={() => console.log('date')}
             />
           </div>
         </div>
@@ -136,7 +186,6 @@ const NewCaseScreen = () => {
               placeholder={field.placeholder}
               rows={field.lines}
               className="w-full px-4 py-3 text-[13px] text-foreground placeholder:text-muted-foreground bg-transparent focus:outline-none resize-none"
-              onChange={() => console.log(field.key)}
             />
           </div>
         ))}
