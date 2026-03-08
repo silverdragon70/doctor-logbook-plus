@@ -17,6 +17,7 @@ import MediaGalleryScreen from "./pages/MediaGalleryScreen";
 import PatientDetailScreen from "./pages/PatientDetailScreen";
 import NotFound from "./pages/NotFound";
 import GroupPearlScreen from "./pages/GroupPearlScreen";
+import ProceduresScreen from "./pages/ProceduresScreen";
 
 const queryClient = new QueryClient();
 
@@ -41,6 +42,7 @@ const App = () => (
           <Route path="/hospital/new" element={<AddHospitalScreen />} />
           <Route path="/settings" element={<SettingsScreen />} />
           <Route path="/group-pearl" element={<GroupPearlScreen />} />
+          <Route path="/procedures" element={<ProceduresScreen />} />
           <Route path="*" element={<NotFound />} />
         </Routes>
       </BrowserRouter>
