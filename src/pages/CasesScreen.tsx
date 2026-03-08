@@ -125,7 +125,10 @@ const CasesScreen = () => {
                   </div>
                   <div>
                     <h4 className="text-[14px] font-bold text-foreground">{c.patientName}</h4>
-                    <p className="text-[11px] text-muted-foreground">{c.meta}</p>
+                    <p className="text-[11px] text-muted-foreground flex items-center gap-1">
+                      <GenderIcon gender={c.gender} size={12} />
+                      {c.room} • {formatTimeAgo(c.lastModified)}
+                    </p>
                   </div>
                 </div>
                 <div className={`px-2.5 py-1 rounded-full text-[10px] font-bold tracking-tight uppercase ${c.tagColor}`}>
