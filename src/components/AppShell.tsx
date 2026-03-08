@@ -34,15 +34,19 @@ const AppShell = () => {
     return location.pathname === path || location.pathname.startsWith(`${path}/`);
   };
 
-  // Hide global header on detail pages, but show bottom nav on case detail
-  const isDetailPage = location.pathname.includes('/case/') || location.pathname.includes('/patient/');
+  // Hide global header on detail pages, but show bottom nav on case/patient/hospital detail
+  const isDetailPage = location.pathname.includes('/case/') || location.pathname.includes('/patient/') || /^\/hospital\/[^/]+$/.test(location.pathname);
   const isCaseDetail = /^\/case\/[^/]+$/.test(location.pathname) && !location.pathname.includes('/case/new');
-  const showBottomNav = !isDetailPage ? isMainTabScreen : isCaseDetail;
+  const isPatientDetail = /^\/patient\/[^/]+$/.test(location.pathname);
+  const isHospitalDetail = /^\/hospital\/[^/]+$/.test(location.pathname);
+  const showBottomNav = !isDetailPage ? isMainTabScreen : (isCaseDetail || isPatientDetail || isHospitalDetail);
 
-  // For case detail pages, highlight "Patients"
+  // Highlight correct tab for detail pages
   const getActive = (path: string) => {
-    if (isCaseDetail && path === '/AllPatientList') return true;
-    if (isCaseDetail) return false;
+    if ((isCaseDetail || isPatientDetail) && path === '/AllPatientList') return true;
+    if ((isCaseDetail || isPatientDetail) && path !== '/AllPatientList') return false;
+    if (isHospitalDetail && path === '/') return true;
+    if (isHospitalDetail && path !== '/') return false;
     return isActive(path);
   };
 
