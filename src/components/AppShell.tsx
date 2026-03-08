@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate, useLocation, Outlet } from 'react-router-dom';
-import { Moon, Sun, Settings, Activity, Search, Users, Plus } from 'lucide-react';
+import { Moon, Sun, Settings, Activity, Search, Users, Plus, ClipboardList } from 'lucide-react';
 
 const AppShell = () => {
   const [isDarkMode, setIsDarkMode] = useState(false);
@@ -14,6 +14,7 @@ const AppShell = () => {
   const navItems = [
     { icon: Activity, label: 'Cases', path: '/cases' },
     { icon: Users, label: 'Patients', path: '/' },
+    { icon: ClipboardList, label: 'Logbook', path: '/logbook' },
     { icon: Search, label: 'Search', path: '/search' },
   ];
 
