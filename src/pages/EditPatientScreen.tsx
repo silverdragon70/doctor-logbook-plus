@@ -27,7 +27,7 @@ const EditPatientScreen = () => {
   const [notes, setNotes] = useState(mockPatient.notes);
 
   const handleSave = () => {
-    console.log('save patient', { id, name, dob, gender, bloodType, phone, notes });
+    console.log('save patient', { id, name, dob, gender, notes });
     navigate(-1);
   };
 
