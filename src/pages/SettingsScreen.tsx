@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import SettingsExportSheet from '@/components/SettingsExportSheet';
 import CreateBackupSheet from '@/components/CreateBackupSheet';
+import AboutSheet from '@/components/AboutSheet';
 import { useNavigate } from 'react-router-dom';
 import {
   ArrowLeft, Palette, Moon, Type, Globe, CalendarDays,
