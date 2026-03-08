@@ -208,7 +208,7 @@ const AboutSheet = ({ open, onOpenChange }: AboutSheetProps) => {
 
           {/* Software Warranty Disclaimer */}
           <SectionHeader icon={Settings} label="Software Warranty Disclaimer" />
-          <BodyText>PediLog is provided strictly <B>"AS IS"</B> and <B>"AS AVAILABLE"</B>.</BodyText>
+          <BodyText>Medora is provided strictly <B>"AS IS"</B> and <B>"AS AVAILABLE"</B>.</BodyText>
           <div className="h-3" />
           <BodyText>The developer makes <B>NO</B> warranties, express or implied, including but not limited to:</BodyText>
           <BulletList items={[
