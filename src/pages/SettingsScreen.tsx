@@ -15,6 +15,7 @@ import SyncFrequencySheet from '@/components/SyncFrequencySheet';
 import GoogleAccountSheet from '@/components/GoogleAccountSheet';
 import ProgressSheet, { OperationType } from '@/components/ProgressSheet';
 import SyncProgressSheet from '@/components/SyncProgressSheet';
+import RestoreBackupSheet from '@/components/RestoreBackupSheet';
 import { useNavigate } from 'react-router-dom';
 import {
   ArrowLeft, Palette, Moon, Type, Globe, CalendarDays,
@@ -113,6 +114,7 @@ const SettingsScreen = () => {
     setProgressDetail(detail || '');
     setProgressOpen(true);
   };
+  const [restoreSheetOpen, setRestoreSheetOpen] = useState(false);
   const [backupSheetOpen, setBackupSheetOpen] = useState(false);
   const [lastBackupInfo, setLastBackupInfo] = useState<{ date: string; size: string; destination: 'local' | 'gdrive' } | null>({ date: '2025-01-15 · 08:30', size: '245 MB', destination: 'local' });
   const [aboutOpen, setAboutOpen] = useState(false);
@@ -231,7 +233,7 @@ const SettingsScreen = () => {
               Backup Now
             </button>
           </div>
-          <Row icon={Download} label="Restore from Backup" subtitle="Select a backup file" right={<Chevron />} onClick={() => startProgress('restore', 'All records restored')} />
+          <Row icon={Download} label="Restore from Backup" subtitle="Select a backup file" right={<Chevron />} onClick={() => setRestoreSheetOpen(true)} />
           <Row icon={Upload} label="Export Data" subtitle="Export your records" right={<Chevron />} onClick={() => setExportOpen(true)} noBorder />
         </Section>
 
@@ -370,6 +372,7 @@ const SettingsScreen = () => {
       />
       <ProgressSheet open={progressOpen} onOpenChange={setProgressOpen} type={progressType} detail={progressDetail} />
       <SyncProgressSheet open={syncProgressOpen} onOpenChange={setSyncProgressOpen} email={googleAccounts.find(a => a.active)?.email || ''} onComplete={(ts) => setLastSyncedText(ts)} />
+      <RestoreBackupSheet open={restoreSheetOpen} onOpenChange={setRestoreSheetOpen} onRestore={() => startProgress('restore', 'All records restored')} />
     </div>
   );
 };
