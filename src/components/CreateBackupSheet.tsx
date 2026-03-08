@@ -25,7 +25,7 @@ interface CreateBackupSheetProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   defaultLocation: SaveLocation;
-  onBackupComplete: () => void;
+  onBackupComplete: (destination: SaveLocation) => void;
 }
 
 const CreateBackupSheet = ({ open, onOpenChange, defaultLocation, onBackupComplete }: CreateBackupSheetProps) => {
