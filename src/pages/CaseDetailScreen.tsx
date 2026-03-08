@@ -204,6 +204,9 @@ const CaseDetailScreen = () => {
   const [showAddInvestigation, setShowAddInvestigation] = useState(false);
   const [showAddManagement, setShowAddManagement] = useState(false);
   const [showAddProgress, setShowAddProgress] = useState(false);
+  const [editInvestigation, setEditInvestigation] = useState<any>(null);
+  const [editManagement, setEditManagement] = useState<any>(null);
+  const [editProgress, setEditProgress] = useState<any>(null);
 
   const toggleEdit = (key: string) => {
     setEditingSections(prev => prev.includes(key) ? prev.filter(s => s !== key) : [...prev, key]);
@@ -439,7 +442,7 @@ const CaseDetailScreen = () => {
                   <div className="flex items-center gap-1">
                     {isCardExpanded && (
                       <>
-                        <button onClick={(e) => { e.stopPropagation(); toggleEdit(`inv-${inv.id}`); }} className="p-1 rounded-full hover:bg-muted/50">
+                        <button onClick={(e) => { e.stopPropagation(); setEditInvestigation({ name: inv.name, type: inv.type, date: inv.date, result: inv.result }); }} className="p-1 rounded-full hover:bg-muted/50">
                           <Pencil size={14} style={{ color: '#2563EB' }} />
                         </button>
                         <button onClick={(e) => { e.stopPropagation(); setDeleteTarget(`inv-${inv.id}`); }} className="p-1 rounded-full hover:bg-muted/50">
@@ -548,7 +551,7 @@ const CaseDetailScreen = () => {
                   </div>
                   {isCardExpanded && (
                     <div className="flex items-center gap-1">
-                      <button onClick={(e) => { e.stopPropagation(); toggleEdit(`mgmt-${entry.id}`); }} className="p-1 rounded-full hover:bg-muted/50">
+                      <button onClick={(e) => { e.stopPropagation(); setEditManagement({ type: entry.type, medications: 'medications' in entry ? (entry as any).medications?.join('\n') : '', mode: 'mode' in entry ? (entry as any).mode : '', details: 'details' in entry ? (entry as any).details : '' }); }} className="p-1 rounded-full hover:bg-muted/50">
                         <Pencil size={14} style={{ color: '#2563EB' }} />
                       </button>
                       <button onClick={(e) => { e.stopPropagation(); setDeleteTarget(`mgmt-${entry.id}`); }} className="p-1 rounded-full hover:bg-muted/50">
@@ -667,7 +670,7 @@ const CaseDetailScreen = () => {
                   </div>
                   {isCardExpanded && (
                     <div className="flex items-center gap-1">
-                      <button onClick={(e) => { e.stopPropagation(); toggleEdit(`prog-${note.id}`); }} className="p-1 rounded-full hover:bg-muted/50">
+                      <button onClick={(e) => { e.stopPropagation(); setEditProgress({ date: note.date, assessment: note.assessment, vitals: note.vitals }); }} className="p-1 rounded-full hover:bg-muted/50">
                         <Pencil size={14} style={{ color: '#2563EB' }} />
                       </button>
                       <button onClick={(e) => { e.stopPropagation(); setDeleteTarget(`prog-${note.id}`); }} className="p-1 rounded-full hover:bg-muted/50">
@@ -807,10 +810,15 @@ const CaseDetailScreen = () => {
         </div>
       )}
 
-      {/* Bottom Sheets */}
+      {/* Bottom Sheets — Add */}
       <AddInvestigationSheet open={showAddInvestigation} onClose={() => setShowAddInvestigation(false)} onSave={(data) => console.log('save investigation', data)} />
       <AddManagementSheet open={showAddManagement} onClose={() => setShowAddManagement(false)} onSave={(data) => console.log('save management', data)} />
       <AddProgressNoteSheet open={showAddProgress} onClose={() => setShowAddProgress(false)} onSave={(data) => console.log('save progress', data)} />
+
+      {/* Bottom Sheets — Edit (pre-filled) */}
+      <AddInvestigationSheet open={!!editInvestigation} onClose={() => setEditInvestigation(null)} onSave={(data) => { console.log('update investigation', data); setEditInvestigation(null); }} initialData={editInvestigation} />
+      <AddManagementSheet open={!!editManagement} onClose={() => setEditManagement(null)} onSave={(data) => { console.log('update management', data); setEditManagement(null); }} initialData={editManagement} />
+      <AddProgressNoteSheet open={!!editProgress} onClose={() => setEditProgress(null)} onSave={(data) => { console.log('update progress', data); setEditProgress(null); }} initialData={editProgress} />
     </div>
   );
 };
