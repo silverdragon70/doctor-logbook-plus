@@ -310,6 +310,8 @@ const SettingsScreen = () => {
           PediLog v1.0.0 · Built for Pediatric Physicians
         </p>
       </div>
+
+      <SettingsExportSheet open={exportOpen} onOpenChange={setExportOpen} />
     </div>
   );
 };
