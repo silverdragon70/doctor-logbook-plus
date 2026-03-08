@@ -472,8 +472,10 @@ const NewCaseScreen = () => {
             </div>
           </div>
         </CollapsibleSection>
+        </div>
 
         {/* ═══ Patient History ═══ */}
+        <div ref={sectionRefs.history}>
         <CollapsibleSection
           title="Patient History"
           icon={<ScrollText size={18} className="text-primary" />}
