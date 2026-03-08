@@ -12,8 +12,8 @@ const AppShell = () => {
   }, [isDarkMode]);
 
   const navItems = [
-    { icon: Activity, label: 'Cases', path: '/cases' },
-    { icon: Users, label: 'Patients', path: '/' },
+    { icon: Activity, label: 'Home', path: '/' },
+    { icon: Users, label: 'Patients', path: '/AllPatientList' },
     { icon: ClipboardList, label: 'Logbook', path: '/logbook' },
     { icon: Search, label: 'Search', path: '/search' },
   ];

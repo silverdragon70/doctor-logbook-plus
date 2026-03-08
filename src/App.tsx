@@ -27,8 +27,8 @@ const App = () => (
       <BrowserRouter>
         <Routes>
           <Route element={<AppShell />}>
-            <Route path="/" element={<PatientsScreen />} />
-            <Route path="/cases" element={<CasesScreen />} />
+            <Route path="/" element={<CasesScreen />} />
+            <Route path="/AllPatientList" element={<PatientsScreen />} />
             <Route path="/search" element={<SearchScreen />} />
             <Route path="/logbook" element={<LogbookScreen />} />
             
