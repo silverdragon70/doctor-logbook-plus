@@ -204,6 +204,9 @@ const CaseDetailScreen = () => {
   const [showAddInvestigation, setShowAddInvestigation] = useState(false);
   const [showAddManagement, setShowAddManagement] = useState(false);
   const [showAddProgress, setShowAddProgress] = useState(false);
+  const [editInvestigation, setEditInvestigation] = useState<any>(null);
+  const [editManagement, setEditManagement] = useState<any>(null);
+  const [editProgress, setEditProgress] = useState<any>(null);
 
   const toggleEdit = (key: string) => {
     setEditingSections(prev => prev.includes(key) ? prev.filter(s => s !== key) : [...prev, key]);
