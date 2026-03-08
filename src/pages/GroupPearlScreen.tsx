@@ -97,12 +97,6 @@ const GroupPearlScreen = () => {
   // Screen state
   const [screenState, setScreenState] = useState<ScreenState>('empty');
 
-  const toggleDark = () => {
-    const next = !isDarkMode;
-    setIsDarkMode(next);
-    document.documentElement.classList.toggle('dark', next);
-  };
-
   const hasFilters = diagnosis.trim() !== '' || timePeriod !== null || outcome !== null;
 
   const handleGenerate = () => {
