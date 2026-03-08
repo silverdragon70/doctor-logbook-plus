@@ -21,13 +21,21 @@ interface ExportColumn {
   key: string;
 }
 
+interface CaseItem {
+  id: string;
+  diagnosis: string;
+  date: string;
+  complaint: string;
+}
+
 interface ExportSheetProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
-  title: string; // e.g. "Procedures"
+  title: string;
   data: Record<string, any>[];
   columns: ExportColumn[];
-  dateKey: string; // which field holds the date string
+  dateKey: string;
+  cases?: CaseItem[];
 }
 
 const periodOptions: TimePeriod[] = ['All', 'Last Month', 'Last 3 Months', 'Last 6 Months', 'Last Year', 'Custom'];
