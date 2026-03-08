@@ -1227,6 +1227,8 @@ interface GoogleAccount {
 | Request Body | Same as POST |
 
 #### DELETE /procedures/:id
+| Response 200 | `{ success: true }` |
+
 
 ### Lectures
 
