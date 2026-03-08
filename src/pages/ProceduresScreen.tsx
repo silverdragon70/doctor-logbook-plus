@@ -319,11 +319,6 @@ const ProceduresScreen = () => {
   };
 
   const handleBackNavigation = () => {
-    if (window.history.length > 1) {
-      navigate(-1);
-      return;
-    }
-
     navigate('/');
   };
 
