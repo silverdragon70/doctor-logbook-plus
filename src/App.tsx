@@ -36,6 +36,8 @@ const App = () => (
             <Route path="/search" element={<SearchScreen />} />
             <Route path="/logbook" element={<LogbookScreen />} />
             <Route path="/procedures" element={<ProceduresScreen />} />
+            <Route path="/lectures" element={<LecturesScreen />} />
+            <Route path="/courses" element={<CoursesScreen />} />
           </Route>
           <Route path="/case/new" element={<NewCaseScreen />} />
           <Route path="/case/:id" element={<CaseDetailScreen />} />
