@@ -144,10 +144,10 @@ const SettingsScreen = () => {
 
         {/* ─── 3. AI INTEGRATION ─── */}
         <Section title="AI Integration">
-          <Row icon={Bot} iconColor="#8B5CF6" label="AI Provider" subtitle="Anthropic (Claude)" right={<Chevron />} />
-          <Row icon={KeyRound} iconColor="#8B5CF6" label="API Key" subtitle="sk-ant-••••••••••••" right={<Chevron />} />
-          <Row icon={Brain} iconColor="#8B5CF6" label="AI Model" subtitle="Claude Sonnet" right={<Chevron />} />
-          <Row icon={Languages} iconColor="#8B5CF6" label="AI Response Language" subtitle="Arabic" right={<Chevron />} />
+          <Row icon={Bot} iconColor="#8B5CF6" label="AI Provider" subtitle={aiProvider === 'anthropic' ? 'Anthropic (Claude)' : aiProvider === 'openai' ? 'OpenAI (GPT)' : 'Other / Custom'} right={<Chevron />} onClick={() => setAiProviderOpen(true)} />
+          <Row icon={KeyRound} iconColor="#8B5CF6" label="API Key" subtitle={apiKey ? apiKey.slice(0, 7) + '••••••••••••' : 'Not set'} right={<Chevron />} onClick={() => setApiKeyOpen(true)} />
+          <Row icon={Brain} iconColor="#8B5CF6" label="AI Model" subtitle={aiModel === 'sonnet' ? 'Claude Sonnet' : aiModel === 'opus' ? 'Claude Opus' : 'Claude Haiku'} right={<Chevron />} onClick={() => setAiModelOpen(true)} />
+          <Row icon={Languages} iconColor="#8B5CF6" label="AI Response Language" subtitle={aiLanguage === 'arabic' ? 'Arabic' : 'English'} right={<Chevron />} onClick={() => setAiLanguageOpen(true)} />
           <Row icon={Zap} iconColor="#8B5CF6" label="AI Features" subtitle="Insights, CasePearl, GroupPearl" right={sw(aiFeatures, setAiFeatures)} noBorder />
         </Section>
 
