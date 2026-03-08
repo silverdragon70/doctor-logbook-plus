@@ -69,6 +69,21 @@ const LogbookScreen = () => {
           <ChevronRight size={18} className="text-muted-foreground shrink-0 group-hover:translate-x-0.5 transition-transform" />
         </button>
       ))}
+
+      {/* Clinical Pearls Card */}
+      <button
+        onClick={() => navigate('/group-pearl')}
+        className="w-full bg-card rounded-2xl border border-border shadow-card p-5 flex items-center gap-4 active:scale-[0.98] transition-all duration-150 hover:shadow-elevated text-left group"
+      >
+        <div className="w-12 h-12 rounded-xl flex items-center justify-center shrink-0" style={{ backgroundColor: '#FEF3C7' }}>
+          <Diamond size={24} style={{ color: '#D97706' }} />
+        </div>
+        <div className="flex-1 min-w-0">
+          <h3 className="text-base font-semibold text-foreground">Clinical Pearls</h3>
+          <p className="text-xs text-muted-foreground mt-1">Analyze your cases</p>
+        </div>
+        <ChevronRight size={18} className="text-muted-foreground shrink-0 group-hover:translate-x-0.5 transition-transform" />
+      </button>
     </div>
   );
 };
