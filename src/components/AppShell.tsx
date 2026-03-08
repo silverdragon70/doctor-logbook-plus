@@ -34,8 +34,17 @@ const AppShell = () => {
     return location.pathname === path || location.pathname.startsWith(`${path}/`);
   };
 
-  // Hide shell chrome on detail pages
+  // Hide global header on detail pages, but show bottom nav on case detail
   const isDetailPage = location.pathname.includes('/case/') || location.pathname.includes('/patient/');
+  const isCaseDetail = /^\/case\/[^/]+$/.test(location.pathname) && !location.pathname.includes('/case/new');
+  const showBottomNav = !isDetailPage ? isMainTabScreen : isCaseDetail;
+
+  // For case detail pages, highlight "Patients"
+  const getActive = (path: string) => {
+    if (isCaseDetail && path === '/AllPatientList') return true;
+    if (isCaseDetail) return false;
+    return isActive(path);
+  };
 
   return (
     <div className="min-h-screen bg-background transition-colors duration-300">
