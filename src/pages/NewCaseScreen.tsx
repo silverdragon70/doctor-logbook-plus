@@ -419,7 +419,7 @@ const NewCaseScreen = () => {
 
         {/* ═══ Add Vital Signs ═══ */}
         <CollapsibleSection
-          title="Add Vital Signs"
+          title="Vital Signs"
           icon={<Activity size={18} className="text-primary" />}
           isExpanded={expandedSections.vitals}
           onToggle={() => toggleSection('vitals')}
