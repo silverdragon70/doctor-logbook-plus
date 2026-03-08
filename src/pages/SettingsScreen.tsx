@@ -189,21 +189,6 @@ const SettingsScreen = () => {
           </div>
         </div>
 
-        {/* Backup History */}
-        <div className="space-y-2">
-          <h4 className="text-[11px] font-bold uppercase tracking-wider px-1" style={{ color: '#6B7C93' }}>Backup History</h4>
-          <div className="rounded-2xl overflow-hidden" style={{ background: '#fff', boxShadow: '0px 1px 4px rgba(0,0,0,0.06)' }}>
-            {backupHistory.map((b, i) => (
-              <div key={b.id} className="flex items-center gap-3 px-4" style={{ height: 56, borderBottom: i < backupHistory.length - 1 ? '1px solid #F0F4F8' : 'none' }}>
-                <CheckCircle size={16} className="text-secondary flex-shrink-0" />
-                <div className="flex-1 min-w-0">
-                  <div className="text-[13px] font-bold" style={{ color: '#1A2332' }}>{b.type}</div>
-                  <div className="text-[10px]" style={{ color: '#6B7C93' }}>{b.date} · {b.size}</div>
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
 
         {/* ─── 6. SECURITY ─── */}
         <Section title="Security">
