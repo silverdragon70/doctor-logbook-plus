@@ -2,6 +2,9 @@ import React, { useState } from 'react';
 import SettingsExportSheet from '@/components/SettingsExportSheet';
 import CreateBackupSheet from '@/components/CreateBackupSheet';
 import AboutSheet from '@/components/AboutSheet';
+import ThemeColorSheet from '@/components/ThemeColorSheet';
+import FontSizeSheet from '@/components/FontSizeSheet';
+import DateFormatSheet from '@/components/DateFormatSheet';
 import { useNavigate } from 'react-router-dom';
 import {
   ArrowLeft, Palette, Moon, Type, Globe, CalendarDays,
@@ -78,7 +81,12 @@ const SettingsScreen = () => {
   const [backupSheetOpen, setBackupSheetOpen] = useState(false);
   const [lastBackupInfo, setLastBackupInfo] = useState<{ date: string; size: string; destination: 'local' | 'gdrive' } | null>({ date: '2025-01-15 · 08:30', size: '245 MB', destination: 'local' });
   const [aboutOpen, setAboutOpen] = useState(false);
-
+  const [themeSheetOpen, setThemeSheetOpen] = useState(false);
+  const [themeColor, setThemeColor] = useState('blue');
+  const [fontSheetOpen, setFontSheetOpen] = useState(false);
+  const [fontSize, setFontSize] = useState('medium');
+  const [dateSheetOpen, setDateSheetOpen] = useState(false);
+  const [dateFormat, setDateFormat] = useState('DD MMM YYYY');
 
   const sw = (checked: boolean, onChange: (v: boolean) => void) => (
     <Switch checked={checked} onCheckedChange={onChange} />
@@ -98,11 +106,10 @@ const SettingsScreen = () => {
 
         {/* ─── 1. APP APPEARANCE ─── */}
         <Section title="App Appearance">
-          <Row icon={Palette} label="Theme Color" subtitle="Medical Blue (Default)" right={<Chevron />} />
+          <Row icon={Palette} label="Theme Color" subtitle={themeColor === 'blue' ? 'Medical Blue (Default)' : themeColor === 'green' ? 'Forest Green' : themeColor === 'purple' ? 'Warm Purple' : 'Teal'} right={<Chevron />} onClick={() => setThemeSheetOpen(true)} />
           <Row icon={Moon} label="Dark Mode" subtitle="Easier on eyes at night" right={sw(darkMode, setDarkMode)} />
-          <Row icon={Type} label="Font Size" subtitle="Medium" right={<Chevron />} />
-          <Row icon={Globe} label="Language" subtitle="English" right={<Chevron />} />
-          <Row icon={CalendarDays} label="Date & Time Format" subtitle="DD MMM YYYY" right={<Chevron />} noBorder />
+          <Row icon={Type} label="Font Size" subtitle={fontSize === 'small' ? 'Small' : fontSize === 'medium' ? 'Medium' : 'Large'} right={<Chevron />} onClick={() => setFontSheetOpen(true)} />
+          <Row icon={CalendarDays} label="Date & Time Format" subtitle={dateFormat} right={<Chevron />} onClick={() => setDateSheetOpen(true)} noBorder />
         </Section>
 
         {/* ─── 2. HOSPITAL MANAGEMENT ─── */}
@@ -273,6 +280,9 @@ const SettingsScreen = () => {
         }}
       />
       <AboutSheet open={aboutOpen} onOpenChange={setAboutOpen} />
+      <ThemeColorSheet open={themeSheetOpen} onOpenChange={setThemeSheetOpen} value={themeColor} onApply={setThemeColor} />
+      <FontSizeSheet open={fontSheetOpen} onOpenChange={setFontSheetOpen} value={fontSize} onApply={setFontSize} />
+      <DateFormatSheet open={dateSheetOpen} onOpenChange={setDateSheetOpen} value={dateFormat} onApply={setDateFormat} />
     </div>
   );
 };
