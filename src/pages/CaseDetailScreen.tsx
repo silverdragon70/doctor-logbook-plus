@@ -202,6 +202,7 @@ const CaseDetailScreen = () => {
         data={exportData}
         columns={exportColumns}
         dateKey="date"
+        cases={patientCaseHistory}
       />
 
       {/* Delete Confirmation */}
