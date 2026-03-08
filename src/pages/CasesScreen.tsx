@@ -1,7 +1,7 @@
 import React, { useState, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Search, Hospital, Stethoscope } from 'lucide-react';
-import { BarChart, Bar, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, ComposedChart, LabelList } from 'recharts';
+import { BarChart, Bar, Line, XAxis, YAxis, Tooltip, ResponsiveContainer, ComposedChart, LabelList } from 'recharts';
 
 const mockCases = [
   { caseId: '1', patientName: 'Lucas Miller', initials: 'LM', gender: 'male' as const, department: 'Respiratory', tagColor: 'bg-accent text-accent-foreground', complaint: 'Persistent cough', diagnosis: 'Bronchitis', room: 'Room 402', lastModified: Date.now() - 4 * 60 * 60 * 1000, mediaCount: 2 },
