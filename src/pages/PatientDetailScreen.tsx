@@ -75,10 +75,16 @@ const PatientDetailScreen = () => {
                 <div className="w-9 h-9 bg-accent rounded-lg flex items-center justify-center text-primary">
                   <FileText size={16} />
                 </div>
+                {/* BACKEND LOGIC — Case History Card Data Source
+                   Line 1 (Diagnosis):      case.diagnosis field
+                   Line 2 (Chief Complaint): case.chief_complaint field
+                   Line 3 (Date):           case.admission_date field
+                   All fields come from the same case record in the database
+                   END BACKEND LOGIC */}
                 <div>
-                  <h4 className="text-[13px] font-bold text-foreground">{c.complaint}</h4>
-                  <p className="text-[11px] text-muted-foreground">{c.date}</p>
-                  <p className="text-[11px] text-muted-foreground/70">{c.diagnosis}</p>
+                  <h4 className="text-[13px] font-bold" style={{ color: '#1A2332' }}>{c.diagnosis}</h4>
+                  <p className="text-[13px]" style={{ color: '#6B7C93' }}>{c.complaint}</p>
+                  <p className="text-[13px]" style={{ color: '#6B7C93' }}>{c.date}</p>
                 </div>
               </div>
               <div className="flex items-center gap-2">
