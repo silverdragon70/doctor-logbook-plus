@@ -14,7 +14,6 @@ const mockPatient = {
   dob: new Date('2018-03-12'),
   gender: 'male' as 'male' | 'female',
   notes: 'No known allergies. Vaccinations up to date.',
-  notes: 'No known allergies. Vaccinations up to date.',
 };
 
 const EditPatientScreen = () => {
