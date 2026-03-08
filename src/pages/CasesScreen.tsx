@@ -236,7 +236,7 @@ const CasesScreen = () => {
       </div>
 
       {/* Hospital Overview Card */}
-      <section className="relative overflow-hidden bg-card border border-border rounded-2xl shadow-card">
+      <section onClick={() => navigate('/hospital/1')} className="relative overflow-hidden bg-card border border-border rounded-2xl shadow-card cursor-pointer active:scale-[0.98] transition-all">
         <div className="h-1 w-full gradient-brand" />
         <div className="p-4 flex items-center gap-4">
           <div className="w-[44px] h-[44px] bg-accent rounded-xl flex items-center justify-center text-primary">
