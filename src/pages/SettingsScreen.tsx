@@ -225,9 +225,9 @@ const SettingsScreen = () => {
           <Row icon={Eye} label="Default View Mode" subtitle="Display" right={<Chevron />} noBorder />
         </Section>
 
-        {/* ─── 9. DANGER ZONE ─── */}
+        {/* ─── 9. DELETE DATA ─── */}
         <div className="space-y-2">
-          <h3 className="text-[12px] font-bold uppercase tracking-wider px-1" style={{ color: '#6B7C93' }}>Danger Zone</h3>
+          <h3 className="text-[12px] font-bold uppercase tracking-wider px-1" style={{ color: '#6B7C93' }}>Delete Data</h3>
           <div className="space-y-3">
             <AlertDialog>
               <AlertDialogTrigger asChild>
