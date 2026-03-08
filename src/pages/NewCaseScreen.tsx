@@ -417,54 +417,6 @@ const NewCaseScreen = () => {
           </div>
         </CollapsibleSection>
 
-        {/* ═══ Add Vital Signs ═══ */}
-        <CollapsibleSection
-          title="Vital Signs"
-          icon={<Activity size={18} className="text-primary" />}
-          isExpanded={expandedSections.vitals}
-          onToggle={() => toggleSection('vitals')}
-          rightLabel="Today · Now"
-        >
-          <div className="space-y-4 pt-3">
-            <div className="grid grid-cols-2 gap-3">
-              <div className="space-y-1.5">
-                <label className={labelClass} style={{ color: '#6B7C93' }}>HR (BPM)</label>
-                <input type="text" inputMode="numeric" pattern="[0-9]*" value={hr} onChange={(e) => setHr(e.target.value.replace(/\D/g, ''))} placeholder="128" className={cn(inputClass, 'h-12')} />
-              </div>
-              <div className="space-y-1.5">
-                <label className={labelClass} style={{ color: '#6B7C93' }}>SPO₂ (%)</label>
-                <input type="text" inputMode="numeric" pattern="[0-9]*" value={spo2} onChange={(e) => setSpo2(e.target.value.replace(/\D/g, ''))} placeholder="94" className={cn(inputClass, 'h-12')} />
-              </div>
-            </div>
-
-            <div className="grid grid-cols-2 gap-3">
-              <div className="space-y-1.5">
-                <label className={labelClass} style={{ color: '#6B7C93' }}>Temp (°C)</label>
-                <input type="text" inputMode="decimal" value={temp} onChange={(e) => setTemp(e.target.value.replace(/[^0-9.]/g, ''))} placeholder="38.6" className={cn(inputClass, 'h-12')} />
-              </div>
-              <div className="space-y-1.5">
-                <label className={labelClass} style={{ color: '#6B7C93' }}>RR (/Min)</label>
-                <input type="text" inputMode="numeric" pattern="[0-9]*" value={rr} onChange={(e) => setRr(e.target.value.replace(/\D/g, ''))} placeholder="46" className={cn(inputClass, 'h-12')} />
-              </div>
-            </div>
-
-            <div className="grid grid-cols-2 gap-3">
-              <div className="space-y-1.5">
-                <label className={labelClass} style={{ color: '#6B7C93' }}>BP (mmHg)</label>
-                <input type="text" inputMode="numeric" value={bp} onChange={(e) => setBp(e.target.value.replace(/[^0-9/]/g, ''))} placeholder="88/55" className={cn(inputClass, 'h-12')} />
-              </div>
-              <div className="space-y-1.5">
-                <label className={labelClass} style={{ color: '#6B7C93' }}>Weight (kg)</label>
-                <input type="text" inputMode="decimal" value={weight} onChange={(e) => setWeight(e.target.value.replace(/[^0-9.]/g, ''))} placeholder="13.2" className={cn(inputClass, 'h-12')} />
-              </div>
-            </div>
-
-            <div className="space-y-1.5">
-              <label className={labelClass} style={{ color: '#6B7C93' }}>Date & Time</label>
-              <input type="datetime-local" value={vitalDateTime} onChange={(e) => setVitalDateTime(e.target.value)} className={cn(inputClass, 'h-12')} />
-            </div>
-          </div>
-        </CollapsibleSection>
 
         {/* ═══ Investigations ═══ */}
         <CollapsibleSection
