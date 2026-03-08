@@ -369,7 +369,6 @@ const ProceduresScreen = () => {
               value={formHospital}
               onChange={setFormHospital}
               hospitals={hospitals}
-              onAddHospital={handleAddHospital}
             />
           </div>
 
