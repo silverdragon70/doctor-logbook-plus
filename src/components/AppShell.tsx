@@ -18,7 +18,7 @@ const AppShell = () => {
     { icon: Search, label: 'Search', path: '/search' },
   ];
 
-  const logbookSubScreens = ['/procedures', '/group-pearl'];
+  const logbookSubScreens = ['/procedures', '/lectures', '/courses', '/group-pearl'];
   const isMainTabScreen = navItems.some((item) => item.path === location.pathname) || logbookSubScreens.some((p) => location.pathname.startsWith(p));
 
   const isActive = (path: string) => {
