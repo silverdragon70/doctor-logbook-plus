@@ -250,12 +250,15 @@ const ProceduresScreen = () => {
   const [filter, setFilter] = useState<FilterType>('All');
   const [showForm, setShowForm] = useState(false);
   const [procedures] = useState<Procedure[]>(MOCK_PROCEDURES);
+  const [hospitals, setHospitals] = useState<string[]>(EXISTING_HOSPITALS);
 
   // Form state
   const [formName, setFormName] = useState('');
   const [formDate, setFormDate] = useState<Date>(new Date());
   const [formParticipation, setFormParticipation] = useState<ParticipationType>('Performed');
   const [formPatient, setFormPatient] = useState('');
+  const [formHospital, setFormHospital] = useState('');
+  const [formSupervisor, setFormSupervisor] = useState('');
   const [formIndication, setFormIndication] = useState('');
   const [formNotes, setFormNotes] = useState('');
   const [showPatientDropdown, setShowPatientDropdown] = useState(false);
