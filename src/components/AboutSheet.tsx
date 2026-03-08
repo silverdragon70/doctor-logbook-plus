@@ -104,7 +104,7 @@ const AboutSheet = ({ open, onOpenChange }: AboutSheetProps) => {
 
           {/* Encryption Disclaimer */}
           <SectionHeader icon={Lock} label="Encryption Disclaimer" />
-          <BodyText>PediLog may implement encryption technologies such as AES-256 as a best-effort security measure.</BodyText>
+          <BodyText>Medora may implement encryption technologies such as AES-256 as a best-effort security measure.</BodyText>
           <div className="h-3" />
           <BodyText>However, encryption is provided <B>WITHOUT ANY GUARANTEE</B> of absolute security.</BodyText>
           <div className="h-3" />
