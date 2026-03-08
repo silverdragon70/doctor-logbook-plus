@@ -25,7 +25,7 @@ interface CreateBackupSheetProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   defaultLocation: SaveLocation;
-  onBackupComplete: () => void;
+  onBackupComplete: (destination: SaveLocation) => void;
 }
 
 const CreateBackupSheet = ({ open, onOpenChange, defaultLocation, onBackupComplete }: CreateBackupSheetProps) => {
@@ -33,7 +33,7 @@ const CreateBackupSheet = ({ open, onOpenChange, defaultLocation, onBackupComple
   const [saveLocation, setSaveLocation] = useState<SaveLocation>(defaultLocation);
   const [isRunning, setIsRunning] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [showLocationDropdown, setShowLocationDropdown] = useState(false);
+  
 
   const handleStartBackup = () => {
     if (!selectedType) return;
@@ -44,7 +44,7 @@ const CreateBackupSheet = ({ open, onOpenChange, defaultLocation, onBackupComple
     setTimeout(() => {
       setIsRunning(false);
       onOpenChange(false);
-      onBackupComplete();
+      onBackupComplete(saveLocation);
       toast({ title: 'Backup completed ✓', description: `${backupOptions.find(o => o.id === selectedType)?.label} saved to ${saveLocation === 'local' ? 'Device' : 'Google Drive'}.` });
       setSelectedType(null);
     }, 2500);
@@ -97,32 +97,29 @@ const CreateBackupSheet = ({ open, onOpenChange, defaultLocation, onBackupComple
           {/* Save To */}
           <div className="space-y-2">
             <h4 className="text-[11px] font-bold uppercase tracking-wider" style={{ color: '#6B7C93' }}>Save To</h4>
-            <div className="relative">
+            <div className="grid grid-cols-2 gap-2">
               <button
-                onClick={() => setShowLocationDropdown(!showLocationDropdown)}
-                className="w-full flex items-center justify-between p-3.5 rounded-xl text-left"
-                style={{ background: '#F8FAFC', border: '1.5px solid #DDE3EA' }}
+                onClick={() => setSaveLocation('local')}
+                className="flex items-center justify-center gap-1.5 py-2.5 rounded-xl text-[13px] font-bold transition-colors"
+                style={{
+                  background: saveLocation === 'local' ? '#2563EB' : '#fff',
+                  color: saveLocation === 'local' ? '#fff' : '#1A2332',
+                  border: saveLocation === 'local' ? '1.5px solid #2563EB' : '1.5px solid #DDE3EA',
+                }}
               >
-                <div className="flex items-center gap-2.5">
-                  {saveLocation === 'local' ? <HardDrive size={18} style={{ color: '#2563EB' }} /> : <Cloud size={18} style={{ color: '#2563EB' }} />}
-                  <span className="text-[14px] font-medium" style={{ color: '#1A2332' }}>
-                    {saveLocation === 'local' ? 'Local' : 'Google Drive'}
-                  </span>
-                </div>
-                <span style={{ color: '#6B7C93' }}>▾</span>
+                <HardDrive size={14} /> Local
               </button>
-              {showLocationDropdown && (
-                <div className="absolute top-full left-0 right-0 mt-1 rounded-xl overflow-hidden z-10" style={{ background: '#fff', border: '1.5px solid #DDE3EA', boxShadow: '0 4px 12px rgba(0,0,0,0.1)' }}>
-                  <button onClick={() => { setSaveLocation('local'); setShowLocationDropdown(false); }} className="w-full flex items-center gap-2.5 px-4 py-3 hover:bg-muted/40 text-left" style={{ borderBottom: '1px solid #F0F4F8' }}>
-                    <HardDrive size={16} style={{ color: '#2563EB' }} />
-                    <span className="text-[13px] font-medium" style={{ color: '#1A2332' }}>Local</span>
-                  </button>
-                  <button onClick={() => { setSaveLocation('gdrive'); setShowLocationDropdown(false); }} className="w-full flex items-center gap-2.5 px-4 py-3 hover:bg-muted/40 text-left">
-                    <Cloud size={16} style={{ color: '#2563EB' }} />
-                    <span className="text-[13px] font-medium" style={{ color: '#1A2332' }}>Google Drive</span>
-                  </button>
-                </div>
-              )}
+              <button
+                onClick={() => setSaveLocation('gdrive')}
+                className="flex items-center justify-center gap-1.5 py-2.5 rounded-xl text-[13px] font-bold transition-colors"
+                style={{
+                  background: saveLocation === 'gdrive' ? '#2563EB' : '#fff',
+                  color: saveLocation === 'gdrive' ? '#fff' : '#1A2332',
+                  border: saveLocation === 'gdrive' ? '1.5px solid #2563EB' : '1.5px solid #DDE3EA',
+                }}
+              >
+                <Cloud size={14} /> G-Drive
+              </button>
             </div>
           </div>
 

@@ -75,8 +75,7 @@ const SettingsScreen = () => {
   const [autoSave, setAutoSave] = useState(true);
   const [exportOpen, setExportOpen] = useState(false);
   const [backupSheetOpen, setBackupSheetOpen] = useState(false);
-  const [backupLocation, setBackupLocation] = useState<'local' | 'gdrive'>('local');
-  const [lastBackupInfo, setLastBackupInfo] = useState({ date: '2025-01-15 · 08:30', size: '245 MB' });
+  const [lastBackupInfo, setLastBackupInfo] = useState<{ date: string; size: string; destination: 'local' | 'gdrive' } | null>({ date: '2025-01-15 · 08:30', size: '245 MB', destination: 'local' });
 
 
   const sw = (checked: boolean, onChange: (v: boolean) => void) => (
@@ -157,40 +156,22 @@ const SettingsScreen = () => {
             </div>
           </div>
           <Row icon={Image} label="Image Handling" subtitle="Lazy Load" right={<Chevron />} />
-          <div className="px-4 py-3 flex items-center gap-3" style={{ borderBottom: '1px solid #F0F4F8' }}>
-            <Save size={20} className="text-primary flex-shrink-0" />
-            <div className="flex-1">
-              <div className="text-[15px] font-medium mb-2" style={{ color: '#1A2332' }}>Default Backup Location</div>
-              <div className="grid grid-cols-2 gap-2">
-                <button
-                  onClick={() => setBackupLocation('local')}
-                  className="flex items-center justify-center gap-1.5 py-2 rounded-xl text-[12px] font-bold transition-colors"
-                  style={{
-                    background: backupLocation === 'local' ? 'hsl(213,78%,48%)' : '#F0F4F8',
-                    color: backupLocation === 'local' ? '#fff' : '#1A2332',
-                  }}
-                >
-                  <HardDrive size={14} /> Local
-                </button>
-                <button
-                  onClick={() => setBackupLocation('gdrive')}
-                  className="flex items-center justify-center gap-1.5 py-2 rounded-xl text-[12px] font-bold transition-colors"
-                  style={{
-                    background: backupLocation === 'gdrive' ? 'hsl(213,78%,48%)' : '#F0F4F8',
-                    color: backupLocation === 'gdrive' ? '#fff' : '#1A2332',
-                  }}
-                >
-                  <Cloud size={14} /> G-Drive
-                </button>
-              </div>
-            </div>
-          </div>
           {/* Last Backup */}
           <div className="px-4 py-3 flex items-center gap-3" style={{ borderBottom: '1px solid #F0F4F8' }}>
             <Clock size={20} className="text-primary flex-shrink-0" />
             <div className="flex-1">
               <div className="text-[15px] font-medium" style={{ color: '#1A2332' }}>Last Backup</div>
-              <div className="text-[12px]" style={{ color: '#6B7C93' }}>{lastBackupInfo.date} · {lastBackupInfo.size}</div>
+              {lastBackupInfo ? (
+                <>
+                  <div className="text-[12px]" style={{ color: '#6B7C93' }}>{lastBackupInfo.date} · {lastBackupInfo.size}</div>
+                  <div className="flex items-center gap-1 text-[11px]" style={{ color: '#94A3B8' }}>
+                    {lastBackupInfo.destination === 'local' ? <HardDrive size={12} /> : <Cloud size={12} />}
+                    {lastBackupInfo.destination === 'local' ? 'Local' : 'G-Drive'}
+                  </div>
+                </>
+              ) : (
+                <div className="text-[11px] font-medium" style={{ color: '#EF4444' }}>No backup yet</div>
+              )}
             </div>
             <button
               onClick={() => setBackupSheetOpen(true)}
@@ -294,12 +275,13 @@ const SettingsScreen = () => {
       <CreateBackupSheet
         open={backupSheetOpen}
         onOpenChange={setBackupSheetOpen}
-        defaultLocation={backupLocation}
-        onBackupComplete={() => {
+        defaultLocation={lastBackupInfo?.destination || 'local'}
+        onBackupComplete={(destination: 'local' | 'gdrive') => {
           const now = new Date();
           setLastBackupInfo({
             date: now.toISOString().slice(0, 10) + ' · ' + now.toTimeString().slice(0, 5),
             size: 'calculating...',
+            destination,
           });
         }}
       />
