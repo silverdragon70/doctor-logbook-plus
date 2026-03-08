@@ -606,6 +606,25 @@ const ProceduresScreen = () => {
       >
         <Plus size={26} />
       </button>
+
+      {/* Export Sheet */}
+      <ExportSheet
+        open={showExport}
+        onOpenChange={setShowExport}
+        title="Procedures"
+        data={procedures}
+        dateKey="date"
+        columns={[
+          { header: 'Procedure Name', key: 'name' },
+          { header: 'Date', key: 'date' },
+          { header: 'Participation', key: 'participation' },
+          { header: 'Patient', key: 'patientName' },
+          { header: 'Hospital', key: 'hospital' },
+          { header: 'Supervisor', key: 'supervisor' },
+          { header: 'Indication', key: 'indication' },
+          { header: 'Notes', key: 'notes' },
+        ]}
+      />
     </>
   );
 };
