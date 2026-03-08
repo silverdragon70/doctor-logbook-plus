@@ -216,6 +216,7 @@ const CaseDetailScreen = () => {
   const [dischargeNotes, setDischargeNotes] = useState('');
   const [dischargeOutcome, setDischargeOutcome] = useState<string | null>(null);
   const [caseStatus, setCaseStatus] = useState<'active' | 'discharged'>('active');
+  const [outcomeDropdownOpen, setOutcomeDropdownOpen] = useState(false);
 
   const toggleEdit = (key: string) => {
     setEditingSections(prev => prev.includes(key) ? prev.filter(s => s !== key) : [...prev, key]);
@@ -883,30 +884,42 @@ const CaseDetailScreen = () => {
                   </div>
 
                   {/* Outcome */}
-                  <div className="space-y-1.5">
+                  <div className="space-y-1.5 relative">
                     <span style={{ color: '#6B7C93', fontSize: '11px', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.05em' }}>
                       Outcome *
                     </span>
-                    <div className="grid grid-cols-2 gap-2">
-                      {outcomes.map(o => (
-                        <button
-                          key={o.key}
-                          onClick={() => setDischargeOutcome(o.key)}
-                          className="flex items-center gap-2 text-left transition-all"
-                          style={{
-                            padding: '10px 12px',
-                            borderRadius: '12px',
-                            border: dischargeOutcome === o.key ? '1.5px solid #2563EB' : '1.5px solid #DDE3EA',
-                            background: dischargeOutcome === o.key ? '#EFF6FF' : '#F8FAFC',
-                            color: dischargeOutcome === o.key ? '#2563EB' : '#1A2332',
-                            fontSize: '13px',
-                            fontWeight: dischargeOutcome === o.key ? 700 : 400,
-                          }}
-                        >
-                          {o.label}
-                        </button>
-                      ))}
-                    </div>
+                    <button
+                      onClick={() => setOutcomeDropdownOpen(prev => !prev)}
+                      className="w-full flex items-center justify-between text-left transition-all"
+                      style={{
+                        height: 48, padding: '0 16px', borderRadius: '12px',
+                        border: outcomeDropdownOpen ? '1.5px solid #2563EB' : '1.5px solid #DDE3EA',
+                        background: '#F8FAFC', fontSize: '14px',
+                        color: dischargeOutcome ? '#1A2332' : '#94A3B8',
+                      }}
+                    >
+                      {outcomes.find(o => o.key === dischargeOutcome)?.label || 'Select outcome...'}
+                      <ChevronDown size={16} style={{ color: '#94A3B8', transform: outcomeDropdownOpen ? 'rotate(180deg)' : 'rotate(0)', transition: 'transform 0.2s' }} />
+                    </button>
+                    {outcomeDropdownOpen && (
+                      <div style={{ background: '#FFFFFF', border: '1.5px solid #DDE3EA', borderRadius: '12px', boxShadow: '0px 4px 12px rgba(0,0,0,0.10)', maxHeight: 200, overflowY: 'auto', marginTop: 4 }}>
+                        {outcomes.map(o => (
+                          <button
+                            key={o.key}
+                            onClick={() => { setDischargeOutcome(o.key); setOutcomeDropdownOpen(false); }}
+                            className="w-full text-left transition-colors"
+                            style={{
+                              height: 44, padding: '0 16px', display: 'flex', alignItems: 'center',
+                              background: dischargeOutcome === o.key ? '#EFF6FF' : 'transparent',
+                              color: dischargeOutcome === o.key ? '#2563EB' : '#1A2332',
+                              fontWeight: dischargeOutcome === o.key ? 700 : 400, fontSize: '13px',
+                            }}
+                          >
+                            {o.label}
+                          </button>
+                        ))}
+                      </div>
+                    )}
                   </div>
 
                   {/* Notes */}
