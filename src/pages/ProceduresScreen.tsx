@@ -530,16 +530,15 @@ const ProceduresScreen = () => {
             ))}
           </div>
         )}
-      </div>
 
-      {/* FAB */}
-      <button
-        onClick={() => setShowForm(true)}
-        className="fixed bottom-6 right-6 w-14 h-14 rounded-full bg-primary text-primary-foreground shadow-brand flex items-center justify-center active:scale-95 transition-transform z-40"
-      >
-        <Plus size={26} />
-      </button>
-    </div>
+        {/* FAB */}
+        <button
+          onClick={() => setShowForm(true)}
+          className="fixed bottom-6 right-6 w-14 h-14 rounded-full bg-primary text-primary-foreground shadow-brand flex items-center justify-center active:scale-95 transition-transform z-40"
+        >
+          <Plus size={26} />
+        </button>
+      </div>
   );
 };
 
