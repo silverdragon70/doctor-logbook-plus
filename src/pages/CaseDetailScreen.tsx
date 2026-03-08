@@ -1,6 +1,10 @@
 import React, { useState, useRef, useEffect, useCallback } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
-import { ArrowLeft, Edit2, Trash2, Camera, Image, ChevronDown, ChevronUp, Upload, Lightbulb, Pencil, Plus } from 'lucide-react';
+import { ArrowLeft, Edit2, Trash2, Camera, Image, ChevronDown, ChevronUp, Upload, Lightbulb, Pencil, Plus, LogOut, CalendarDays, X } from 'lucide-react';
+import { format } from 'date-fns';
+import { cn } from '@/lib/utils';
+import { Calendar } from '@/components/ui/calendar';
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import ExportSheet from '@/components/ExportSheet';
 import {
   AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent,
@@ -207,6 +211,10 @@ const CaseDetailScreen = () => {
   const [editInvestigation, setEditInvestigation] = useState<any>(null);
   const [editManagement, setEditManagement] = useState<any>(null);
   const [editProgress, setEditProgress] = useState<any>(null);
+  const [showDischargeDialog, setShowDischargeDialog] = useState(false);
+  const [dischargeDate, setDischargeDate] = useState<Date>(new Date());
+  const [dischargeNotes, setDischargeNotes] = useState('');
+  const [caseStatus, setCaseStatus] = useState<'active' | 'discharged'>('active');
 
   const toggleEdit = (key: string) => {
     setEditingSections(prev => prev.includes(key) ? prev.filter(s => s !== key) : [...prev, key]);
@@ -284,6 +292,14 @@ const CaseDetailScreen = () => {
           </button>
           <button onClick={() => navigate(`/case/${id}/pearl`, { state: { caseData: mockCase } })} className="p-2 rounded-full hover:bg-muted transition-colors" style={{ color: '#D97706' }}>
             <Lightbulb size={18} />
+          </button>
+          <button
+            onClick={() => caseStatus !== 'discharged' && setShowDischargeDialog(true)}
+            className="p-2 rounded-full hover:bg-muted transition-colors"
+            style={{ color: caseStatus === 'discharged' ? '#94A3B8' : '#10B981', cursor: caseStatus === 'discharged' ? 'default' : 'pointer' }}
+            disabled={caseStatus === 'discharged'}
+          >
+            <LogOut size={18} />
           </button>
           <button onClick={() => setShowDeleteDialog(true)} className="p-2 rounded-full hover:bg-muted text-destructive">
             <Trash2 size={18} />
@@ -819,6 +835,83 @@ const CaseDetailScreen = () => {
       <AddInvestigationSheet open={!!editInvestigation} onClose={() => setEditInvestigation(null)} onSave={(data) => { console.log('update investigation', data); setEditInvestigation(null); }} initialData={editInvestigation} />
       <AddManagementSheet open={!!editManagement} onClose={() => setEditManagement(null)} onSave={(data) => { console.log('update management', data); setEditManagement(null); }} initialData={editManagement} />
       <AddProgressNoteSheet open={!!editProgress} onClose={() => setEditProgress(null)} onSave={(data) => { console.log('update progress', data); setEditProgress(null); }} initialData={editProgress} />
+
+      {/* Discharge Dialog */}
+      {showDischargeDialog && (
+        <>
+          <div className="fixed inset-0 z-50 bg-black/40" onClick={() => setShowDischargeDialog(false)} />
+          <div className="fixed inset-0 z-50 flex items-center justify-center p-6">
+            <div style={{ background: '#FFFFFF', borderRadius: '18px', padding: '24px', width: '100%', maxWidth: '340px' }}>
+              <div className="flex flex-col items-center text-center space-y-2 mb-5">
+                <LogOut size={28} style={{ color: '#10B981' }} />
+                <span style={{ fontSize: '16px', fontWeight: 700, color: '#1A2332' }}>Discharge Patient?</span>
+                <span style={{ fontSize: '13px', color: '#6B7C93' }}>
+                  Mark {mockCase.patientName} as discharged from this case. This will close the case.
+                </span>
+              </div>
+
+              <div className="space-y-4 mb-5">
+                <div className="space-y-1.5">
+                  <span style={{ color: '#6B7C93', fontSize: '11px', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.05em' }}>
+                    Discharge Date
+                  </span>
+                  <Popover>
+                    <PopoverTrigger asChild>
+                      <button
+                        className={cn(
+                          'w-full h-12 px-4 bg-card border border-border rounded-xl text-[14px] text-left transition-all focus:outline-none focus:border-primary flex items-center justify-between',
+                          !dischargeDate && 'text-muted-foreground'
+                        )}
+                      >
+                        {dischargeDate ? format(dischargeDate, 'MM/dd/yyyy') : 'mm/dd/yyyy'}
+                        <CalendarDays size={16} className="text-muted-foreground" />
+                      </button>
+                    </PopoverTrigger>
+                    <PopoverContent className="w-auto p-0" align="start">
+                      <Calendar mode="single" selected={dischargeDate} onSelect={(d) => d && setDischargeDate(d)} initialFocus className="p-3 pointer-events-auto" />
+                    </PopoverContent>
+                  </Popover>
+                </div>
+
+                <div className="space-y-1.5">
+                  <span style={{ color: '#6B7C93', fontSize: '11px', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.05em' }}>
+                    Discharge Notes (optional)
+                  </span>
+                  <textarea
+                    value={dischargeNotes}
+                    onChange={(e) => setDischargeNotes(e.target.value)}
+                    placeholder="e.g. condition on discharge..."
+                    rows={3}
+                    className="w-full px-4 py-3 bg-card border border-border rounded-xl text-[14px] text-foreground placeholder:text-muted-foreground focus:outline-none focus:border-primary transition-all resize-none"
+                  />
+                </div>
+              </div>
+
+              <div className="flex gap-3">
+                <button
+                  onClick={() => setShowDischargeDialog(false)}
+                  style={{ border: '1.5px solid #DDE3EA', color: '#6B7C93', borderRadius: '12px', height: '48px', fontWeight: 600, fontSize: '14px', background: '#FFFFFF' }}
+                  className="flex-1"
+                >
+                  Cancel
+                </button>
+                <button
+                  onClick={() => {
+                    console.log('discharge', { date: dischargeDate, notes: dischargeNotes });
+                    setCaseStatus('discharged');
+                    setShowDischargeDialog(false);
+                    setDischargeNotes('');
+                  }}
+                  style={{ background: '#10B981', color: '#FFFFFF', borderRadius: '12px', height: '48px', fontWeight: 600, fontSize: '14px' }}
+                  className="flex-1"
+                >
+                  Discharge
+                </button>
+              </div>
+            </div>
+          </div>
+        </>
+      )}
     </div>
   );
 };
