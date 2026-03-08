@@ -74,12 +74,27 @@ function downloadBlob(blob: Blob, filename: string) {
   URL.revokeObjectURL(url);
 }
 
-const ExportSheet: React.FC<ExportSheetProps> = ({ open, onOpenChange, title, data, columns, dateKey }) => {
+const ExportSheet: React.FC<ExportSheetProps> = ({ open, onOpenChange, title, data, columns, dateKey, cases }) => {
   const [period, setPeriod] = useState<TimePeriod>('All');
   const [exportFormat, setExportFormat] = useState<ExportFormat>('PDF');
   const [customFrom, setCustomFrom] = useState<Date>(subMonths(new Date(), 1));
   const [customTo, setCustomTo] = useState<Date>(new Date());
+  const [selectedCaseIds, setSelectedCaseIds] = useState<string[]>([]);
 
+  // Initialize all cases as selected when cases change
+  React.useEffect(() => {
+    if (cases) setSelectedCaseIds(cases.map(c => c.id));
+  }, [cases]);
+
+  const toggleCase = (id: string) => {
+    setSelectedCaseIds(prev => prev.includes(id) ? prev.filter(x => x !== id) : [...prev, id]);
+  };
+
+  const allSelected = cases ? selectedCaseIds.length === cases.length : true;
+  const toggleAll = () => {
+    if (!cases) return;
+    setSelectedCaseIds(allSelected ? [] : cases.map(c => c.id));
+  };
   const { from, to } = getDateRange(period, customFrom, customTo);
   const filtered = useMemo(() => filterByDate(data, dateKey, from, to), [data, dateKey, from, to]);
 
