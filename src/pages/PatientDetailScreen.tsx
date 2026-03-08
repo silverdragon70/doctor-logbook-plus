@@ -8,11 +8,22 @@ const mockPatient = {
 };
 
 const mockCases = [
-  { caseId: '1', date: '2025-01-15', complaint: 'Persistent cough', diagnosis: 'Acute bronchitis', mediaCount: 2 },
-  { caseId: '7', date: '2024-11-20', complaint: 'Fever', diagnosis: 'Viral infection', mediaCount: 0 },
-  { caseId: '8', date: '2024-09-05', complaint: 'Rash', diagnosis: 'Contact dermatitis', mediaCount: 3 },
-  { caseId: '9', date: '2024-06-10', complaint: 'Well-child check', diagnosis: 'Healthy', mediaCount: 0 },
+  { caseId: '1', date: '2025-01-15', complaint: 'Persistent cough', diagnosis: 'Acute bronchitis', mediaCount: 2, status: 'active' as const, outcome: null as string | null },
+  { caseId: '7', date: '2024-11-20', complaint: 'Fever', diagnosis: 'Viral infection', mediaCount: 0, status: 'discharged' as const, outcome: 'cured' },
+  { caseId: '8', date: '2024-09-05', complaint: 'Rash', diagnosis: 'Contact dermatitis', mediaCount: 3, status: 'discharged' as const, outcome: 'followup' },
+  { caseId: '9', date: '2024-06-10', complaint: 'Well-child check', diagnosis: 'Healthy', mediaCount: 0, status: 'discharged' as const, outcome: 'homecare' },
 ];
+
+const outcomeBadgeMap: Record<string, { label: string; bg: string; color: string }> = {
+  cured: { label: 'Cured / Recovered', bg: '#DBEAFE', color: '#2563EB' },
+  followup: { label: 'Follow Up Required', bg: '#FEF9C3', color: '#CA8A04' },
+  referred: { label: 'Referred to Specialist', bg: '#EDE9FE', color: '#7C3AED' },
+  transferred: { label: 'Transferred', bg: '#E0F2FE', color: '#0369A1' },
+  lama: { label: 'LAMA', bg: '#FEF3C7', color: '#D97706' },
+  chronic: { label: 'Chronic / Ongoing', bg: '#F1F5F9', color: '#475569' },
+  homecare: { label: 'Home Care', bg: '#ECFDF5', color: '#059669' },
+  died: { label: 'Died', bg: '#FEE2E2', color: '#DC2626' },
+};
 
 const PatientDetailScreen = () => {
   const navigate = useNavigate();
@@ -69,29 +80,44 @@ const PatientDetailScreen = () => {
             <div
               key={c.caseId}
               onClick={() => navigate(`/case/${c.caseId}`)}
-              className="p-3 bg-card border border-border rounded-xl flex items-center justify-between active:scale-[0.98] transition-all cursor-pointer hover:shadow-card"
+              className="p-3 bg-card border border-border rounded-xl active:scale-[0.98] transition-all cursor-pointer hover:shadow-card"
             >
-              <div className="flex items-center gap-3">
-                <div className="w-9 h-9 bg-accent rounded-lg flex items-center justify-center text-primary">
-                  <FileText size={16} />
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-3">
+                  <div className="w-9 h-9 bg-accent rounded-lg flex items-center justify-center text-primary">
+                    <FileText size={16} />
+                  </div>
+                  {/* BACKEND LOGIC — Case History Card Data Source
+                     Line 1 (Diagnosis):      case.diagnosis field
+                     Line 2 (Chief Complaint): case.chief_complaint field
+                     Line 3 (Date):           case.admission_date field
+                     All fields come from the same case record in the database
+                     END BACKEND LOGIC */}
+                  <div>
+                    <h4 className="text-[13px] font-bold" style={{ color: '#1A2332' }}>{c.diagnosis}</h4>
+                    <p className="text-[13px]" style={{ color: '#6B7C93' }}>{c.complaint}</p>
+                    <div className="flex items-center gap-2 mt-0.5">
+                      <span className="text-[13px]" style={{ color: '#6B7C93' }}>{c.date}</span>
+                    </div>
+                  </div>
                 </div>
-                {/* BACKEND LOGIC — Case History Card Data Source
-                   Line 1 (Diagnosis):      case.diagnosis field
-                   Line 2 (Chief Complaint): case.chief_complaint field
-                   Line 3 (Date):           case.admission_date field
-                   All fields come from the same case record in the database
-                   END BACKEND LOGIC */}
-                <div>
-                  <h4 className="text-[13px] font-bold" style={{ color: '#1A2332' }}>{c.diagnosis}</h4>
-                  <p className="text-[13px]" style={{ color: '#6B7C93' }}>{c.complaint}</p>
-                  <p className="text-[13px]" style={{ color: '#6B7C93' }}>{c.date}</p>
+                <div className="flex items-center gap-2">
+                  {c.mediaCount > 0 && (
+                    <span className="text-[10px] bg-accent text-accent-foreground px-2 py-0.5 rounded-full font-bold">{c.mediaCount} 📷</span>
+                  )}
+                  <ChevronRight size={16} className="text-muted-foreground" />
                 </div>
               </div>
-              <div className="flex items-center gap-2">
-                {c.mediaCount > 0 && (
-                  <span className="text-[10px] bg-accent text-accent-foreground px-2 py-0.5 rounded-full font-bold">{c.mediaCount} 📷</span>
-                )}
-                <ChevronRight size={16} className="text-muted-foreground" />
+              <div className="flex justify-end mt-1">
+                {c.status === 'active' ? (
+                  <span className="text-[10px] font-bold uppercase" style={{ borderRadius: 20, padding: '3px 10px', backgroundColor: '#DCFCE7', color: '#16A34A' }}>
+                    Hospitalized
+                  </span>
+                ) : c.outcome && outcomeBadgeMap[c.outcome] ? (
+                  <span className="text-[10px] font-bold uppercase" style={{ borderRadius: 20, padding: '3px 10px', backgroundColor: outcomeBadgeMap[c.outcome].bg, color: outcomeBadgeMap[c.outcome].color }}>
+                    {outcomeBadgeMap[c.outcome].label}
+                  </span>
+                ) : null}
               </div>
             </div>
           ))}
