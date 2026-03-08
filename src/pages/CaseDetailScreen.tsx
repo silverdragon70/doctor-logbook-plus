@@ -409,7 +409,7 @@ const CaseDetailScreen = () => {
               Order by investigation.date DESC
               Each card maps to one investigation record.
               END BACKEND LOGIC */}
-          {mockCase.investigations.map((inv) => {
+          {(mockCase.investigations || []).map((inv) => {
             const isCardExpanded = expandedSubs.includes(`inv-${inv.id}`);
             const typeIcon = inv.type === 'Lab Result' ? '🧪' : inv.type === 'Imaging' ? '🩻' : '📄';
             return (
