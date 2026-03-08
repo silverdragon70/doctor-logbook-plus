@@ -127,7 +127,15 @@ const NewCaseScreen = () => {
     classification: true,
     history: false,
     vitals: false,
+    management: false,
+    medications: false,
+    respiratory: false,
+    feeding: false,
   });
+
+  const [medications, setMedications] = useState('');
+  const [respiratorySupport, setRespiratorySupport] = useState('');
+  const [feeding, setFeeding] = useState('');
 
   const toggleSection = (key: string) => {
     setExpandedSections((prev) => ({ ...prev, [key]: !prev[key] }));
