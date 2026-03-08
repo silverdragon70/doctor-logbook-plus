@@ -5,6 +5,7 @@ import AboutSheet from '@/components/AboutSheet';
 import ThemeColorSheet from '@/components/ThemeColorSheet';
 import FontSizeSheet from '@/components/FontSizeSheet';
 import DateFormatSheet from '@/components/DateFormatSheet';
+import ManageHospitalsSheet from '@/components/ManageHospitalsSheet';
 import { useNavigate } from 'react-router-dom';
 import {
   ArrowLeft, Palette, Moon, Type, Globe, CalendarDays,
