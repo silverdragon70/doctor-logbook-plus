@@ -129,6 +129,7 @@ const NewCaseScreen = () => {
     vitals: false,
     investigations: false,
     management: false,
+    progressNote: false,
     medications: false,
     respiratory: false,
     feeding: false,
