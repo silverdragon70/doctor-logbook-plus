@@ -91,7 +91,7 @@ const RestoreBackupSheet = ({ open, onOpenChange, onRestore }: RestoreBackupShee
               <div className="flex items-center gap-3 rounded-xl mb-5" style={{ padding: '12px 16px', background: '#F8FAFC', border: '1px solid #DDE3EA' }}>
                 <Package size={22} style={{ color: '#2563EB' }} />
                 <div>
-                  <div className="text-[14px] font-bold" style={{ color: '#1A2332' }}>backup_2025-01-15.pedilog</div>
+                  <div className="text-[14px] font-bold" style={{ color: '#1A2332' }}>backup_2025-01-15.medora</div>
                   <div className="text-[12px]" style={{ color: '#6B7C93' }}>245 MB · Full Backup</div>
                   <div className="text-[11px]" style={{ color: '#94A3B8' }}>Created: 15 Jan 2025</div>
                 </div>

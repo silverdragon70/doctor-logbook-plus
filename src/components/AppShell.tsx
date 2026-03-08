@@ -59,10 +59,10 @@ const AppShell = () => {
           <header className="sticky top-0 z-50 px-5 py-4 flex items-center justify-between border-b border-border bg-background/80 backdrop-blur-md">
             <div className="flex items-center gap-3">
               <div className="w-[34px] h-[34px] bg-primary rounded-lg flex items-center justify-center shadow-brand">
-                <span className="text-primary-foreground font-bold text-lg">P</span>
+                <span className="text-primary-foreground font-bold text-lg">M</span>
               </div>
               <div className="flex flex-col">
-                <h1 className="text-[18px] font-bold text-foreground leading-none">PediLog</h1>
+                <h1 className="text-[18px] font-bold text-foreground leading-none">Medora</h1>
                 <span className="text-[11px] font-normal tracking-[0.5px] text-muted-foreground mt-1 uppercase">Medical Logbook</span>
               </div>
             </div>

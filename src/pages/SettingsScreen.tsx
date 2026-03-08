@@ -311,7 +311,7 @@ const SettingsScreen = () => {
 
         {/* Footer */}
         <p className="text-center text-[11px] pb-4" style={{ color: '#6B7C93' }}>
-          PediLog v1.0.0 · Built for Pediatric Physicians
+          Medora v1.0.0 · Built for Pediatric Physicians
         </p>
       </div>
 

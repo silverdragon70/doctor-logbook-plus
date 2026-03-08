@@ -227,7 +227,7 @@ const AboutSheet = ({ open, onOpenChange }: AboutSheetProps) => {
 
           {/* User Responsibility */}
           <SectionHeader icon={Users} label="User Responsibility" />
-          <BodyText>By using PediLog, you acknowledge and agree that:</BodyText>
+          <BodyText>By using Medora, you acknowledge and agree that:</BodyText>
           <BulletList items={[
             'You are solely responsible for all data entered into the app',
             'You are responsible for ensuring compliance with all applicable medical privacy laws and institutional policies',
