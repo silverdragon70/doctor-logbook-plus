@@ -417,54 +417,6 @@ const NewCaseScreen = () => {
           </div>
         </CollapsibleSection>
 
-        {/* ═══ Add Vital Signs ═══ */}
-        <CollapsibleSection
-          title="Vital Signs"
-          icon={<Activity size={18} className="text-primary" />}
-          isExpanded={expandedSections.vitals}
-          onToggle={() => toggleSection('vitals')}
-          rightLabel="Today · Now"
-        >
-          <div className="space-y-4 pt-3">
-            <div className="grid grid-cols-2 gap-3">
-              <div className="space-y-1.5">
-                <label className={labelClass} style={{ color: '#6B7C93' }}>HR (BPM)</label>
-                <input type="text" inputMode="numeric" pattern="[0-9]*" value={hr} onChange={(e) => setHr(e.target.value.replace(/\D/g, ''))} placeholder="128" className={cn(inputClass, 'h-12')} />
-              </div>
-              <div className="space-y-1.5">
-                <label className={labelClass} style={{ color: '#6B7C93' }}>SPO₂ (%)</label>
-                <input type="text" inputMode="numeric" pattern="[0-9]*" value={spo2} onChange={(e) => setSpo2(e.target.value.replace(/\D/g, ''))} placeholder="94" className={cn(inputClass, 'h-12')} />
-              </div>
-            </div>
-
-            <div className="grid grid-cols-2 gap-3">
-              <div className="space-y-1.5">
-                <label className={labelClass} style={{ color: '#6B7C93' }}>Temp (°C)</label>
-                <input type="text" inputMode="decimal" value={temp} onChange={(e) => setTemp(e.target.value.replace(/[^0-9.]/g, ''))} placeholder="38.6" className={cn(inputClass, 'h-12')} />
-              </div>
-              <div className="space-y-1.5">
-                <label className={labelClass} style={{ color: '#6B7C93' }}>RR (/Min)</label>
-                <input type="text" inputMode="numeric" pattern="[0-9]*" value={rr} onChange={(e) => setRr(e.target.value.replace(/\D/g, ''))} placeholder="46" className={cn(inputClass, 'h-12')} />
-              </div>
-            </div>
-
-            <div className="grid grid-cols-2 gap-3">
-              <div className="space-y-1.5">
-                <label className={labelClass} style={{ color: '#6B7C93' }}>BP (mmHg)</label>
-                <input type="text" inputMode="numeric" value={bp} onChange={(e) => setBp(e.target.value.replace(/[^0-9/]/g, ''))} placeholder="88/55" className={cn(inputClass, 'h-12')} />
-              </div>
-              <div className="space-y-1.5">
-                <label className={labelClass} style={{ color: '#6B7C93' }}>Weight (kg)</label>
-                <input type="text" inputMode="decimal" value={weight} onChange={(e) => setWeight(e.target.value.replace(/[^0-9.]/g, ''))} placeholder="13.2" className={cn(inputClass, 'h-12')} />
-              </div>
-            </div>
-
-            <div className="space-y-1.5">
-              <label className={labelClass} style={{ color: '#6B7C93' }}>Date & Time</label>
-              <input type="datetime-local" value={vitalDateTime} onChange={(e) => setVitalDateTime(e.target.value)} className={cn(inputClass, 'h-12')} />
-            </div>
-          </div>
-        </CollapsibleSection>
 
         {/* ═══ Investigations ═══ */}
         <CollapsibleSection
@@ -681,6 +633,70 @@ const NewCaseScreen = () => {
                 rows={3}
                 className={cn(inputClass, 'h-auto py-3 resize-none')}
               />
+            </div>
+
+            {/* Nested: Vital Signs */}
+            <div className="rounded-[14px] border border-[hsl(216,20%,90%)] bg-[hsl(210,40%,98%)] overflow-hidden">
+              <button
+                onClick={() => toggleSection('vitals')}
+                className="w-full px-3 py-3 flex items-center justify-between"
+              >
+                <div className="flex items-center gap-2">
+                  <span className="text-[16px]">🫀</span>
+                  <span className="text-[15px] font-bold" style={{ color: '#1A2332' }}>Vital Signs</span>
+                </div>
+                <ChevronDown
+                  size={16}
+                  style={{ color: '#6B7C93' }}
+                  className={cn('transition-transform duration-300', expandedSections.vitals && 'rotate-180')}
+                />
+              </button>
+              <div className={cn(
+                'overflow-hidden transition-all duration-300 ease-in-out',
+                expandedSections.vitals ? 'max-h-[800px] opacity-100' : 'max-h-0 opacity-0'
+              )}>
+                <div className="px-3 pb-3 pt-1 border-t border-[hsl(216,20%,90%)]">
+                  <div className="space-y-4">
+                    <div className="grid grid-cols-2 gap-3">
+                      <div className="space-y-1.5">
+                        <label className={labelClass} style={{ color: '#6B7C93' }}>HR (BPM)</label>
+                        <input type="text" inputMode="numeric" pattern="[0-9]*" value={hr} onChange={(e) => setHr(e.target.value.replace(/\D/g, ''))} placeholder="128" className={cn(inputClass, 'h-12')} />
+                      </div>
+                      <div className="space-y-1.5">
+                        <label className={labelClass} style={{ color: '#6B7C93' }}>SPO₂ (%)</label>
+                        <input type="text" inputMode="numeric" pattern="[0-9]*" value={spo2} onChange={(e) => setSpo2(e.target.value.replace(/\D/g, ''))} placeholder="94" className={cn(inputClass, 'h-12')} />
+                      </div>
+                    </div>
+
+                    <div className="grid grid-cols-2 gap-3">
+                      <div className="space-y-1.5">
+                        <label className={labelClass} style={{ color: '#6B7C93' }}>Temp (°C)</label>
+                        <input type="text" inputMode="decimal" value={temp} onChange={(e) => setTemp(e.target.value.replace(/[^0-9.]/g, ''))} placeholder="38.6" className={cn(inputClass, 'h-12')} />
+                      </div>
+                      <div className="space-y-1.5">
+                        <label className={labelClass} style={{ color: '#6B7C93' }}>RR (/Min)</label>
+                        <input type="text" inputMode="numeric" pattern="[0-9]*" value={rr} onChange={(e) => setRr(e.target.value.replace(/\D/g, ''))} placeholder="46" className={cn(inputClass, 'h-12')} />
+                      </div>
+                    </div>
+
+                    <div className="grid grid-cols-2 gap-3">
+                      <div className="space-y-1.5">
+                        <label className={labelClass} style={{ color: '#6B7C93' }}>BP (mmHg)</label>
+                        <input type="text" inputMode="numeric" value={bp} onChange={(e) => setBp(e.target.value.replace(/[^0-9/]/g, ''))} placeholder="88/55" className={cn(inputClass, 'h-12')} />
+                      </div>
+                      <div className="space-y-1.5">
+                        <label className={labelClass} style={{ color: '#6B7C93' }}>Weight (kg)</label>
+                        <input type="text" inputMode="decimal" value={weight} onChange={(e) => setWeight(e.target.value.replace(/[^0-9.]/g, ''))} placeholder="13.2" className={cn(inputClass, 'h-12')} />
+                      </div>
+                    </div>
+
+                    <div className="space-y-1.5">
+                      <label className={labelClass} style={{ color: '#6B7C93' }}>Date & Time</label>
+                      <input type="datetime-local" value={vitalDateTime} onChange={(e) => setVitalDateTime(e.target.value)} className={cn(inputClass, 'h-12')} />
+                    </div>
+                  </div>
+                </div>
+              </div>
             </div>
           </div>
         </CollapsibleSection>
