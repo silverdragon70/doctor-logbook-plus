@@ -129,6 +129,7 @@ const NewCaseScreen = () => {
     vitals: false,
     investigations: false,
     management: false,
+    progressNote: false,
     medications: false,
     respiratory: false,
     feeding: false,
@@ -142,6 +143,8 @@ const NewCaseScreen = () => {
   const [investigationType, setInvestigationType] = useState('');
   const [investigationDate, setInvestigationDate] = useState<Date | undefined>(undefined);
   const [investigationResult, setInvestigationResult] = useState('');
+  const [progressNoteDate, setProgressNoteDate] = useState<Date | undefined>(undefined);
+  const [progressNoteAssessment, setProgressNoteAssessment] = useState('');
 
   const toggleSection = (key: string) => {
     setExpandedSections((prev) => ({ ...prev, [key]: !prev[key] }));
@@ -643,6 +646,41 @@ const NewCaseScreen = () => {
                   </div>
                 </div>
               </div>
+            </div>
+          </div>
+        </CollapsibleSection>
+
+        {/* ═══ Progress Note ═══ */}
+        <CollapsibleSection
+          title="Progress Note"
+          icon={<span className="text-[18px]">📝</span>}
+          isExpanded={expandedSections.progressNote}
+          onToggle={() => toggleSection('progressNote')}
+        >
+          <div className="space-y-4">
+            <div className="space-y-1.5">
+              <label className={labelClass} style={{ color: '#6B7C93' }}>Date</label>
+              <Popover>
+                <PopoverTrigger asChild>
+                  <button className={cn(inputClass, 'flex items-center justify-between text-left', !progressNoteDate && 'text-muted-foreground')}>
+                    {progressNoteDate ? format(progressNoteDate, 'MM/dd/yyyy') : 'mm/dd/yyyy'}
+                    <CalendarIcon size={16} className="text-muted-foreground" />
+                  </button>
+                </PopoverTrigger>
+                <PopoverContent className="w-auto p-0" align="start">
+                  <CalendarPicker mode="single" selected={progressNoteDate} onSelect={setProgressNoteDate} initialFocus />
+                </PopoverContent>
+              </Popover>
+            </div>
+            <div className="space-y-1.5">
+              <label className={labelClass} style={{ color: '#6B7C93' }}>Assessment</label>
+              <textarea
+                value={progressNoteAssessment}
+                onChange={(e) => setProgressNoteAssessment(e.target.value)}
+                placeholder="Clinical assessment..."
+                rows={3}
+                className={cn(inputClass, 'h-auto py-3 resize-none')}
+              />
             </div>
           </div>
         </CollapsibleSection>
