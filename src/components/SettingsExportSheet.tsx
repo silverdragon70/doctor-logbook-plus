@@ -17,6 +17,7 @@ interface SettingsExportSheetProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   gdriveConnected?: boolean;
+  onExportStart?: () => void;
 }
 
 const periodOptions: TimePeriod[] = ['All', 'Last Month', 'Last 3M', 'Last 6M', 'Last Year', 'Custom'];
