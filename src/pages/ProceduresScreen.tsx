@@ -514,10 +514,13 @@ const ProceduresScreen = () => {
                     </span>
                   </div>
                 </div>
-                {(proc.patientName || proc.location) && (
+                {(proc.patientName || proc.hospital) && (
                   <p className="text-xs text-muted-foreground">
-                    {[proc.patientName, proc.location].filter(Boolean).join(' · ')}
+                    {[proc.patientName, proc.hospital].filter(Boolean).join(' · ')}
                   </p>
+                )}
+                {proc.supervisor && (
+                  <p className="text-xs text-muted-foreground"><span className="font-medium text-foreground/70">Supervisor:</span> {proc.supervisor}</p>
                 )}
                 {proc.indication && (
                   <p className="text-xs text-muted-foreground"><span className="font-medium text-foreground/70">Indication:</span> {proc.indication}</p>
