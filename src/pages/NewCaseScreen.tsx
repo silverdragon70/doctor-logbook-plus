@@ -142,6 +142,8 @@ const NewCaseScreen = () => {
   const [investigationType, setInvestigationType] = useState('');
   const [investigationDate, setInvestigationDate] = useState<Date | undefined>(undefined);
   const [investigationResult, setInvestigationResult] = useState('');
+  const [progressNoteDate, setProgressNoteDate] = useState<Date | undefined>(undefined);
+  const [progressNoteAssessment, setProgressNoteAssessment] = useState('');
 
   const toggleSection = (key: string) => {
     setExpandedSections((prev) => ({ ...prev, [key]: !prev[key] }));
