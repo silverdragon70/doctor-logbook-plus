@@ -17,6 +17,7 @@ interface SettingsExportSheetProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   gdriveConnected?: boolean;
+  onExportStart?: () => void;
 }
 
 const periodOptions: TimePeriod[] = ['All', 'Last Month', 'Last 3M', 'Last 6M', 'Last Year', 'Custom'];
@@ -31,7 +32,7 @@ const exportCategories = [
 
 const hospitals = ['All Hospitals', 'Cairo University', 'Ain Shams Hospital', 'Kasr El Aini'];
 
-const SettingsExportSheet: React.FC<SettingsExportSheetProps> = ({ open, onOpenChange, gdriveConnected = true }) => {
+const SettingsExportSheet: React.FC<SettingsExportSheetProps> = ({ open, onOpenChange, gdriveConnected = true, onExportStart }) => {
   const [selectedCategories, setSelectedCategories] = useState<string[]>(['cases', 'procedures', 'lectures', 'courses']);
   const [hospital, setHospital] = useState('All Hospitals');
   const [hospitalOpen, setHospitalOpen] = useState(false);
@@ -51,6 +52,7 @@ const SettingsExportSheet: React.FC<SettingsExportSheetProps> = ({ open, onOpenC
   const handleExport = () => {
     console.log('export', { selectedCategories, hospital, period, exportFormat, saveLocation });
     onOpenChange(false);
+    onExportStart?.();
   };
 
   return (

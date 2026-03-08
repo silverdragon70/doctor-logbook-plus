@@ -13,6 +13,7 @@ import AIModelSheet from '@/components/AIModelSheet';
 import AILanguageSheet from '@/components/AILanguageSheet';
 import SyncFrequencySheet from '@/components/SyncFrequencySheet';
 import GoogleAccountSheet from '@/components/GoogleAccountSheet';
+import ProgressSheet, { OperationType } from '@/components/ProgressSheet';
 import { useNavigate } from 'react-router-dom';
 import {
   ArrowLeft, Palette, Moon, Type, Globe, CalendarDays,
@@ -98,6 +99,15 @@ const SettingsScreen = () => {
   const [confirmDialogs, setConfirmDialogs] = useState(true);
   const [autoSave, setAutoSave] = useState(true);
   const [exportOpen, setExportOpen] = useState(false);
+  const [progressOpen, setProgressOpen] = useState(false);
+  const [progressType, setProgressType] = useState<OperationType>('backup');
+  const [progressDetail, setProgressDetail] = useState('');
+
+  const startProgress = (type: OperationType, detail?: string) => {
+    setProgressType(type);
+    setProgressDetail(detail || '');
+    setProgressOpen(true);
+  };
   const [backupSheetOpen, setBackupSheetOpen] = useState(false);
   const [lastBackupInfo, setLastBackupInfo] = useState<{ date: string; size: string; destination: 'local' | 'gdrive' } | null>({ date: '2025-01-15 · 08:30', size: '245 MB', destination: 'local' });
   const [aboutOpen, setAboutOpen] = useState(false);
@@ -216,7 +226,7 @@ const SettingsScreen = () => {
               Backup Now
             </button>
           </div>
-          <Row icon={Download} label="Restore from Backup" subtitle="Select a backup file" right={<Chevron />} />
+          <Row icon={Download} label="Restore from Backup" subtitle="Select a backup file" right={<Chevron />} onClick={() => startProgress('restore', 'All records restored')} />
           <Row icon={Upload} label="Export Data" subtitle="Export your records" right={<Chevron />} onClick={() => setExportOpen(true)} noBorder />
         </Section>
 
@@ -295,16 +305,17 @@ const SettingsScreen = () => {
         </p>
       </div>
 
-      <SettingsExportSheet open={exportOpen} onOpenChange={setExportOpen} />
+      <SettingsExportSheet open={exportOpen} onOpenChange={setExportOpen} onExportStart={() => startProgress('export', 'File saved to Downloads')} />
       <CreateBackupSheet
         open={backupSheetOpen}
         onOpenChange={setBackupSheetOpen}
         defaultLocation={lastBackupInfo?.destination || 'local'}
         onBackupComplete={(destination: 'local' | 'gdrive') => {
+          startProgress('backup', destination === 'local' ? '245 MB · Local Storage' : '245 MB · Google Drive');
           const now = new Date();
           setLastBackupInfo({
             date: now.toISOString().slice(0, 10) + ' · ' + now.toTimeString().slice(0, 5),
-            size: 'calculating...',
+            size: '245 MB',
             destination,
           });
         }}
@@ -321,6 +332,7 @@ const SettingsScreen = () => {
       <AILanguageSheet open={aiLanguageOpen} onOpenChange={setAiLanguageOpen} value={aiLanguage} onApply={setAiLanguage} />
       <SyncFrequencySheet open={syncFreqOpen} onOpenChange={setSyncFreqOpen} value={syncFrequency} onApply={setSyncFrequency} />
       <GoogleAccountSheet open={googleAccountOpen} onOpenChange={setGoogleAccountOpen} email={googleEmail} onConnect={() => { setGoogleEmail('user@gmail.com'); setSyncEnabled(true); }} onSwitch={() => console.log('switch account')} onDisconnect={() => { setGoogleEmail(''); setSyncEnabled(false); }} />
+      <ProgressSheet open={progressOpen} onOpenChange={setProgressOpen} type={progressType} detail={progressDetail} />
     </div>
   );
 };
