@@ -485,7 +485,7 @@ const CaseDetailScreen = () => {
                               background: '#F1F5F9', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0,
                               fontSize: '13px', fontWeight: 700, color: '#6B7C93',
                             }}>
-                              +{inv.images.length - 3}
+                              +{(inv.images || []).length - 3}
                             </div>
                           )}
                         </div>
