@@ -164,7 +164,7 @@ const AboutSheet = ({ open, onOpenChange }: AboutSheetProps) => {
 
           {/* AI Disclaimer */}
           <SectionHeader icon={Bot} label="Artificial Intelligence Disclaimer" />
-          <BodyText>AI features within PediLog may send de-identified or processed data to third-party AI providers.</BodyText>
+          <BodyText>AI features within Medora may send de-identified or processed data to third-party AI providers.</BodyText>
           <div className="h-3" />
           <BodyText>AI-generated content is produced by automated machine learning systems and may contain:</BodyText>
           <BulletList items={[
