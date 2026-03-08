@@ -396,8 +396,6 @@ const CaseDetailScreen = () => {
           onToggle={() => toggleSection('investigations')}
           sectionRef={sectionRefs.investigations}
           onAdd={() => console.log('add investigation')}
-          onEdit={() => toggleEdit('investigations')}
-          isEditing={editingSections.includes('investigations')}
         >
           {/* UI LOGIC — Investigation Cards
               Render one card per investigation record.
