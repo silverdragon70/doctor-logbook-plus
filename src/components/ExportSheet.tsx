@@ -80,6 +80,7 @@ const ExportSheet: React.FC<ExportSheetProps> = ({ open, onOpenChange, title, da
   const [customFrom, setCustomFrom] = useState<Date>(subMonths(new Date(), 1));
   const [customTo, setCustomTo] = useState<Date>(new Date());
   const [selectedCaseIds, setSelectedCaseIds] = useState<string[]>([]);
+  const [caseDropdownOpen, setCaseDropdownOpen] = useState(false);
 
   // Initialize all cases as selected when cases change
   React.useEffect(() => {
