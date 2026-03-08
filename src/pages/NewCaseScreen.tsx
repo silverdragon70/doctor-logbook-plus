@@ -1,6 +1,6 @@
 import React, { useState, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { ArrowLeft, Save, Camera, User, Calendar, Search, X, CalendarIcon, ChevronDown, ClipboardList, Stethoscope, ScrollText, Activity, Pill, Wind, Baby, AirVent } from 'lucide-react';
+import { ArrowLeft, Save, Camera, User, Calendar, Search, X, CalendarIcon, ChevronDown, ClipboardList, Stethoscope, ScrollText, Activity, Pill, Wind, Baby, AirVent, Upload, FlaskConical } from 'lucide-react';
 import { format } from 'date-fns';
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
@@ -127,6 +127,7 @@ const NewCaseScreen = () => {
     classification: true,
     history: false,
     vitals: false,
+    investigations: false,
     management: false,
     medications: false,
     respiratory: false,
@@ -137,6 +138,10 @@ const NewCaseScreen = () => {
   const [respiratorySupport, setRespiratorySupport] = useState('');
   const [respiratoryType, setRespiratoryType] = useState('');
   const [feeding, setFeeding] = useState('');
+  const [investigationName, setInvestigationName] = useState('');
+  const [investigationType, setInvestigationType] = useState('');
+  const [investigationDate, setInvestigationDate] = useState<Date | undefined>(undefined);
+  const [investigationResult, setInvestigationResult] = useState('');
 
   const toggleSection = (key: string) => {
     setExpandedSections((prev) => ({ ...prev, [key]: !prev[key] }));
@@ -455,6 +460,64 @@ const NewCaseScreen = () => {
               <label className={labelClass} style={{ color: '#6B7C93' }}>Date & Time</label>
               <input type="datetime-local" value={vitalDateTime} onChange={(e) => setVitalDateTime(e.target.value)} className={cn(inputClass, 'h-12')} />
             </div>
+          </div>
+        </CollapsibleSection>
+
+        {/* ═══ Investigations ═══ */}
+        <CollapsibleSection
+          title="Investigations"
+          icon={<span className="text-[18px]">🔬</span>}
+          isExpanded={expandedSections.investigations}
+          onToggle={() => toggleSection('investigations')}
+        >
+          <div className="space-y-4 pt-3">
+            <div className="space-y-1.5">
+              <label className={labelClass} style={{ color: '#6B7C93' }}>Investigation Name</label>
+              <input type="text" value={investigationName} onChange={(e) => setInvestigationName(e.target.value)} placeholder="e.g. CBC, Chest X-Ray..." className={inputClass} />
+            </div>
+
+            <div className="grid grid-cols-2 gap-3">
+              <div className="space-y-1.5">
+                <label className={labelClass} style={{ color: '#6B7C93' }}>Type</label>
+                <Select value={investigationType} onValueChange={setInvestigationType}>
+                  <SelectTrigger className="w-full h-11 bg-[hsl(210,40%,98%)] border-[1.5px] border-[hsl(216,20%,90%)] rounded-[12px] text-[14px] focus:border-primary">
+                    <SelectValue placeholder="Lab Result" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="lab">Lab Result</SelectItem>
+                    <SelectItem value="imaging">Imaging</SelectItem>
+                    <SelectItem value="other">Other</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+              <div className="space-y-1.5">
+                <label className={labelClass} style={{ color: '#6B7C93' }}>Date</label>
+                <Popover>
+                  <PopoverTrigger asChild>
+                    <Button variant="outline" className="w-full justify-start text-left text-[14px] h-11 bg-[hsl(210,40%,98%)] border-[1.5px] border-[hsl(216,20%,90%)] rounded-[12px] hover:border-primary">
+                      <CalendarIcon className="mr-2 h-4 w-4 text-muted-foreground" />
+                      {investigationDate ? format(investigationDate, 'MM/dd/yyyy') : <span className="text-muted-foreground">mm/dd/yyyy</span>}
+                    </Button>
+                  </PopoverTrigger>
+                  <PopoverContent className="w-auto p-0" align="start">
+                    <CalendarPicker mode="single" selected={investigationDate} onSelect={setInvestigationDate} initialFocus className={cn('p-3 pointer-events-auto')} />
+                  </PopoverContent>
+                </Popover>
+              </div>
+            </div>
+
+            <div className="space-y-1.5">
+              <label className={labelClass} style={{ color: '#6B7C93' }}>Result (Text)</label>
+              <textarea value={investigationResult} onChange={(e) => setInvestigationResult(e.target.value)} placeholder="Enter findings or numeric results..." rows={3} className={cn(inputClass, 'h-auto py-3 resize-none')} />
+            </div>
+
+            <button
+              onClick={() => console.log('attach investigation image')}
+              className="w-full h-20 border-2 border-dashed border-[hsl(216,20%,90%)] rounded-[12px] bg-[hsl(210,40%,98%)] flex flex-col items-center justify-center text-muted-foreground hover:border-primary hover:text-primary transition-colors"
+            >
+              <Upload size={20} />
+              <span className="text-[11px] font-medium mt-1">Tap to attach image (Lab sheet / Imaging)</span>
+            </button>
           </div>
         </CollapsibleSection>
 
