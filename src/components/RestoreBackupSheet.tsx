@@ -79,7 +79,7 @@ const RestoreBackupSheet = ({ open, onOpenChange, onRestore }: RestoreBackupShee
               <div className="flex items-start gap-2 rounded-xl p-3" style={{ background: '#FFFBEB' }}>
                 <AlertTriangle size={16} style={{ color: '#F59E0B' }} className="flex-shrink-0 mt-0.5" />
                 <p className="text-[12px] leading-[18px]" style={{ color: '#92400E' }}>
-                  Only PediLog backup files are supported (.pedilog)
+                  Only Medora backup files are supported (.medora)
                 </p>
               </div>
             </>
