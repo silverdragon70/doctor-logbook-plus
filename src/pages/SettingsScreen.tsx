@@ -76,6 +76,14 @@ const SettingsScreen = () => {
   /* toggles */
   const [darkMode, setDarkMode] = useState(false);
   const [aiFeatures, setAiFeatures] = useState(true);
+  const [aiProvider, setAiProvider] = useState('anthropic');
+  const [apiKey, setApiKey] = useState('sk-ant-api03-xxxxxxxxxxxx');
+  const [aiModel, setAiModel] = useState('sonnet');
+  const [aiLanguage, setAiLanguage] = useState('arabic');
+  const [aiProviderOpen, setAiProviderOpen] = useState(false);
+  const [apiKeyOpen, setApiKeyOpen] = useState(false);
+  const [aiModelOpen, setAiModelOpen] = useState(false);
+  const [aiLanguageOpen, setAiLanguageOpen] = useState(false);
   const [syncEnabled, setSyncEnabled] = useState(true);
   const [encryptedBackup, setEncryptedBackup] = useState(true);
   const [pinLock, setPinLock] = useState(false);
