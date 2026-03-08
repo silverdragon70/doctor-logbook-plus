@@ -276,6 +276,7 @@ const NewCaseScreen = () => {
       <div className="px-5 py-5 space-y-5 pb-10">
 
         {/* ═══ Patient Information ═══ */}
+        <div ref={sectionRefs.patient}>
         <CollapsibleSection
           title="Patient Information"
           icon={<ClipboardList size={18} className="text-primary" />}
