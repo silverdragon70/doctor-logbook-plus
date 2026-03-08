@@ -519,7 +519,7 @@ const CaseDetailScreen = () => {
           isExpanded={expandedSections.includes('management')}
           onToggle={() => toggleSection('management')}
           sectionRef={sectionRefs.management}
-          onAdd={() => console.log('add management')}
+          onAdd={() => setShowAddManagement(true)}
         >
           {/* UI LOGIC — Management Cards
               Render one card per management entry.
