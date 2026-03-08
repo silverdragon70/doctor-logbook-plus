@@ -650,6 +650,41 @@ const NewCaseScreen = () => {
           </div>
         </CollapsibleSection>
 
+        {/* ═══ Progress Note ═══ */}
+        <CollapsibleSection
+          title="Progress Note"
+          icon={<span className="text-[18px]">📝</span>}
+          isExpanded={expandedSections.progressNote}
+          onToggle={() => toggleSection('progressNote')}
+        >
+          <div className="space-y-4">
+            <div className="space-y-1.5">
+              <label className={labelClass} style={{ color: '#6B7C93' }}>Date</label>
+              <Popover>
+                <PopoverTrigger asChild>
+                  <button className={cn(inputClass, 'flex items-center justify-between text-left', !progressNoteDate && 'text-muted-foreground')}>
+                    {progressNoteDate ? format(progressNoteDate, 'MM/dd/yyyy') : 'mm/dd/yyyy'}
+                    <CalendarIcon size={16} className="text-muted-foreground" />
+                  </button>
+                </PopoverTrigger>
+                <PopoverContent className="w-auto p-0" align="start">
+                  <CalendarPicker mode="single" selected={progressNoteDate} onSelect={setProgressNoteDate} initialFocus />
+                </PopoverContent>
+              </Popover>
+            </div>
+            <div className="space-y-1.5">
+              <label className={labelClass} style={{ color: '#6B7C93' }}>Assessment</label>
+              <textarea
+                value={progressNoteAssessment}
+                onChange={(e) => setProgressNoteAssessment(e.target.value)}
+                placeholder="Clinical assessment..."
+                rows={3}
+                className={cn(inputClass, 'h-auto py-3 resize-none')}
+              />
+            </div>
+          </div>
+        </CollapsibleSection>
+
         {/* ═══ Attach Images ═══ */}
         <div className="bg-card border border-border rounded-[18px] p-4">
           <span className="text-[12px] font-bold text-foreground block mb-3">Attach Images</span>
