@@ -76,7 +76,7 @@ const AppShell = () => {
         </main>
 
         {/* BOTTOM NAV */}
-        {!isDetailPage && (
+        {!isDetailPage && isMainTabScreen && (
           <nav className="fixed bottom-0 left-1/2 -translate-x-1/2 w-full max-w-[430px] h-[72px] bg-card/90 backdrop-blur-xl border-t border-border flex items-center justify-around px-6 z-40">
             {navItems.map((item) => (
               <button
