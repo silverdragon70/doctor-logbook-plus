@@ -144,7 +144,7 @@ const GroupPearlScreen = () => {
               <ArrowLeft size={22} />
             </button>
             <div>
-              <h1 className="text-[17px] font-bold text-foreground leading-tight">Group Pearl</h1>
+              <h1 className="text-[17px] font-bold text-foreground leading-tight">Clinical Pearls</h1>
               <p className="text-[11px] text-muted-foreground mt-0.5">Analyze case patterns</p>
             </div>
           </div>
