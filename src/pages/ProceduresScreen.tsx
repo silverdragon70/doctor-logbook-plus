@@ -449,7 +449,8 @@ const ProceduresScreen = () => {
 
   // ─── Main List View ───
   return (
-    <div className="px-5 py-6 space-y-5 animate-fade-in pb-24">
+    <>
+      <div className="px-5 py-6 space-y-5 animate-fade-in pb-24">
         {/* Stats Row */}
         <div className="grid grid-cols-3 gap-3">
           {statCards.map(s => (
@@ -530,15 +531,16 @@ const ProceduresScreen = () => {
             ))}
           </div>
         )}
-
-        {/* FAB */}
-        <button
-          onClick={() => setShowForm(true)}
-          className="fixed bottom-[84px] left-1/2 translate-x-[110px] w-14 h-14 bg-primary rounded-[18px] flex items-center justify-center text-primary-foreground shadow-brand active:scale-90 transition-all z-50 group overflow-hidden"
-        >
-          <Plus size={26} />
-        </button>
       </div>
+
+      {/* FAB — outside animate-fade-in so it's visible immediately */}
+      <button
+        onClick={() => setShowForm(true)}
+        className="fixed bottom-[84px] left-1/2 translate-x-[110px] w-14 h-14 bg-primary rounded-[18px] flex items-center justify-center text-primary-foreground shadow-brand active:scale-90 transition-all z-50 group overflow-hidden"
+      >
+        <Plus size={26} />
+      </button>
+    </>
   );
 };
 
