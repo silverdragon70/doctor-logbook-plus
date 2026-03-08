@@ -293,6 +293,14 @@ const CaseDetailScreen = () => {
           <button onClick={() => navigate(`/case/${id}/pearl`, { state: { caseData: mockCase } })} className="p-2 rounded-full hover:bg-muted transition-colors" style={{ color: '#D97706' }}>
             <Lightbulb size={18} />
           </button>
+          <button
+            onClick={() => caseStatus !== 'discharged' && setShowDischargeDialog(true)}
+            className="p-2 rounded-full hover:bg-muted transition-colors"
+            style={{ color: caseStatus === 'discharged' ? '#94A3B8' : '#10B981', cursor: caseStatus === 'discharged' ? 'default' : 'pointer' }}
+            disabled={caseStatus === 'discharged'}
+          >
+            <LogOut size={18} />
+          </button>
           <button onClick={() => setShowDeleteDialog(true)} className="p-2 rounded-full hover:bg-muted text-destructive">
             <Trash2 size={18} />
           </button>
