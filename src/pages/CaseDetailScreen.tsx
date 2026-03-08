@@ -38,6 +38,14 @@ const exportColumns = [
   { header: 'Value', key: 'value' },
 ];
 
+// Mock case history for this patient
+const patientCaseHistory = [
+  { id: '1', diagnosis: 'Acute bronchitis', date: '2025-01-15', complaint: 'Persistent cough' },
+  { id: '2', diagnosis: 'Viral infection', date: '2024-11-20', complaint: 'Fever' },
+  { id: '3', diagnosis: 'Contact dermatitis', date: '2024-09-05', complaint: 'Rash' },
+  { id: '4', diagnosis: 'Healthy', date: '2024-06-10', complaint: 'Well-child check' },
+];
+
 const CaseDetailScreen = () => {
   const navigate = useNavigate();
   const { id } = useParams();
