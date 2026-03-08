@@ -31,18 +31,21 @@ const mockCase = {
     { id: '2', name: 'Chest X-Ray', type: 'Imaging' as const, date: '06/03/2025', result: 'Bilateral infiltrates noted in lower lobes. No pleural effusion. Heart size normal.', images: [] },
     { id: '3', name: 'Echo', type: 'Imaging' as const, date: '07/03/2025', result: 'Normal cardiac function. EF 65%. No structural abnormalities detected.', images: ['img3.jpg', 'img4.jpg', 'img5.jpg', 'img6.jpg', 'img7.jpg'] },
   ],
-  medications: ['Cefotaxime 1g IV q8h', 'Salbutamol nebulization q6h', 'Oral prednisolone 1mg/kg x 3 days'],
-  medicationChartImage: '',
-  respiratorySupport: 'Nasal O₂',
-  respiratoryDetails: '2 L/min',
-  feedingType: 'Nasogastric',
-  feedingDetails: '60 mL/hr, formula type...',
-  progressDate: '05 / 03 / 2025',
-  assessment: '',
-  vitals: {
-    hr: '128', spo2: '94', temp: '38.6', rr: '46',
-    bp: '88/55', weight: '13.2', dateTime: '05/03/2025  07:00 AM',
-  },
+  managementEntries: [
+    { id: 'm1', type: 'Medications' as const, date: '05/03/2025', medications: ['Cefotaxime 1g IV q8h', 'Azithromycin 150mg PO OD', 'Salbutamol nebulization q6h'], chartImage: '' },
+    { id: 'm2', type: 'Respiratory Support' as const, date: '05/03/2025', mode: 'Nasal O₂', details: '2 L/min' },
+    { id: 'm3', type: 'Feeding' as const, date: '06/03/2025', mode: 'Nasogastric', details: '60 mL/hr, formula type...' },
+  ],
+  progressNotes: [
+    {
+      id: 'p1', date: '05/03/2025', assessment: 'Patient showing improvement. Fever subsiding. Cough less frequent.',
+      vitals: { hr: '128', spo2: '94', temp: '38.6', rr: '46', bp: '88/55', weight: '13.2', dateTime: '05/03/2025  07:00 AM' },
+    },
+    {
+      id: 'p2', date: '06/03/2025', assessment: 'Continued improvement. Tolerating feeds well. SpO2 stable on room air.',
+      vitals: { hr: '118', spo2: '97', temp: '37.2', rr: '32', bp: '90/58', weight: '13.2', dateTime: '06/03/2025  08:30 AM' },
+    },
+  ],
   mediaCount: 2,
 };
 
@@ -512,60 +515,108 @@ const CaseDetailScreen = () => {
           onEdit={() => toggleEdit('management')}
           isEditing={editingSections.includes('management')}
         >
-          {/* Sub 5A — Medications */}
-          <SubAccordion
-            icon="💊" title="Medications"
-            isExpanded={expandedSubs.includes('medications')}
-            onToggle={() => toggleSub('medications')}
-          >
-            <div className="space-y-1.5">
-              <span style={{ color: '#6B7C93', fontSize: '12px', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.05em' }}>
-                Medications List
-              </span>
-              <div style={{
-                background: '#F8FAFC', border: '1.5px solid #DDE3EA', borderRadius: '12px',
-                padding: '12px 16px', color: '#1A2332', fontSize: '15px', lineHeight: '1.8',
+          {/* UI LOGIC — Management Cards
+              Render one card per management entry.
+              Each card is independently expandable.
+              All cards collapsed by default.
+              ✏️ icon appears only when card is expanded.
+              END UI LOGIC */}
+          {/* BACKEND LOGIC — Management Data
+              Fetch all management entries where management.case_id = current case ID
+              Order by management.date DESC
+              Each card maps to one management record.
+              END BACKEND LOGIC */}
+          {(mockCase.managementEntries || []).map((entry) => {
+            const isCardExpanded = expandedSubs.includes(`mgmt-${entry.id}`);
+            const typeIcon = entry.type === 'Medications' ? '💊' : entry.type === 'Respiratory Support' ? '🫁' : '🍼';
+            return (
+              <div key={entry.id} style={{
+                background: '#FFFFFF', borderRadius: '14px', border: '1px solid #DDE3EA',
+                padding: '12px 16px', marginBottom: '10px',
+                boxShadow: '0px 1px 4px rgba(0,0,0,0.06)',
               }}>
-                {mockCase.medications.length > 0
-                  ? mockCase.medications.map((med, i) => <div key={i}>{i + 1}. {med}</div>)
-                  : '—'}
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-2">
+                    <span style={{ fontSize: '16px' }}>{typeIcon}</span>
+                    <span style={{ fontSize: '14px', fontWeight: 700, color: '#1A2332' }}>{entry.type}</span>
+                  </div>
+                  {isCardExpanded && (
+                    <button onClick={() => toggleEdit(`mgmt-${entry.id}`)} className="p-1 rounded-full hover:bg-muted/50">
+                      <Pencil size={14} style={{ color: '#2563EB' }} />
+                    </button>
+                  )}
+                </div>
+                <div className="flex items-center justify-between mt-1">
+                  <span style={{ fontSize: '12px', color: '#6B7C93' }}>{entry.date}</span>
+                  <button onClick={() => toggleSub(`mgmt-${entry.id}`)} className="p-1">
+                    <ChevronDown size={14} className="text-muted-foreground transition-transform duration-300"
+                      style={{ transform: isCardExpanded ? 'rotate(180deg)' : 'rotate(0deg)' }} />
+                  </button>
+                </div>
+
+                {isCardExpanded && (
+                  <>
+                    <div style={{ borderTop: '1px solid #DDE3EA', margin: '8px 0' }} />
+                    <div className="space-y-3">
+                      {entry.type === 'Medications' && 'medications' in entry && (
+                        <>
+                          <div className="space-y-1.5">
+                            <span style={{ color: '#6B7C93', fontSize: '12px', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.05em' }}>
+                              Medications List
+                            </span>
+                            <div style={{
+                              background: '#F8FAFC', border: '1.5px solid #DDE3EA', borderRadius: '12px',
+                              padding: '12px 16px', color: '#1A2332', fontSize: '15px', lineHeight: '1.8',
+                            }}>
+                              {(entry as any).medications.length > 0
+                                ? (entry as any).medications.map((med: string, i: number) => <div key={i}>{i + 1}. {med}</div>)
+                                : '—'}
+                            </div>
+                          </div>
+                        </>
+                      )}
+                      {entry.type === 'Respiratory Support' && 'mode' in entry && (
+                        <>
+                          <div className="space-y-1.5">
+                            <span style={{ color: '#6B7C93', fontSize: '12px', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.05em' }}>
+                              Selected Mode
+                            </span>
+                            <div>
+                              <span style={{
+                                display: 'inline-flex', padding: '8px 16px', borderRadius: '20px', fontSize: '14px', fontWeight: 600,
+                                background: '#2563EB', color: '#FFFFFF',
+                              }}>
+                                {(entry as any).mode || '—'}
+                              </span>
+                            </div>
+                          </div>
+                          <DisplayField label="Details" value={(entry as any).details} />
+                        </>
+                      )}
+                      {entry.type === 'Feeding' && 'mode' in entry && (
+                        <>
+                          <div className="space-y-1.5">
+                            <span style={{ color: '#6B7C93', fontSize: '12px', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.05em' }}>
+                              Selected Mode
+                            </span>
+                            <div>
+                              <span style={{
+                                display: 'inline-flex', padding: '8px 16px', borderRadius: '20px', fontSize: '14px', fontWeight: 600,
+                                background: '#2563EB', color: '#FFFFFF',
+                              }}>
+                                {(entry as any).mode || '—'}
+                              </span>
+                            </div>
+                          </div>
+                          <DisplayField label="Feeding Details" value={(entry as any).details} />
+                        </>
+                      )}
+                    </div>
+                  </>
+                )}
               </div>
-            </div>
-          </SubAccordion>
-
-          {/* Sub 5B — Respiratory Support */}
-          <SubAccordion
-            icon="🫁" title="Respiratory Support"
-            isExpanded={expandedSubs.includes('respiratory')}
-            onToggle={() => toggleSub('respiratory')}
-          >
-            <div className="space-y-1.5">
-              <span style={{
-                display: 'inline-flex', padding: '8px 16px', borderRadius: '20px', fontSize: '14px', fontWeight: 600,
-                background: '#2563EB', color: '#FFFFFF',
-              }}>
-                {mockCase.respiratorySupport || '—'}
-              </span>
-            </div>
-            <DisplayField label="Details" value={mockCase.respiratoryDetails} />
-          </SubAccordion>
-
-          {/* Sub 5C — Feeding */}
-          <SubAccordion
-            icon="🍼" title="Feeding"
-            isExpanded={expandedSubs.includes('feeding')}
-            onToggle={() => toggleSub('feeding')}
-          >
-            <div className="space-y-1.5">
-              <span style={{
-                display: 'inline-flex', padding: '8px 16px', borderRadius: '20px', fontSize: '14px', fontWeight: 600,
-                background: '#2563EB', color: '#FFFFFF',
-              }}>
-                {mockCase.feedingType || '—'}
-              </span>
-            </div>
-            <DisplayField label="Feeding Details" value={mockCase.feedingDetails} />
-          </SubAccordion>
+            );
+          })}
         </AccordionSection>
 
         {/* SECTION 6 — Progress Note */}
@@ -578,25 +629,86 @@ const CaseDetailScreen = () => {
           onEdit={() => toggleEdit('progress')}
           isEditing={editingSections.includes('progress')}
         >
-          <DisplayField label="Date" value={mockCase.progressDate} />
-          <DisplayField label="Assessment" value={mockCase.assessment} isMultiLine />
+          {/* UI LOGIC — Progress Note Cards
+              Render one card per progress note entry.
+              Each card is independently expandable.
+              Each card has its own nested Vital Signs.
+              All cards and nested vitals collapsed by default.
+              ✏️ icon appears only when card is expanded.
+              END UI LOGIC */}
+          {/* BACKEND LOGIC — Progress Note Data
+              Fetch all progress notes where progress_note.case_id = current case ID
+              Order by progress_note.date DESC
+              Each card maps to one progress_note record.
+              Vital Signs fetched from vitals table where vitals.progress_note_id = progress_note.id
+              END BACKEND LOGIC */}
+          {(mockCase.progressNotes || []).map((note) => {
+            const isCardExpanded = expandedSubs.includes(`prog-${note.id}`);
+            return (
+              <div key={note.id} style={{
+                background: '#FFFFFF', borderRadius: '14px', border: '1px solid #DDE3EA',
+                padding: '12px 16px', marginBottom: '10px',
+                boxShadow: '0px 1px 4px rgba(0,0,0,0.06)',
+              }}>
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-2">
+                    <span style={{ fontSize: '16px' }}>📝</span>
+                    <span style={{ fontSize: '14px', fontWeight: 700, color: '#1A2332' }}>Progress Note</span>
+                  </div>
+                  {isCardExpanded && (
+                    <button onClick={() => toggleEdit(`prog-${note.id}`)} className="p-1 rounded-full hover:bg-muted/50">
+                      <Pencil size={14} style={{ color: '#2563EB' }} />
+                    </button>
+                  )}
+                </div>
+                <div className="flex items-center justify-between mt-1">
+                  <span style={{ fontSize: '12px', color: '#6B7C93' }}>{note.date}</span>
+                  <button onClick={() => toggleSub(`prog-${note.id}`)} className="p-1">
+                    <ChevronDown size={14} className="text-muted-foreground transition-transform duration-300"
+                      style={{ transform: isCardExpanded ? 'rotate(180deg)' : 'rotate(0deg)' }} />
+                  </button>
+                </div>
 
-          {/* Nested Vital Signs */}
-          <SubAccordion
-            icon="🫀" title="Vital Signs"
-            isExpanded={expandedSubs.includes('vitals')}
-            onToggle={() => toggleSub('vitals')}
-          >
-            <div className="grid grid-cols-2 gap-3">
-              <DisplayField label="HR (BPM)" value={mockCase.vitals.hr} />
-              <DisplayField label="SPO₂ (%)" value={mockCase.vitals.spo2} />
-              <DisplayField label="TEMP (°C)" value={mockCase.vitals.temp} />
-              <DisplayField label="RR (/MIN)" value={mockCase.vitals.rr} />
-              <DisplayField label="BP (MMHG)" value={mockCase.vitals.bp} />
-              <DisplayField label="WEIGHT (KG)" value={mockCase.vitals.weight} />
-            </div>
-            <DisplayField label="Date & Time" value={mockCase.vitals.dateTime} />
-          </SubAccordion>
+                {isCardExpanded && (
+                  <>
+                    <div style={{ borderTop: '1px solid #DDE3EA', margin: '8px 0' }} />
+                    <div className="space-y-3">
+                      <DisplayField label="Assessment" value={note.assessment} isMultiLine />
+
+                      {/* Nested Vital Signs */}
+                      <div style={{ background: '#F8FAFC', borderRadius: '12px', border: '1px solid #DDE3EA', overflow: 'hidden' }}>
+                        <button
+                          onClick={() => toggleSub(`vitals-${note.id}`)}
+                          className="w-full flex items-center justify-between hover:bg-muted/30 transition-colors"
+                          style={{ padding: '12px' }}
+                        >
+                          <div className="flex items-center gap-2">
+                            <span style={{ fontSize: '14px' }}>🫀</span>
+                            <span style={{ fontSize: '13px', fontWeight: 700, color: '#1A2332' }}>Vital Signs</span>
+                          </div>
+                          <ChevronDown size={16} className="text-muted-foreground transition-transform duration-300"
+                            style={{ transform: expandedSubs.includes(`vitals-${note.id}`) ? 'rotate(180deg)' : 'rotate(0deg)' }} />
+                        </button>
+                        {expandedSubs.includes(`vitals-${note.id}`) && (
+                          <div style={{ padding: '0 12px 12px 12px', borderTop: '1px solid #DDE3EA' }} className="space-y-3 pt-3">
+                            <div className="grid grid-cols-2 gap-3">
+                              <DisplayField label="HR (BPM)" value={note.vitals.hr} />
+                              <DisplayField label="SPO₂ (%)" value={note.vitals.spo2} />
+                              <DisplayField label="TEMP (°C)" value={note.vitals.temp} />
+                              <DisplayField label="RR (/MIN)" value={note.vitals.rr} />
+                              <DisplayField label="BP (MMHG)" value={note.vitals.bp} />
+                              <DisplayField label="WEIGHT (KG)" value={note.vitals.weight} />
+                            </div>
+                            <DisplayField label="Date & Time" value={note.vitals.dateTime} />
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                  </>
+                )}
+              </div>
+            );
+          })}
         </AccordionSection>
 
         {/* Media Section */}
