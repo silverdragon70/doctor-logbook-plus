@@ -69,7 +69,7 @@ const SettingsScreen = () => {
   const [encryptedBackup, setEncryptedBackup] = useState(true);
   const [pinLock, setPinLock] = useState(false);
   const [biometric, setBiometric] = useState(true);
-  const [quickEntry, setQuickEntry] = useState(false);
+  
   const [confirmDialogs, setConfirmDialogs] = useState(true);
   const [autoSave, setAutoSave] = useState(true);
   const [exportOpen, setExportOpen] = useState(false);
