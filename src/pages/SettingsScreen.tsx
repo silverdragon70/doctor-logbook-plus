@@ -319,6 +319,8 @@ const SettingsScreen = () => {
       <APIKeySheet open={apiKeyOpen} onOpenChange={setApiKeyOpen} value={apiKey} onSave={setApiKey} onRemove={() => setApiKey('')} />
       <AIModelSheet open={aiModelOpen} onOpenChange={setAiModelOpen} value={aiModel} onApply={setAiModel} />
       <AILanguageSheet open={aiLanguageOpen} onOpenChange={setAiLanguageOpen} value={aiLanguage} onApply={setAiLanguage} />
+      <SyncFrequencySheet open={syncFreqOpen} onOpenChange={setSyncFreqOpen} value={syncFrequency} onApply={setSyncFrequency} />
+      <GoogleAccountSheet open={googleAccountOpen} onOpenChange={setGoogleAccountOpen} email={googleEmail} onSwitch={() => console.log('switch account')} onDisconnect={() => { setGoogleEmail(''); setSyncEnabled(false); }} />
     </div>
   );
 };
