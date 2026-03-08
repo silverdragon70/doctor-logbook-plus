@@ -76,8 +76,9 @@ const PatientDetailScreen = () => {
                   <FileText size={16} />
                 </div>
                 <div>
-                  <h4 className="text-[13px] font-bold text-foreground">{c.diagnosis}</h4>
-                  <p className="text-[11px] text-muted-foreground">{c.date} • {c.diagnosis}</p>
+                  <h4 className="text-[13px] font-bold text-foreground">{c.complaint}</h4>
+                  <p className="text-[11px] text-muted-foreground">{c.date}</p>
+                  <p className="text-[11px] text-muted-foreground/70">{c.diagnosis}</p>
                 </div>
               </div>
               <div className="flex items-center gap-2">
