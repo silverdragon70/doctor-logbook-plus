@@ -1,0 +1,342 @@
+ROLE:
+You are a senior frontend engineer specializing in Capacitor + React + Vite.
+
+PROJECT: Medora — Personal medical logbook app for physicians.
+Tech stack: React + Vite + TypeScript + @capacitor-community/sqlite
+
+CRITICAL RULES:
+- Do NOT modify any file in /src/pages/ or /src/components/
+- Work ONLY in /src/services/ and /src/hooks/
+- All types are already defined in /src/types/index.ts
+- Database is already initialized via /src/db/database.ts → getDb()
+- Use generateId() from /src/db/generateId.ts for all new IDs
+
+PREREQUISITE: Task 1 must be complete.
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+TASK 2 — CORE SERVICES
+(Patients, Cases, Investigations, Management, Progress Notes)
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+PART A — Sync Queue Helper
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+Create /src/services/syncQueue.ts
+
+export async function enqueueSyncJob(
+  tableName: string,
+  recordId: string,
+  operation: 'INSERT' | 'UPDATE' | 'DELETE',
+  payload?: object
+): Promise<void>
+
+  INSERT INTO sync_queue (id, table_name, record_id, operation, payload, created_at, status, retry_count)
+  VALUES (generateId(), ?, ?, ?, ?, datetime('now'), 'pending', 0)
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+PART B — Patient Service
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+Create /src/services/patientService.ts
+
+Import: getDb, generateId, enqueueSyncJob, Patient
+
+─── getAll(filters?) ──────────────────────────────────────────
+
+filters?: {
+  search?: string
+  dateAdded?: 'week' | 'month' | '3months' | 'year'
+  ageGroup?: 'neonate' | 'infant' | 'toddler' | 'child' | 'adolescent'
+  specialty?: string
+}
+
+Query:
+  SELECT p.*,
+    COUNT(DISTINCT c.id) as case_count,
+    MAX(c.admission_date) as last_visit,
+    (SELECT specialty FROM cases WHERE patient_id = p.id
+     AND is_deleted = 0 ORDER BY created_at DESC LIMIT 1) as specialty,
+    CASE WHEN EXISTS (
+      SELECT 1 FROM cases WHERE patient_id = p.id
+      AND status = 'active' AND is_deleted = 0
+    ) THEN 'active' ELSE 'discharged' END as status
+  FROM patients p
+  LEFT JOIN cases c ON c.patient_id = p.id AND c.is_deleted = 0
+  WHERE p.is_deleted = 0
+  GROUP BY p.id
+
+Apply filters:
+  search → AND p.name LIKE '%?%'
+  dateAdded:
+    week     → AND p.created_at >= datetime('now', '-7 days')
+    month    → AND p.created_at >= datetime('now', '-30 days')
+    3months  → AND p.created_at >= datetime('now', '-90 days')
+    year     → AND p.created_at >= datetime('now', '-365 days')
+  ageGroup → filter in JS after query (calculate age from dob):
+    neonate:    age in days 0-28
+    infant:     age in months 1-12
+    toddler:    age in years 1-3
+    child:      age in years 3-12
+    adolescent: age in years 12-18
+  specialty → AND (SELECT specialty FROM cases WHERE patient_id = p.id
+              ORDER BY created_at DESC LIMIT 1) = ?
+
+Map DB row → Patient type:
+  patientId = id
+  age = calculate from dob_day, dob_month, dob_year → years (decimal)
+  caseCount = case_count
+  lastVisit = last_visit ?? ''
+  dateAdded = created_at (date portion only)
+
+─── getById(id) ───────────────────────────────────────────────
+
+Return: { patient: Patient, stats: { cases: number, images: number, lastVisit: string } }
+
+  Query patient + count cases + count media via cases JOIN media
+
+─── create(data) ──────────────────────────────────────────────
+
+data: {
+  name: string
+  dobDay: string
+  dobMonth: string
+  dobYear: string
+  gender: 'male' | 'female'
+  fileNumber?: string
+}
+
+  const id = generateId()
+  INSERT INTO patients
+  enqueueSyncJob('patients', id, 'INSERT')
+  Return Patient
+
+─── update(id, data) ──────────────────────────────────────────
+
+  UPDATE patients SET ...fields..., updated_at = datetime('now') WHERE id = ?
+  enqueueSyncJob('patients', id, 'UPDATE')
+  Return updated Patient
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+PART C — Case Service
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+Create /src/services/caseService.ts
+
+─── getAll(filters?) ──────────────────────────────────────────
+
+Return all cases WHERE is_deleted = 0
+JOIN patients to get patientName, patientAge, patientGender, fileNumber, dob
+JOIN hospitals to get hospital name
+Apply optional filters: hospitalId, status, search
+
+─── getByPatientId(patientId) ─────────────────────────────────
+
+SELECT cases WHERE patient_id = ? AND is_deleted = 0
+ORDER BY admission_date DESC
+Include patient info and hospital name
+
+─── getById(id) ───────────────────────────────────────────────
+
+Return: {
+  case: Case
+  investigations: Investigation[]     (with images array)
+  management: ManagementEntry[]       (parse medications JSON)
+  progressNotes: ProgressNote[]       (with vitals embedded)
+}
+
+For investigations: SELECT + JOIN investigation_images
+For progressNotes: SELECT + JOIN vitals
+
+─── create(data) ──────────────────────────────────────────────
+
+data: {
+  patientId?: string
+  patientData?: { name, dobDay, dobMonth, dobYear, gender, fileNumber? }
+  hospitalId?: string
+  admissionDate: string
+  specialty: string
+  provisionalDiagnosis?: string
+  chiefComplaint?: string
+  historyComplaint?: string
+  presentHistory?: string
+  pastMedicalHistory?: string
+  allergies?: string
+  currentMedications?: string
+}
+
+  If patientData → create patient first via patientService.create()
+  const id = generateId()
+  INSERT INTO cases
+  enqueueSyncJob('cases', id, 'INSERT')
+  Return Case
+
+─── update(id, data) ──────────────────────────────────────────
+
+  UPDATE cases SET ...fields...,
+    last_modified = (strftime('%s','now') * 1000),
+    updated_at = datetime('now')
+  WHERE id = ?
+  enqueueSyncJob('cases', id, 'UPDATE')
+  Return updated Case
+
+─── discharge(id, data) ───────────────────────────────────────
+
+data: { date: string, outcome: string, notes?: string }
+
+  UPDATE cases SET
+    status = 'discharged',
+    discharge_date = ?,
+    discharge_outcome = ?,
+    discharge_notes = ?,
+    last_modified = (strftime('%s','now') * 1000),
+    updated_at = datetime('now')
+  WHERE id = ?
+  enqueueSyncJob('cases', id, 'UPDATE')
+
+─── delete(id) ────────────────────────────────────────────────
+
+  Soft delete: UPDATE cases SET is_deleted = 1, updated_at = datetime('now') WHERE id = ?
+  Also soft delete: investigations, management_entries, progress_notes WHERE case_id = ?
+  enqueueSyncJob('cases', id, 'DELETE')
+
+─── getActiveForInsights() ────────────────────────────────────
+
+  Return all active cases with full data (investigations, management, progressNotes)
+  WHERE status = 'active' AND is_deleted = 0
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+PART D — Investigation Service
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+Create /src/services/investigationService.ts
+
+─── getByCaseId(caseId) ───────────────────────────────────────
+  SELECT investigations WHERE case_id = ? AND is_deleted = 0
+  For each: SELECT file_path FROM investigation_images WHERE investigation_id = ?
+  Return Investigation[] with images: string[]
+
+─── create(caseId, data) ──────────────────────────────────────
+  data: { name, type, date, result, images?: string[] }
+  INSERT INTO investigations
+  If images: INSERT INTO investigation_images per image
+  enqueueSyncJob
+
+─── update(id, data) ──────────────────────────────────────────
+  UPDATE investigations SET ...
+  enqueueSyncJob
+
+─── delete(id) ────────────────────────────────────────────────
+  Soft delete investigation
+  DELETE FROM investigation_images WHERE investigation_id = ?
+  enqueueSyncJob
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+PART E — Management Service
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+Create /src/services/managementService.ts
+
+─── getByCaseId(caseId) ───────────────────────────────────────
+  SELECT management_entries WHERE case_id = ? AND is_deleted = 0
+  ORDER BY date ASC
+  Parse medications TEXT → JSON.parse() for Medications type
+  Return ManagementEntry[]
+
+─── create(caseId, data) ──────────────────────────────────────
+  data: { type, date, medications?, chartImage?, mode?, details? }
+  If Medications type: JSON.stringify(medications) before INSERT
+  INSERT INTO management_entries
+  enqueueSyncJob
+
+─── update(id, data) / delete(id) ────────────────────────────
+  Standard update/soft delete + enqueueSyncJob
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+PART F — Progress Note Service
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+Create /src/services/progressNoteService.ts
+
+─── getByCaseId(caseId) ───────────────────────────────────────
+  SELECT progress_notes WHERE case_id = ? AND is_deleted = 0
+  For each: SELECT * FROM vitals WHERE progress_note_id = ?
+  Return ProgressNote[] with vitals embedded
+
+─── create(caseId, data) ──────────────────────────────────────
+  data: { date, assessment, vitals: VitalSigns }
+  INSERT INTO progress_notes → get new id
+  INSERT INTO vitals (progress_note_id = new id)
+  enqueueSyncJob
+
+─── update(id, data) ──────────────────────────────────────────
+  UPDATE progress_notes + UPDATE vitals WHERE progress_note_id = ?
+  enqueueSyncJob
+
+─── delete(id) ────────────────────────────────────────────────
+  Soft delete progress_note
+  DELETE FROM vitals WHERE progress_note_id = ?
+  enqueueSyncJob
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+PART G — React Query Hooks
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+Create /src/hooks/usePatients.ts
+  usePatients(filters?)          → useQuery(['patients', filters])
+  usePatient(id)                 → useQuery(['patient', id])
+  useCreatePatient()             → useMutation → invalidate ['patients']
+  useUpdatePatient()             → useMutation → invalidate ['patients', 'patient']
+
+Create /src/hooks/useCases.ts
+  useCases(filters?)             → useQuery(['cases', filters])
+  usePatientCases(patientId)     → useQuery(['patient-cases', patientId])
+  useCase(id)                    → useQuery(['case', id])
+  useCreateCase()                → useMutation → invalidate ['cases','patients']
+  useUpdateCase()                → useMutation → invalidate ['case', id]
+  useDischargeCase()             → useMutation → invalidate ['case','cases','patients']
+  useDeleteCase()                → useMutation → invalidate ['cases','patients']
+
+Create /src/hooks/useInvestigations.ts
+  useCreateInvestigation()       → useMutation → invalidate ['case', caseId]
+  useUpdateInvestigation()       → useMutation → invalidate ['case', caseId]
+  useDeleteInvestigation()       → useMutation → invalidate ['case', caseId]
+
+Create /src/hooks/useManagement.ts
+  useCreateManagement()          → useMutation → invalidate ['case', caseId]
+  useUpdateManagement()          → useMutation → invalidate ['case', caseId]
+  useDeleteManagement()          → useMutation → invalidate ['case', caseId]
+
+Create /src/hooks/useProgressNotes.ts
+  useCreateProgressNote()        → useMutation → invalidate ['case', caseId]
+  useUpdateProgressNote()        → useMutation → invalidate ['case', caseId]
+  useDeleteProgressNote()        → useMutation → invalidate ['case', caseId]
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+DELIVERABLES — TASK 2
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+Files:
+  src/services/syncQueue.ts
+  src/services/patientService.ts
+  src/services/caseService.ts
+  src/services/investigationService.ts
+  src/services/managementService.ts
+  src/services/progressNoteService.ts
+  src/hooks/usePatients.ts
+  src/hooks/useCases.ts
+  src/hooks/useInvestigations.ts
+  src/hooks/useManagement.ts
+  src/hooks/useProgressNotes.ts
+
+Confirm:
+  ✅ Create patient → row in patients table
+  ✅ Create case → linked to patient, hospital name resolved
+  ✅ Add investigation with images array
+  ✅ Add progress note → vitals saved in vitals table
+  ✅ Delete case → soft deletes all related records
+  ✅ All writes enqueue to sync_queue
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+DO NOT implement hospitals, logbook, or media yet. Task 3.
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
