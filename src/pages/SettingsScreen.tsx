@@ -245,8 +245,7 @@ const SettingsScreen = () => {
         <Section title="Behavior">
           
           <Row icon={MessageSquare} label="Confirmation Dialogs" subtitle="Ask before deleting" right={sw(confirmDialogs, setConfirmDialogs)} />
-          <Row icon={Save} label="Auto-Save" subtitle="Save drafts automatically" right={sw(autoSave, setAutoSave)} />
-          <Row icon={Eye} label="Default View Mode" subtitle="Display" right={<Chevron />} noBorder />
+          <Row icon={Save} label="Auto-Save" subtitle="Save drafts automatically" right={sw(autoSave, setAutoSave)} noBorder />
         </Section>
 
         {/* ─── 9. DELETE DATA ─── */}
