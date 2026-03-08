@@ -91,7 +91,9 @@ const SettingsScreen = () => {
   const [syncFrequency, setSyncFrequency] = useState('daily');
   const [syncFreqOpen, setSyncFreqOpen] = useState(false);
   const [googleAccountOpen, setGoogleAccountOpen] = useState(false);
-  const [googleEmail, setGoogleEmail] = useState('user@gmail.com');
+  const [googleAccounts, setGoogleAccounts] = useState<{ id: string; email: string; active: boolean }[]>([
+    { id: '1', email: 'user@gmail.com', active: true },
+  ]);
   const [encryptedBackup, setEncryptedBackup] = useState(true);
   const [pinLock, setPinLock] = useState(false);
   const [biometric, setBiometric] = useState(true);
@@ -169,7 +171,7 @@ const SettingsScreen = () => {
 
         {/* ─── 4. GOOGLE DRIVE SYNC ─── */}
         <Section title="Google Drive Sync">
-          <Row icon={Cloud} iconColor="#22C55E" label="Sync Enabled" subtitle={googleEmail} right={sw(syncEnabled, setSyncEnabled)} />
+          <Row icon={Cloud} iconColor="#22C55E" label="Sync Enabled" subtitle={googleAccounts.find(a => a.active)?.email || 'No account'} right={sw(syncEnabled, setSyncEnabled)} />
           <Row icon={RefreshCw} iconColor="#22C55E" label="Sync Frequency" subtitle={syncFrequency === 'hourly' ? 'Every hour' : syncFrequency === '6hours' ? 'Every 6 hours' : syncFrequency === 'daily' ? 'Daily' : syncFrequency === 'weekly' ? 'Weekly' : 'Manual only'} right={<Chevron />} onClick={() => setSyncFreqOpen(true)} />
           <Row icon={Lock} iconColor="#22C55E" label="Encrypted Backup" subtitle="AES-256 encryption" right={sw(encryptedBackup, setEncryptedBackup)} />
           <Row icon={UserCircle} iconColor="#22C55E" label="Change Google Account" right={<Chevron />} onClick={() => setGoogleAccountOpen(true)} />
@@ -331,7 +333,38 @@ const SettingsScreen = () => {
       <AIModelSheet open={aiModelOpen} onOpenChange={setAiModelOpen} value={aiModel} onApply={setAiModel} />
       <AILanguageSheet open={aiLanguageOpen} onOpenChange={setAiLanguageOpen} value={aiLanguage} onApply={setAiLanguage} />
       <SyncFrequencySheet open={syncFreqOpen} onOpenChange={setSyncFreqOpen} value={syncFrequency} onApply={setSyncFrequency} />
-      <GoogleAccountSheet open={googleAccountOpen} onOpenChange={setGoogleAccountOpen} email={googleEmail} onConnect={() => { setGoogleEmail('user@gmail.com'); setSyncEnabled(true); }} onSwitch={() => console.log('switch account')} onDisconnect={() => { setGoogleEmail(''); setSyncEnabled(false); }} />
+      <GoogleAccountSheet
+        open={googleAccountOpen}
+        onOpenChange={setGoogleAccountOpen}
+        accounts={googleAccounts}
+        onConnect={() => {
+          const newId = Date.now().toString();
+          const newEmail = `new${googleAccounts.length + 1}@gmail.com`;
+          if (googleAccounts.length === 0) {
+            setGoogleAccounts([{ id: newId, email: newEmail, active: true }]);
+            setSyncEnabled(true);
+          } else {
+            setGoogleAccounts(prev => [...prev, { id: newId, email: newEmail, active: false }]);
+          }
+        }}
+        onSetActive={(id) => {
+          setGoogleAccounts(prev => prev.map(a => ({ ...a, active: a.id === id })));
+        }}
+        onDisconnectOne={(id) => {
+          setGoogleAccounts(prev => {
+            const filtered = prev.filter(a => a.id !== id);
+            if (filtered.length > 0 && !filtered.some(a => a.active)) {
+              filtered[0].active = true;
+            }
+            if (filtered.length === 0) setSyncEnabled(false);
+            return filtered;
+          });
+        }}
+        onDisconnectAll={() => {
+          setGoogleAccounts([]);
+          setSyncEnabled(false);
+        }}
+      />
       <ProgressSheet open={progressOpen} onOpenChange={setProgressOpen} type={progressType} detail={progressDetail} />
     </div>
   );
