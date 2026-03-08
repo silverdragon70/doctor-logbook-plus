@@ -118,7 +118,7 @@ const SettingsScreen = () => {
         {/* ─── 2. HOSPITAL MANAGEMENT ─── */}
         <Section title="Hospital Management">
           <Row icon={Building2} iconColor="#0EA5E9" label="Manage Hospitals" subtitle="Add, edit or remove" right={<Chevron />} onClick={() => setHospitalsSheetOpen(true)} />
-          <Row icon={Home} iconColor="#0EA5E9" label="Default Hospital" subtitle="Cairo University" right={<Chevron />} noBorder />
+          <Row icon={Home} iconColor="#0EA5E9" label="Default Hospital" subtitle={defaultHospitalName} right={<Chevron />} onClick={() => setDefaultHospitalSheetOpen(true)} noBorder />
         </Section>
 
         {/* ─── 3. AI INTEGRATION ─── */}
