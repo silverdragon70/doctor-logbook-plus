@@ -124,40 +124,7 @@ const GroupPearlScreen = () => {
   };
 
   return (
-    <div className="min-h-screen bg-background transition-colors duration-300">
-      <div className="max-w-[430px] mx-auto min-h-screen relative flex flex-col border-x border-border bg-background shadow-elevated">
-        {/* HEADER */}
-        <header className="sticky top-0 z-50 px-4 py-3.5 flex items-center justify-between border-b border-border bg-background/80 backdrop-blur-xl">
-          <div className="flex items-center gap-3">
-            <button
-              onClick={() => navigate(-1)}
-              className="p-1.5 -ml-1.5 rounded-full hover:bg-muted text-foreground transition-colors"
-            >
-              <ArrowLeft size={22} />
-            </button>
-            <div>
-              <h1 className="text-[17px] font-bold text-foreground leading-tight">Clinical Pearls</h1>
-              <p className="text-[11px] text-muted-foreground mt-0.5">Analyze case patterns</p>
-            </div>
-          </div>
-          <div className="flex items-center gap-2">
-            <button
-              onClick={toggleDark}
-              className="p-2 rounded-full hover:bg-muted text-muted-foreground transition-colors"
-            >
-              {isDarkMode ? <Sun size={20} /> : <Moon size={20} />}
-            </button>
-            <button
-              onClick={() => navigate('/settings')}
-              className="p-2 rounded-full hover:bg-muted text-muted-foreground transition-colors"
-            >
-              <Settings size={20} />
-            </button>
-          </div>
-        </header>
-
-        {/* SCROLLABLE CONTENT */}
-        <main className="flex-1 overflow-y-auto px-4 py-4 space-y-4 pb-10">
+      <div className="px-4 py-4 space-y-4 pb-24 animate-fade-in">
           {/* FILTER CARD */}
           <div className="bg-card rounded-[18px] shadow-card p-4 space-y-4 border border-border/50">
             <h2 className="text-sm font-semibold text-foreground">Filters</h2>
