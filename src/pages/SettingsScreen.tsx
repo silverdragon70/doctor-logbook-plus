@@ -7,6 +7,10 @@ import FontSizeSheet from '@/components/FontSizeSheet';
 import DateFormatSheet from '@/components/DateFormatSheet';
 import ManageHospitalsSheet from '@/components/ManageHospitalsSheet';
 import DefaultHospitalSheet from '@/components/DefaultHospitalSheet';
+import AIProviderSheet from '@/components/AIProviderSheet';
+import APIKeySheet from '@/components/APIKeySheet';
+import AIModelSheet from '@/components/AIModelSheet';
+import AILanguageSheet from '@/components/AILanguageSheet';
 import { useNavigate } from 'react-router-dom';
 import {
   ArrowLeft, Palette, Moon, Type, Globe, CalendarDays,
@@ -72,6 +76,14 @@ const SettingsScreen = () => {
   /* toggles */
   const [darkMode, setDarkMode] = useState(false);
   const [aiFeatures, setAiFeatures] = useState(true);
+  const [aiProvider, setAiProvider] = useState('anthropic');
+  const [apiKey, setApiKey] = useState('sk-ant-api03-xxxxxxxxxxxx');
+  const [aiModel, setAiModel] = useState('sonnet');
+  const [aiLanguage, setAiLanguage] = useState('arabic');
+  const [aiProviderOpen, setAiProviderOpen] = useState(false);
+  const [apiKeyOpen, setApiKeyOpen] = useState(false);
+  const [aiModelOpen, setAiModelOpen] = useState(false);
+  const [aiLanguageOpen, setAiLanguageOpen] = useState(false);
   const [syncEnabled, setSyncEnabled] = useState(true);
   const [encryptedBackup, setEncryptedBackup] = useState(true);
   const [pinLock, setPinLock] = useState(false);
@@ -132,10 +144,10 @@ const SettingsScreen = () => {
 
         {/* ─── 3. AI INTEGRATION ─── */}
         <Section title="AI Integration">
-          <Row icon={Bot} iconColor="#8B5CF6" label="AI Provider" subtitle="Anthropic (Claude)" right={<Chevron />} />
-          <Row icon={KeyRound} iconColor="#8B5CF6" label="API Key" subtitle="sk-ant-••••••••••••" right={<Chevron />} />
-          <Row icon={Brain} iconColor="#8B5CF6" label="AI Model" subtitle="Claude Sonnet" right={<Chevron />} />
-          <Row icon={Languages} iconColor="#8B5CF6" label="AI Response Language" subtitle="Arabic" right={<Chevron />} />
+          <Row icon={Bot} iconColor="#8B5CF6" label="AI Provider" subtitle={aiProvider === 'anthropic' ? 'Anthropic (Claude)' : aiProvider === 'openai' ? 'OpenAI (GPT)' : 'Other / Custom'} right={<Chevron />} onClick={() => setAiProviderOpen(true)} />
+          <Row icon={KeyRound} iconColor="#8B5CF6" label="API Key" subtitle={apiKey ? apiKey.slice(0, 7) + '••••••••••••' : 'Not set'} right={<Chevron />} onClick={() => setApiKeyOpen(true)} />
+          <Row icon={Brain} iconColor="#8B5CF6" label="AI Model" subtitle={aiModel === 'sonnet' ? 'Claude Sonnet' : aiModel === 'opus' ? 'Claude Opus' : 'Claude Haiku'} right={<Chevron />} onClick={() => setAiModelOpen(true)} />
+          <Row icon={Languages} iconColor="#8B5CF6" label="AI Response Language" subtitle={aiLanguage === 'arabic' ? 'Arabic' : 'English'} right={<Chevron />} onClick={() => setAiLanguageOpen(true)} />
           <Row icon={Zap} iconColor="#8B5CF6" label="AI Features" subtitle="Insights, CasePearl, GroupPearl" right={sw(aiFeatures, setAiFeatures)} noBorder />
         </Section>
 
@@ -297,6 +309,10 @@ const SettingsScreen = () => {
       <DateFormatSheet open={dateSheetOpen} onOpenChange={setDateSheetOpen} value={dateFormat} onApply={setDateFormat} />
       <ManageHospitalsSheet open={hospitalsSheetOpen} onOpenChange={setHospitalsSheetOpen} />
       <DefaultHospitalSheet open={defaultHospitalSheetOpen} onOpenChange={setDefaultHospitalSheetOpen} hospitals={hospitalsList} value={defaultHospitalId} onApply={setDefaultHospitalId} />
+      <AIProviderSheet open={aiProviderOpen} onOpenChange={setAiProviderOpen} value={aiProvider} onApply={setAiProvider} />
+      <APIKeySheet open={apiKeyOpen} onOpenChange={setApiKeyOpen} value={apiKey} onSave={setApiKey} onRemove={() => setApiKey('')} />
+      <AIModelSheet open={aiModelOpen} onOpenChange={setAiModelOpen} value={aiModel} onApply={setAiModel} />
+      <AILanguageSheet open={aiLanguageOpen} onOpenChange={setAiLanguageOpen} value={aiLanguage} onApply={setAiLanguage} />
     </div>
   );
 };
