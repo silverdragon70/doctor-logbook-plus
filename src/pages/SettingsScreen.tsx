@@ -211,7 +211,7 @@ const SettingsScreen = () => {
               </div>
             </div>
           </div>
-          <Row icon={Image} label="Image Handling" subtitle="Lazy Load" right={<Chevron />} />
+          <Row icon={Image} label="Image Handling" subtitle={imageQuality === 'compress' ? 'Auto Compress' : 'Lazy Load'} right={<Chevron />} onClick={() => setImageHandlingOpen(true)} />
           {/* Last Backup */}
           <div className="px-4 py-3 flex items-center gap-3" style={{ borderBottom: '1px solid #F0F4F8' }}>
             <Clock size={20} className="text-primary flex-shrink-0" />
