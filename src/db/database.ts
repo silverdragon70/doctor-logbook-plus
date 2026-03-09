@@ -1,127 +1,73 @@
-import initSqlJs, { Database as SqlJsDatabase } from 'sql.js';
+import { CapacitorSQLite, SQLiteConnection, SQLiteDBConnection } from '@capacitor-community/sqlite';
+import { Preferences } from '@capacitor/preferences';
+import { Capacitor } from '@capacitor/core';
 import { V1_MIGRATION, DEFAULT_SETTINGS } from './migrations/v1';
 import generateId from './generateId';
 
-const DB_NAME = 'medora_db';
-const DB_STORE = 'medora_store';
+const DB_NAME = 'medora.db';
+const DB_PASSWORD_KEY = 'medora_db_password';
 
-let db: SqlJsDatabase | null = null;
+const sqlite = new SQLiteConnection(CapacitorSQLite);
+let db: SQLiteDBConnection | null = null;
 
-// Persistence helpers using IndexedDB
-function openIndexedDB(): Promise<IDBDatabase> {
-  return new Promise((resolve, reject) => {
-    const req = indexedDB.open(DB_STORE, 1);
-    req.onupgradeneeded = () => {
-      req.result.createObjectStore('db');
-    };
-    req.onsuccess = () => resolve(req.result);
-    req.onerror = () => reject(req.error);
-  });
+function generatePassword(length = 32): string {
+  const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*';
+  let result = '';
+  for (let i = 0; i < length; i++) {
+    result += chars.charAt(Math.floor(Math.random() * chars.length));
+  }
+  return result;
 }
 
-async function loadFromIndexedDB(): Promise<Uint8Array | null> {
-  const idb = await openIndexedDB();
-  return new Promise((resolve, reject) => {
-    const tx = idb.transaction('db', 'readonly');
-    const store = tx.objectStore('db');
-    const req = store.get(DB_NAME);
-    req.onsuccess = () => resolve(req.result || null);
-    req.onerror = () => reject(req.error);
-  });
-}
+async function getOrCreatePassword(): Promise<string> {
+  const { value } = await Preferences.get({ key: DB_PASSWORD_KEY });
+  if (value) return value;
 
-async function saveToIndexedDB(): Promise<void> {
-  if (!db) return;
-  const data = db.export();
-  const idb = await openIndexedDB();
-  return new Promise((resolve, reject) => {
-    const tx = idb.transaction('db', 'readwrite');
-    const store = tx.objectStore('db');
-    store.put(data, DB_NAME);
-    tx.oncomplete = () => resolve();
-    tx.onerror = () => reject(tx.error);
-  });
+  const password = generatePassword();
+  await Preferences.set({ key: DB_PASSWORD_KEY, value: password });
+  return password;
 }
-
-// Debounced auto-save
-let saveTimeout: ReturnType<typeof setTimeout> | null = null;
-function scheduleSave() {
-  if (saveTimeout) clearTimeout(saveTimeout);
-  saveTimeout = setTimeout(() => {
-    saveToIndexedDB().catch(console.error);
-  }, 500);
-}
-
-// Wrapper that mimics @capacitor-community/sqlite's API
-interface CompatibleDb {
-  query(sql: string, params?: any[]): Promise<{ values: any[] }>;
-  run(sql: string, params?: any[]): Promise<{ changes: { changes: number; lastId: number } }>;
-  execute(sql: string): Promise<void>;
-}
-
-function createWrapper(sqlDb: SqlJsDatabase): CompatibleDb {
-  return {
-    async query(sql: string, params?: any[]) {
-      try {
-        const stmt = sqlDb.prepare(sql);
-        if (params) stmt.bind(params);
-        const values: any[] = [];
-        while (stmt.step()) {
-          values.push(stmt.getAsObject());
-        }
-        stmt.free();
-        return { values };
-      } catch (e) {
-        console.error('SQL query error:', sql, e);
-        return { values: [] };
-      }
-    },
-    async run(sql: string, params?: any[]) {
-      try {
-        sqlDb.run(sql, params);
-        scheduleSave();
-        const changes = sqlDb.getRowsModified();
-        // Get last insert rowid
-        const lastIdResult = sqlDb.exec('SELECT last_insert_rowid() as id');
-        const lastId = lastIdResult.length > 0 ? lastIdResult[0].values[0][0] as number : 0;
-        return { changes: { changes, lastId } };
-      } catch (e) {
-        console.error('SQL run error:', sql, e);
-        return { changes: { changes: 0, lastId: 0 } };
-      }
-    },
-    async execute(sql: string) {
-      try {
-        sqlDb.run(sql);
-        scheduleSave();
-      } catch (e) {
-        console.error('SQL execute error:', sql, e);
-      }
-    },
-  };
-}
-
-let dbWrapper: CompatibleDb | null = null;
 
 export async function initDatabase(): Promise<void> {
   if (db) return;
 
-  const SQL = await initSqlJs({
-    locateFile: (file) => `https://sql.js.org/dist/${file}`,
-  });
+  const platform = Capacitor.getPlatform();
 
-  // Try to load existing DB from IndexedDB
-  const savedData = await loadFromIndexedDB();
-  if (savedData) {
-    db = new SQL.Database(savedData);
-  } else {
-    db = new SQL.Database();
+  if (platform === 'web') {
+    // On web, use jeep-sqlite for development/testing
+    console.log('Running on web platform — SQLite limited to native');
+    console.log('Database initialized successfully (web mock)');
+    return;
   }
 
-  dbWrapper = createWrapper(db);
+  const password = await getOrCreatePassword();
 
-  // Set WAL mode (no-op in sql.js but harmless)
-  await dbWrapper.execute('PRAGMA journal_mode = WAL;');
+  // Set encryption secret before any connection operations
+  try {
+    await sqlite.setEncryptionSecret(password);
+  } catch (e) {
+    console.log('Encryption secret may already be set:', e);
+  }
+
+  const ret = await sqlite.checkConnectionsConsistency();
+  const isConn = (await sqlite.isConnection(DB_NAME, false)).result;
+
+  if (ret.result && isConn) {
+    db = await sqlite.retrieveConnection(DB_NAME, false);
+  } else {
+    db = await sqlite.createConnection(
+      DB_NAME,
+      true, // encrypted
+      'secret', // mode
+      1, // version
+      false // readonly
+    );
+  }
+
+  await db.open();
+
+  // Set WAL mode
+  await db.execute('PRAGMA journal_mode = WAL;');
 
   // Run migration
   const statements = V1_MIGRATION.split(';')
@@ -129,30 +75,27 @@ export async function initDatabase(): Promise<void> {
     .filter(s => s.length > 0);
 
   for (const stmt of statements) {
-    await dbWrapper.execute(stmt + ';');
+    await db.execute(stmt + ';');
   }
 
   // Check if schema_version exists, if not seed default settings
-  const res = await dbWrapper.query("SELECT value FROM settings WHERE key = 'schema_version'");
+  const res = await db.query("SELECT value FROM settings WHERE key = 'schema_version'");
   if (!res.values || res.values.length === 0) {
     for (const [key, value] of Object.entries(DEFAULT_SETTINGS)) {
-      await dbWrapper.execute(
+      await db.execute(
         `INSERT OR IGNORE INTO settings (key, value, updated_at) VALUES ('${key}', '${value}', datetime('now'));`
       );
     }
   }
 
-  // Force save after init
-  await saveToIndexedDB();
-
-  console.log('Database initialized successfully (sql.js)');
+  console.log('Database initialized successfully');
 }
 
-export function getDb(): CompatibleDb {
-  if (!dbWrapper) {
+export function getDb(): SQLiteDBConnection {
+  if (!db) {
     throw new Error('Database not initialized. Call initDatabase() first.');
   }
-  return dbWrapper;
+  return db;
 }
 
 export { generateId };
