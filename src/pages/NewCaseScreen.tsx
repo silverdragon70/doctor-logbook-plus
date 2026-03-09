@@ -361,10 +361,10 @@ const NewCaseScreen = () => {
                     </div>
                     {searchQuery.trim() && (
                       <div className="max-h-[200px] overflow-y-auto divide-y divide-border">
-                        {filteredPatients.length > 0 ? (
+                    {filteredPatients.length > 0 ? (
                           filteredPatients.map((p) => (
                             <button
-                              key={p.id}
+                              key={p.patientId}
                               onMouseDown={() => handleSelectPatient(p)}
                               className="w-full px-4 py-3 text-left hover:bg-muted/50 transition-colors flex items-center justify-between"
                             >

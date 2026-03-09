@@ -336,8 +336,8 @@ const ProceduresScreen = () => {
         {/* Stats Row */}
         <div className="grid grid-cols-3 gap-3">
           {([
-            { label: 'Performed', value: stats?.performed ?? 0, type: 'Performed' as ParticipationType },
-            { label: 'Assisted', value: stats?.assistant ?? 0, type: 'Assisted' as ParticipationType },
+          { label: 'Performed', value: stats?.performed ?? 0, type: 'Performed' as ParticipationType },
+            { label: 'Assisted', value: stats?.assisted ?? 0, type: 'Assisted' as ParticipationType },
             { label: 'Observed', value: stats?.observed ?? 0, type: 'Observed' as ParticipationType },
           ]).map(s => (
             <div key={s.type} className={cn("rounded-2xl p-4 text-center", participationStyles[s.type].bg)}>
