@@ -173,7 +173,7 @@ const ProceduresScreen = () => {
   const deleteProcedure = useDeleteProcedure();
 
   const hospitalNames = hospitalList.map(h => h.name);
-  const patients = patientList.map(p => ({ id: p.id, name: p.name }));
+  const patients = patientList.map(p => ({ id: p.patientId, name: p.name }));
 
   useEffect(() => {
     const handler = () => setShowExport(true);
