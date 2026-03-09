@@ -226,7 +226,7 @@ const NewCaseScreen = () => {
 
     try {
       await createCase.mutateAsync({
-        patientId: selectedPatient?.id,
+        patientId: selectedPatient?.patientId,
         patientData: patientMode === 'new' && patientName.trim() ? {
           name: patientName,
           dobDay,
@@ -239,7 +239,6 @@ const NewCaseScreen = () => {
         admissionDate: format(admissionDate, 'yyyy-MM-dd'),
         specialty,
         provisionalDiagnosis: provisionalDiagnosis || undefined,
-        finalDiagnosis: finalDiagnosis || undefined,
         chiefComplaint: chiefComplaint || undefined,
         presentHistory: presentHistory || undefined,
         pastMedicalHistory: pastMedicalHistory || undefined,
