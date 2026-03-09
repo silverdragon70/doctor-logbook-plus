@@ -42,6 +42,13 @@ export async function initDatabase(): Promise<void> {
 
   const password = await getOrCreatePassword();
 
+  // Set encryption secret before any connection operations
+  try {
+    await sqlite.setEncryptionSecret(password);
+  } catch (e) {
+    console.log('Encryption secret may already be set:', e);
+  }
+
   const ret = await sqlite.checkConnectionsConsistency();
   const isConn = (await sqlite.isConnection(DB_NAME, false)).result;
 
