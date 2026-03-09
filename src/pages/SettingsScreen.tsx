@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import SettingsExportSheet from '@/components/SettingsExportSheet';
 import CreateBackupSheet from '@/components/CreateBackupSheet';
 import AboutSheet from '@/components/AboutSheet';
@@ -33,6 +33,15 @@ import {
   AlertDialogContent, AlertDialogDescription, AlertDialogFooter,
   AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger,
 } from '@/components/ui/alert-dialog';
+
+// Hooks
+import { useSettings, useUpdateSetting, useUpdateSettings } from '@/hooks/useSettings';
+import { useHospitals, useCreateHospital, useUpdateHospital, useDeleteHospital } from '@/hooks/useHospitals';
+import { useGoogleAccounts, useConnectGoogle, useDisconnectGoogle, useSetActiveAccount, useSyncNow } from '@/hooks/useGoogleDrive';
+import { useLastBackupInfo, useCreateBackup, useRestoreBackup } from '@/hooks/useBackup';
+import { useExportData } from '@/hooks/useExport';
+import { useStorageSize } from '@/hooks/useStorage';
+import { formatSize } from '@/services/storageService';
 
 /* ── helpers ── */
 const Section = ({ title, children }: { title: string; children: React.ReactNode }) => (
@@ -79,65 +88,88 @@ const Chevron = () => <span className="text-[16px]" style={{ color: '#6B7C93' }}
 const SettingsScreen = () => {
   const navigate = useNavigate();
 
-  /* toggles */
-  const [darkMode, setDarkMode] = useState(false);
-  const [aiFeatures, setAiFeatures] = useState(true);
-  const [aiProvider, setAiProvider] = useState('anthropic');
-  const [apiKey, setApiKey] = useState('sk-ant-api03-xxxxxxxxxxxx');
-  const [aiModel, setAiModel] = useState('sonnet');
-  const [aiLanguage, setAiLanguage] = useState('english');
+  // ─── Real data hooks ───────────────────────────────────────
+  const { data: settings } = useSettings();
+  const { mutate: updateSetting } = useUpdateSetting();
+  const { mutate: updateSettings } = useUpdateSettings();
+
+  const { data: hospitals = [] } = useHospitals();
+
+  const { data: googleAccounts = [] } = useGoogleAccounts();
+  const { mutate: connectGoogle } = useConnectGoogle();
+  const { mutate: disconnectGoogle } = useDisconnectGoogle();
+  const { mutate: setActiveAccount } = useSetActiveAccount();
+  const { start: startSync } = useSyncNow();
+
+  const { data: lastBackupData } = useLastBackupInfo();
+  const { start: startBackup } = useCreateBackup();
+  const { start: startRestore } = useRestoreBackup();
+  const { start: startExport } = useExportData();
+
+  const { data: storageBytes } = useStorageSize();
+
+  // ─── Sheet open/close state ────────────────────────────────
   const [aiProviderOpen, setAiProviderOpen] = useState(false);
   const [apiKeyOpen, setApiKeyOpen] = useState(false);
   const [aiModelOpen, setAiModelOpen] = useState(false);
   const [aiLanguageOpen, setAiLanguageOpen] = useState(false);
-  const [syncEnabled, setSyncEnabled] = useState(true);
-  const [syncFrequency, setSyncFrequency] = useState('daily');
   const [syncFreqOpen, setSyncFreqOpen] = useState(false);
   const [googleAccountOpen, setGoogleAccountOpen] = useState(false);
-  const [googleAccounts, setGoogleAccounts] = useState<{ id: string; email: string; active: boolean }[]>([
-    { id: '1', email: 'user@gmail.com', active: true },
-  ]);
-  const [encryptedBackup, setEncryptedBackup] = useState(true);
-  const [pinLock, setPinLock] = useState(false);
-  const [biometric, setBiometric] = useState(true);
-  
-  const [confirmDialogs, setConfirmDialogs] = useState(true);
-  const [autoSave, setAutoSave] = useState(true);
   const [exportOpen, setExportOpen] = useState(false);
   const [progressOpen, setProgressOpen] = useState(false);
   const [progressType, setProgressType] = useState<OperationType>('backup');
   const [progressDetail, setProgressDetail] = useState('');
   const [syncProgressOpen, setSyncProgressOpen] = useState(false);
-  const [lastSyncedText, setLastSyncedText] = useState('5 Mar 2025 · 06:48');
+  const [restoreSheetOpen, setRestoreSheetOpen] = useState(false);
+  const [imageHandlingOpen, setImageHandlingOpen] = useState(false);
+  const [backupSheetOpen, setBackupSheetOpen] = useState(false);
+  const [aboutOpen, setAboutOpen] = useState(false);
+  const [themeSheetOpen, setThemeSheetOpen] = useState(false);
+  const [fontSheetOpen, setFontSheetOpen] = useState(false);
+  const [dateSheetOpen, setDateSheetOpen] = useState(false);
+  const [hospitalsSheetOpen, setHospitalsSheetOpen] = useState(false);
+  const [defaultHospitalSheetOpen, setDefaultHospitalSheetOpen] = useState(false);
+
+  // ─── Derived values from settings ─────────────────────────
+  const themeColor = (settings?.themeColor as string) || 'blue';
+  const darkMode = (settings?.darkMode as boolean) ?? false;
+  const fontSize = (settings?.fontSize as string) || 'medium';
+  const dateFormat = (settings?.dateFormat as string) || 'DD MMM YYYY';
+  const defaultHospitalId = (settings?.defaultHospitalId as string) || '';
+  const aiProvider = (settings?.aiProvider as string) || 'anthropic';
+  const apiKey = (settings?.apiKey as string) || '';
+  const aiModel = (settings?.aiModel as string) || 'sonnet';
+  const aiLanguage = (settings?.aiLanguage as string) || 'english';
+  const aiFeatures = (settings?.aiFeatures as boolean) ?? true;
+  const syncEnabled = (settings?.syncEnabled as boolean) ?? false;
+  const syncFrequency = (settings?.syncFrequency as string) || 'daily';
+  const encryptedBackup = (settings?.encryptedBackup as boolean) ?? true;
+  const pinLock = (settings?.pinLock as boolean) ?? false;
+  const biometric = (settings?.biometric as boolean) ?? false;
+  const confirmDialogs = (settings?.confirmDialogs as boolean) ?? true;
+  const autoSave = (settings?.autoSave as boolean) ?? true;
+  const imageQuality = (settings?.imageQuality as string) || 'original';
+  const imageMaxSize = (settings?.imageMaxSize as string) || '5';
+  const lastSyncedText = (settings as any)?.last_synced_at || 'Never';
+
+  const defaultHospitalName = hospitals.find((h: any) => h.id === defaultHospitalId)?.name || 'None';
+  const activeAccount = googleAccounts.find((a: any) => a.active);
+
+  // Storage display
+  const storageUsedMB = storageBytes ? storageBytes / (1024 * 1024) : 0;
+  const storageLabel = storageBytes ? formatSize(storageBytes) : '0 MB';
+  const storagePercent = Math.min((storageUsedMB / 500) * 100, 100);
+
+  // Last backup display
+  const lastBackupInfo = lastBackupData
+    ? { date: lastBackupData.date || '', size: lastBackupData.size || '', destination: (lastBackupData.destination as 'local' | 'gdrive') || 'local' }
+    : null;
 
   const startProgress = (type: OperationType, detail?: string) => {
     setProgressType(type);
     setProgressDetail(detail || '');
     setProgressOpen(true);
   };
-  const [restoreSheetOpen, setRestoreSheetOpen] = useState(false);
-  const [imageHandlingOpen, setImageHandlingOpen] = useState(false);
-  const [imageQuality, setImageQuality] = useState<'compress' | 'original'>('original');
-  const [imageMaxSize, setImageMaxSize] = useState<'1' | '5' | '10' | 'none'>('5');
-  const [backupSheetOpen, setBackupSheetOpen] = useState(false);
-  const [lastBackupInfo, setLastBackupInfo] = useState<{ date: string; size: string; destination: 'local' | 'gdrive' } | null>({ date: '2025-01-15 · 08:30', size: '245 MB', destination: 'local' });
-  const [aboutOpen, setAboutOpen] = useState(false);
-  const [themeSheetOpen, setThemeSheetOpen] = useState(false);
-  const [themeColor, setThemeColor] = useState('blue');
-  const [fontSheetOpen, setFontSheetOpen] = useState(false);
-  const [fontSize, setFontSize] = useState('medium');
-  const [dateSheetOpen, setDateSheetOpen] = useState(false);
-  const [dateFormat, setDateFormat] = useState('DD MMM YYYY');
-  const [hospitalsSheetOpen, setHospitalsSheetOpen] = useState(false);
-  const [defaultHospitalSheetOpen, setDefaultHospitalSheetOpen] = useState(false);
-  const [defaultHospitalId, setDefaultHospitalId] = useState('2');
-
-  const hospitalsList = [
-    { id: '1', name: "St. Jude Children's", department: 'Main Wing', unit: 'Central Unit' },
-    { id: '2', name: 'Cairo University', department: 'Pediatrics Dept' },
-    { id: '3', name: 'Ain Shams Hospital', department: 'Ward B' },
-  ];
-  const defaultHospitalName = hospitalsList.find(h => h.id === defaultHospitalId)?.name || 'None';
 
   const sw = (checked: boolean, onChange: (v: boolean) => void) => (
     <Switch checked={checked} onCheckedChange={onChange} />
@@ -158,7 +190,7 @@ const SettingsScreen = () => {
         {/* ─── 1. APP APPEARANCE ─── */}
         <Section title="App Appearance">
           <Row icon={Palette} label="Theme Color" subtitle={themeColor === 'blue' ? 'Medical Blue (Default)' : themeColor === 'green' ? 'Forest Green' : themeColor === 'purple' ? 'Warm Purple' : 'Teal'} right={<Chevron />} onClick={() => setThemeSheetOpen(true)} />
-          <Row icon={Moon} label="Dark Mode" subtitle="Easier on eyes at night" right={sw(darkMode, setDarkMode)} />
+          <Row icon={Moon} label="Dark Mode" subtitle="Easier on eyes at night" right={sw(darkMode, (v) => updateSetting({ key: 'darkMode', value: String(v) }))} />
           <Row icon={Type} label="Font Size" subtitle={fontSize === 'small' ? 'Small' : fontSize === 'medium' ? 'Medium' : 'Large'} right={<Chevron />} onClick={() => setFontSheetOpen(true)} />
           <Row icon={CalendarDays} label="Date & Time Format" subtitle={dateFormat} right={<Chevron />} onClick={() => setDateSheetOpen(true)} noBorder />
         </Section>
@@ -175,19 +207,19 @@ const SettingsScreen = () => {
           <Row icon={KeyRound} iconColor="#8B5CF6" label="API Key" subtitle={apiKey ? apiKey.slice(0, 7) + '••••••••••••' : 'Not set'} right={<Chevron />} onClick={() => setApiKeyOpen(true)} />
           <Row icon={Brain} iconColor="#8B5CF6" label="AI Model" subtitle={aiModel === 'sonnet' ? 'Claude Sonnet' : aiModel === 'opus' ? 'Claude Opus' : 'Claude Haiku'} right={<Chevron />} onClick={() => setAiModelOpen(true)} />
           <Row icon={Languages} iconColor="#8B5CF6" label="AI Response Language" subtitle={aiLanguage === 'arabic' ? 'Arabic' : 'English'} right={<Chevron />} onClick={() => setAiLanguageOpen(true)} />
-          <Row icon={Zap} iconColor="#8B5CF6" label="AI Features" subtitle="Insights, CasePearl, GroupPearl" right={sw(aiFeatures, setAiFeatures)} noBorder />
+          <Row icon={Zap} iconColor="#8B5CF6" label="AI Features" subtitle="Insights, CasePearl, GroupPearl" right={sw(aiFeatures, (v) => updateSetting({ key: 'aiFeatures', value: String(v) }))} noBorder />
         </Section>
 
         {/* ─── 4. GOOGLE DRIVE SYNC ─── */}
         <Section title="Google Drive Sync">
-          <Row icon={Cloud} iconColor="#22C55E" label="Sync Enabled" subtitle={googleAccounts.find(a => a.active)?.email || 'No account'} right={sw(syncEnabled, setSyncEnabled)} />
+          <Row icon={Cloud} iconColor="#22C55E" label="Sync Enabled" subtitle={activeAccount?.email || 'No account'} right={sw(syncEnabled, (v) => updateSetting({ key: 'syncEnabled', value: String(v) }))} />
           <Row icon={RefreshCw} iconColor="#22C55E" label="Sync Frequency" subtitle={syncFrequency === 'hourly' ? 'Every hour' : syncFrequency === '6hours' ? 'Every 6 hours' : syncFrequency === 'daily' ? 'Daily' : syncFrequency === 'weekly' ? 'Weekly' : 'Manual only'} right={<Chevron />} onClick={() => setSyncFreqOpen(true)} />
-          <Row icon={Lock} iconColor="#22C55E" label="Encrypted Backup" subtitle="AES-256 encryption" right={sw(encryptedBackup, setEncryptedBackup)} />
+          <Row icon={Lock} iconColor="#22C55E" label="Encrypted Backup" subtitle="AES-256 encryption" right={sw(encryptedBackup, (v) => updateSetting({ key: 'encryptedBackup', value: String(v) }))} />
           <Row icon={UserCircle} iconColor="#22C55E" label="Change Google Account" right={<Chevron />} onClick={() => setGoogleAccountOpen(true)} />
           <Row icon={Clock} iconColor="#22C55E" label="Last Synced" subtitle={lastSyncedText}
             right={
               <button
-                onClick={(e) => { e.stopPropagation(); setSyncProgressOpen(true); }}
+                onClick={(e) => { e.stopPropagation(); setSyncProgressOpen(true); startSync(); }}
                 className="text-[12px] font-bold rounded-lg px-3 py-1.5"
                 style={{ background: 'hsl(213,78%,95%)', color: 'hsl(213,78%,48%)' }}
               >
@@ -205,9 +237,9 @@ const SettingsScreen = () => {
             <HardDriveDownload size={20} className="text-primary flex-shrink-0" />
             <div className="flex-1">
               <div className="text-[15px] font-medium" style={{ color: '#1A2332' }}>Storage Used</div>
-              <div className="text-[12px] mb-1.5" style={{ color: '#6B7C93' }}>142 MB / ~500 MB available</div>
+              <div className="text-[12px] mb-1.5" style={{ color: '#6B7C93' }}>{storageLabel} / ~500 MB available</div>
               <div className="h-2 bg-muted rounded-full overflow-hidden">
-                <div className="h-full bg-primary rounded-full" style={{ width: '28%' }} />
+                <div className="h-full bg-primary rounded-full" style={{ width: `${storagePercent}%` }} />
               </div>
             </div>
           </div>
@@ -243,9 +275,8 @@ const SettingsScreen = () => {
 
         {/* ─── 8. BEHAVIOR ─── */}
         <Section title="Behavior">
-          
-          <Row icon={MessageSquare} label="Confirmation Dialogs" subtitle="Ask before deleting" right={sw(confirmDialogs, setConfirmDialogs)} />
-          <Row icon={Save} label="Auto-Save" subtitle="Save drafts automatically" right={sw(autoSave, setAutoSave)} noBorder />
+          <Row icon={MessageSquare} label="Confirmation Dialogs" subtitle="Ask before deleting" right={sw(confirmDialogs, (v) => updateSetting({ key: 'confirmDialogs', value: String(v) }))} />
+          <Row icon={Save} label="Auto-Save" subtitle="Save drafts automatically" right={sw(autoSave, (v) => updateSetting({ key: 'autoSave', value: String(v) }))} noBorder />
         </Section>
 
         {/* ─── 9. DELETE DATA ─── */}
@@ -315,68 +346,123 @@ const SettingsScreen = () => {
         </p>
       </div>
 
-      <SettingsExportSheet open={exportOpen} onOpenChange={setExportOpen} onExportStart={() => startProgress('export', 'File saved to Downloads')} />
+      {/* ─── Sheets ─── */}
+      <SettingsExportSheet
+        open={exportOpen}
+        onOpenChange={setExportOpen}
+        gdriveConnected={googleAccounts.length > 0}
+        onExportStart={() => startProgress('export', 'File saved to Downloads')}
+      />
       <CreateBackupSheet
         open={backupSheetOpen}
         onOpenChange={setBackupSheetOpen}
         defaultLocation={lastBackupInfo?.destination || 'local'}
         onBackupComplete={(destination: 'local' | 'gdrive') => {
-          startProgress('backup', destination === 'local' ? '245 MB · Local Storage' : '245 MB · Google Drive');
-          const now = new Date();
-          setLastBackupInfo({
-            date: now.toISOString().slice(0, 10) + ' · ' + now.toTimeString().slice(0, 5),
-            size: '245 MB',
-            destination,
-          });
+          startBackup({ type: 'full', destination });
+          startProgress('backup', destination === 'local' ? 'Local Storage' : 'Google Drive');
         }}
       />
       <AboutSheet open={aboutOpen} onOpenChange={setAboutOpen} />
-      <ThemeColorSheet open={themeSheetOpen} onOpenChange={setThemeSheetOpen} value={themeColor} onApply={setThemeColor} />
-      <FontSizeSheet open={fontSheetOpen} onOpenChange={setFontSheetOpen} value={fontSize} onApply={setFontSize} />
-      <DateFormatSheet open={dateSheetOpen} onOpenChange={setDateSheetOpen} value={dateFormat} onApply={setDateFormat} />
+      <ThemeColorSheet
+        open={themeSheetOpen}
+        onOpenChange={setThemeSheetOpen}
+        value={themeColor}
+        onApply={(v) => updateSetting({ key: 'themeColor', value: v })}
+      />
+      <FontSizeSheet
+        open={fontSheetOpen}
+        onOpenChange={setFontSheetOpen}
+        value={fontSize}
+        onApply={(v) => updateSetting({ key: 'fontSize', value: v })}
+      />
+      <DateFormatSheet
+        open={dateSheetOpen}
+        onOpenChange={setDateSheetOpen}
+        value={dateFormat}
+        onApply={(v) => updateSetting({ key: 'dateFormat', value: v })}
+      />
       <ManageHospitalsSheet open={hospitalsSheetOpen} onOpenChange={setHospitalsSheetOpen} />
-      <DefaultHospitalSheet open={defaultHospitalSheetOpen} onOpenChange={setDefaultHospitalSheetOpen} hospitals={hospitalsList} value={defaultHospitalId} onApply={setDefaultHospitalId} />
-      <AIProviderSheet open={aiProviderOpen} onOpenChange={setAiProviderOpen} value={aiProvider} onApply={setAiProvider} />
-      <APIKeySheet open={apiKeyOpen} onOpenChange={setApiKeyOpen} value={apiKey} onSave={setApiKey} onRemove={() => setApiKey('')} />
-      <AIModelSheet open={aiModelOpen} onOpenChange={setAiModelOpen} value={aiModel} onApply={setAiModel} />
-      <AILanguageSheet open={aiLanguageOpen} onOpenChange={setAiLanguageOpen} value={aiLanguage} onApply={setAiLanguage} />
-      <SyncFrequencySheet open={syncFreqOpen} onOpenChange={setSyncFreqOpen} value={syncFrequency} onApply={setSyncFrequency} />
+      <DefaultHospitalSheet
+        open={defaultHospitalSheetOpen}
+        onOpenChange={setDefaultHospitalSheetOpen}
+        hospitals={hospitals.map((h: any) => ({ id: h.id, name: h.name, department: h.department, unit: h.unit }))}
+        value={defaultHospitalId}
+        onApply={(id) => updateSetting({ key: 'defaultHospitalId', value: id })}
+      />
+      <AIProviderSheet
+        open={aiProviderOpen}
+        onOpenChange={setAiProviderOpen}
+        value={aiProvider}
+        onApply={(v) => updateSetting({ key: 'aiProvider', value: v })}
+      />
+      <APIKeySheet
+        open={apiKeyOpen}
+        onOpenChange={setApiKeyOpen}
+        value={apiKey}
+        onSave={(v) => updateSetting({ key: 'apiKey', value: v })}
+        onRemove={() => updateSetting({ key: 'apiKey', value: '' })}
+      />
+      <AIModelSheet
+        open={aiModelOpen}
+        onOpenChange={setAiModelOpen}
+        value={aiModel}
+        onApply={(v) => updateSetting({ key: 'aiModel', value: v })}
+      />
+      <AILanguageSheet
+        open={aiLanguageOpen}
+        onOpenChange={setAiLanguageOpen}
+        value={aiLanguage}
+        onApply={(v) => updateSetting({ key: 'aiLanguage', value: v })}
+      />
+      <SyncFrequencySheet
+        open={syncFreqOpen}
+        onOpenChange={setSyncFreqOpen}
+        value={syncFrequency}
+        onApply={(v) => updateSetting({ key: 'syncFrequency', value: v })}
+      />
       <GoogleAccountSheet
         open={googleAccountOpen}
         onOpenChange={setGoogleAccountOpen}
-        accounts={googleAccounts}
-        onConnect={() => {
-          const newId = Date.now().toString();
-          const newEmail = `new${googleAccounts.length + 1}@gmail.com`;
-          if (googleAccounts.length === 0) {
-            setGoogleAccounts([{ id: newId, email: newEmail, active: true }]);
-            setSyncEnabled(true);
-          } else {
-            setGoogleAccounts(prev => [...prev, { id: newId, email: newEmail, active: false }]);
-          }
-        }}
+        accounts={googleAccounts.map((a: any) => ({ id: a.id || a.email, email: a.email, active: a.active }))}
+        onConnect={() => connectGoogle()}
         onSetActive={(id) => {
-          setGoogleAccounts(prev => prev.map(a => ({ ...a, active: a.id === id })));
+          const account = googleAccounts.find((a: any) => (a.id || a.email) === id);
+          if (account) setActiveAccount(account.email);
         }}
         onDisconnectOne={(id) => {
-          setGoogleAccounts(prev => {
-            const filtered = prev.filter(a => a.id !== id);
-            if (filtered.length > 0 && !filtered.some(a => a.active)) {
-              filtered[0].active = true;
-            }
-            if (filtered.length === 0) setSyncEnabled(false);
-            return filtered;
-          });
+          const account = googleAccounts.find((a: any) => (a.id || a.email) === id);
+          if (account) {
+            disconnectGoogle(account.email, {
+              onSuccess: () => {
+                if (googleAccounts.length <= 1) updateSetting({ key: 'syncEnabled', value: 'false' });
+              }
+            });
+          }
         }}
         onDisconnectAll={() => {
-          setGoogleAccounts([]);
-          setSyncEnabled(false);
+          googleAccounts.forEach((a: any) => disconnectGoogle(a.email));
+          updateSetting({ key: 'syncEnabled', value: 'false' });
         }}
       />
       <ProgressSheet open={progressOpen} onOpenChange={setProgressOpen} type={progressType} detail={progressDetail} />
-      <SyncProgressSheet open={syncProgressOpen} onOpenChange={setSyncProgressOpen} email={googleAccounts.find(a => a.active)?.email || ''} onComplete={(ts) => setLastSyncedText(ts)} />
-      <RestoreBackupSheet open={restoreSheetOpen} onOpenChange={setRestoreSheetOpen} onRestore={() => startProgress('restore', 'All records restored')} />
-      <ImageHandlingSheet open={imageHandlingOpen} onOpenChange={setImageHandlingOpen} onApply={(q, s) => { setImageQuality(q); setImageMaxSize(s); }} />
+      <SyncProgressSheet
+        open={syncProgressOpen}
+        onOpenChange={setSyncProgressOpen}
+        email={activeAccount?.email || ''}
+        onComplete={() => {}}
+      />
+      <RestoreBackupSheet
+        open={restoreSheetOpen}
+        onOpenChange={setRestoreSheetOpen}
+        onRestore={() => startProgress('restore', 'All records restored')}
+      />
+      <ImageHandlingSheet
+        open={imageHandlingOpen}
+        onOpenChange={setImageHandlingOpen}
+        onApply={(q, s) => {
+          updateSettings({ imageQuality: q, imageMaxSize: s });
+        }}
+      />
     </div>
   );
 };
