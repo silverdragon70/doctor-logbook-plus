@@ -7,13 +7,9 @@ import { Button } from '@/components/ui/button';
 import { Calendar as CalendarPicker } from '@/components/ui/calendar';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-
-const existingPatients = [
-  { patientId: '1', name: 'Lucas Miller', fileNumber: 'PED-2024-001', age: '4 years', gender: 'male' as const },
-  { patientId: '2', name: 'Sophia Chen', fileNumber: 'PED-2024-002', age: '7 years', gender: 'female' as const },
-  { patientId: '3', name: 'Ethan Wright', fileNumber: 'PED-2024-003', age: '2 years', gender: 'male' as const },
-  { patientId: '4', name: 'Maya Johnson', fileNumber: 'PED-2024-004', age: '5 years', gender: 'female' as const },
-];
+import { usePatients } from '@/hooks/usePatients';
+import { useHospitals } from '@/hooks/useHospitals';
+import { useCreateCase } from '@/hooks/useCases';
 
 const specialties = [
   { value: 'cardiology', label: 'Cardiology' },
@@ -26,12 +22,6 @@ const specialties = [
   { value: 'infectious-disease', label: 'Infectious Disease' },
   { value: 'neonatology', label: 'Neonatology' },
   { value: 'general-pediatrics', label: 'General Pediatrics' },
-];
-
-const hospitals = [
-  { value: 'cairo-university', label: 'Cairo University Hospital' },
-  { value: 'ain-shams', label: 'Ain Shams University Hospital' },
-  { value: 'kasr-alainy', label: 'Kasr Al-Ainy Hospital' },
 ];
 
 const GenderIcon = ({ gender, size = 13 }: { gender: 'male' | 'female'; size?: number }) => (
@@ -92,8 +82,12 @@ const CollapsibleSection = ({ title, icon, isExpanded, onToggle, rightLabel, chi
 
 const NewCaseScreen = () => {
   const navigate = useNavigate();
+  const { data: allPatients = [] } = usePatients();
+  const { data: hospitals = [] } = useHospitals();
+  const createCase = useCreateCase();
+
   const [patientMode, setPatientMode] = useState<'new' | 'existing'>('new');
-  const [selectedPatient, setSelectedPatient] = useState<typeof existingPatients[0] | null>(null);
+  const [selectedPatient, setSelectedPatient] = useState<typeof allPatients[0] | null>(null);
   const [searchQuery, setSearchQuery] = useState('');
   const [isSearchFocused, setIsSearchFocused] = useState(false);
 
@@ -172,17 +166,14 @@ const NewCaseScreen = () => {
   const handlePillClick = useCallback((key: string) => {
     const ref = sectionRefs[key as keyof typeof sectionRefs];
     if (ref.current) {
-      // Expand section if collapsed
       if (key === 'progressNote') {
         setExpandedSections(prev => ({ ...prev, progressNote: true }));
       } else {
         setExpandedSections(prev => ({ ...prev, [key]: true }));
       }
-      
       setTimeout(() => {
         const el = ref.current;
         if (!el) return;
-        // Calculate offset: header (~52px) + nav bar (~50px)
         const offset = 110;
         const top = el.getBoundingClientRect().top + window.scrollY - offset;
         window.scrollTo({ top, behavior: 'smooth' });
@@ -194,21 +185,15 @@ const NewCaseScreen = () => {
   useEffect(() => {
     const observers: IntersectionObserver[] = [];
     const entries = Object.entries(sectionRefs);
-    
     entries.forEach(([key, ref]) => {
       if (!ref.current) return;
       const observer = new IntersectionObserver(
-        ([entry]) => {
-          if (entry.isIntersecting) {
-            setActivePill(key);
-          }
-        },
+        ([entry]) => { if (entry.isIntersecting) setActivePill(key); },
         { rootMargin: '-100px 0px -60% 0px', threshold: 0 }
       );
       observer.observe(ref.current);
       observers.push(observer);
     });
-
     return () => observers.forEach(o => o.disconnect());
   }, []);
 
@@ -219,12 +204,12 @@ const NewCaseScreen = () => {
   const filteredPatients = useMemo(() => {
     if (!searchQuery.trim()) return [];
     const q = searchQuery.toLowerCase();
-    return existingPatients.filter(
-      (p) => p.name.toLowerCase().includes(q) || p.fileNumber.toLowerCase().includes(q)
+    return allPatients.filter(
+      (p) => p.name.toLowerCase().includes(q) || (p.fileNumber ?? '').toLowerCase().includes(q)
     );
-  }, [searchQuery]);
+  }, [searchQuery, allPatients]);
 
-  const handleSelectPatient = (patient: typeof existingPatients[0]) => {
+  const handleSelectPatient = (patient: typeof allPatients[0]) => {
     setSelectedPatient(patient);
     setSearchQuery('');
     setIsSearchFocused(false);
@@ -235,6 +220,39 @@ const NewCaseScreen = () => {
     setSearchQuery('');
   };
 
+  const handleSave = async () => {
+    if (!admissionDate || !specialty) return;
+
+    try {
+      await createCase.mutateAsync({
+        patientId: selectedPatient?.id,
+        patientData: patientMode === 'new' && patientName.trim() ? {
+          name: patientName,
+          dobDay,
+          dobMonth,
+          dobYear,
+          gender: (gender as 'male' | 'female') || 'male',
+          fileNumber: fileNumber || undefined,
+        } : undefined,
+        hospitalId: hospital || undefined,
+        admissionDate: format(admissionDate, 'yyyy-MM-dd'),
+        specialty,
+        provisionalDiagnosis: provisionalDiagnosis || undefined,
+        finalDiagnosis: finalDiagnosis || undefined,
+        chiefComplaint: chiefComplaint || undefined,
+        presentHistory: presentHistory || undefined,
+        pastMedicalHistory: pastMedicalHistory || undefined,
+        allergies: allergies || undefined,
+        currentMedications: currentMedications || undefined,
+      });
+      navigate(-1);
+    } catch (e) {
+      console.error('Failed to save case', e);
+    }
+  };
+
+  const isSaving = createCase.isPending;
+
   return (
     <div className="min-h-screen bg-background animate-fade-in">
       {/* Header */}
@@ -244,10 +262,11 @@ const NewCaseScreen = () => {
         </button>
         <h1 className="text-[16px] font-bold text-foreground">New Case</h1>
         <button
-          onClick={() => { console.log('save case'); navigate(-1); }}
-          className="px-4 py-2 bg-primary text-primary-foreground rounded-xl text-[13px] font-bold active:scale-95 transition-transform"
+          onClick={handleSave}
+          disabled={isSaving}
+          className="px-4 py-2 bg-primary text-primary-foreground rounded-xl text-[13px] font-bold active:scale-95 transition-transform disabled:opacity-50"
         >
-          <Save size={14} className="inline mr-1" /> Save
+          <Save size={14} className="inline mr-1" /> {isSaving ? 'Saving...' : 'Save'}
         </button>
       </header>
 
@@ -345,7 +364,7 @@ const NewCaseScreen = () => {
                         {filteredPatients.length > 0 ? (
                           filteredPatients.map((p) => (
                             <button
-                              key={p.patientId}
+                              key={p.id}
                               onMouseDown={() => handleSelectPatient(p)}
                               className="w-full px-4 py-3 text-left hover:bg-muted/50 transition-colors flex items-center justify-between"
                             >
@@ -413,7 +432,7 @@ const NewCaseScreen = () => {
                       </SelectTrigger>
                       <SelectContent>
                         {hospitals.map((h) => (
-                          <SelectItem key={h.value} value={h.value}>{h.label}</SelectItem>
+                          <SelectItem key={h.id} value={h.id}>{h.name}</SelectItem>
                         ))}
                       </SelectContent>
                     </Select>
@@ -513,7 +532,6 @@ const NewCaseScreen = () => {
         </CollapsibleSection>
         </div>
 
-
         {/* ═══ Investigations ═══ */}
         <div ref={sectionRefs.investigations}>
         <CollapsibleSection
@@ -585,24 +603,14 @@ const NewCaseScreen = () => {
           <div className="space-y-2 pt-2">
             {/* Nested: Medications */}
             <div className="rounded-[14px] border border-[hsl(216,20%,90%)] bg-[hsl(210,40%,98%)] overflow-hidden">
-              <button
-                onClick={() => toggleSection('medications')}
-                className="w-full px-3 py-3 flex items-center justify-between"
-              >
+              <button onClick={() => toggleSection('medications')} className="w-full px-3 py-3 flex items-center justify-between">
                 <div className="flex items-center gap-2">
                   <span className="text-[16px]">💊</span>
                   <span className="text-[15px] font-bold" style={{ color: '#1A2332' }}>Medications</span>
                 </div>
-                <ChevronDown
-                  size={16}
-                  style={{ color: '#6B7C93' }}
-                  className={cn('transition-transform duration-300', expandedSections.medications && 'rotate-180')}
-                />
+                <ChevronDown size={16} style={{ color: '#6B7C93' }} className={cn('transition-transform duration-300', expandedSections.medications && 'rotate-180')} />
               </button>
-              <div className={cn(
-                'overflow-hidden transition-all duration-300 ease-in-out',
-                expandedSections.medications ? 'max-h-[500px] opacity-100' : 'max-h-0 opacity-0'
-              )}>
+              <div className={cn('overflow-hidden transition-all duration-300 ease-in-out', expandedSections.medications ? 'max-h-[500px] opacity-100' : 'max-h-0 opacity-0')}>
                 <div className="px-3 pb-3 pt-1 border-t border-[hsl(216,20%,90%)]">
                   <div className="space-y-1.5">
                     <label className={labelClass} style={{ color: '#6B7C93' }}>Current Medications</label>
@@ -614,24 +622,14 @@ const NewCaseScreen = () => {
 
             {/* Nested: Respiratory Support */}
             <div className="rounded-[14px] border border-[hsl(216,20%,90%)] bg-[hsl(210,40%,98%)] overflow-hidden">
-              <button
-                onClick={() => toggleSection('respiratory')}
-                className="w-full px-3 py-3 flex items-center justify-between"
-              >
+              <button onClick={() => toggleSection('respiratory')} className="w-full px-3 py-3 flex items-center justify-between">
                 <div className="flex items-center gap-2">
                   <AirVent size={16} className="text-primary" />
                   <span className="text-[15px] font-bold" style={{ color: '#1A2332' }}>Respiratory Support</span>
                 </div>
-                <ChevronDown
-                  size={16}
-                  style={{ color: '#6B7C93' }}
-                  className={cn('transition-transform duration-300', expandedSections.respiratory && 'rotate-180')}
-                />
+                <ChevronDown size={16} style={{ color: '#6B7C93' }} className={cn('transition-transform duration-300', expandedSections.respiratory && 'rotate-180')} />
               </button>
-              <div className={cn(
-                'overflow-hidden transition-all duration-300 ease-in-out',
-                expandedSections.respiratory ? 'max-h-[800px] opacity-100' : 'max-h-0 opacity-0'
-              )}>
+              <div className={cn('overflow-hidden transition-all duration-300 ease-in-out', expandedSections.respiratory ? 'max-h-[800px] opacity-100' : 'max-h-0 opacity-0')}>
                 <div className="px-3 pb-3 pt-1 border-t border-[hsl(216,20%,90%)]">
                   <div className="space-y-3">
                     <div className="space-y-1.5">
@@ -672,24 +670,14 @@ const NewCaseScreen = () => {
 
             {/* Nested: Feeding */}
             <div className="rounded-[14px] border border-[hsl(216,20%,90%)] bg-[hsl(210,40%,98%)] overflow-hidden">
-              <button
-                onClick={() => toggleSection('feeding')}
-                className="w-full px-3 py-3 flex items-center justify-between"
-              >
+              <button onClick={() => toggleSection('feeding')} className="w-full px-3 py-3 flex items-center justify-between">
                 <div className="flex items-center gap-2">
                   <span className="text-[16px]">🍼</span>
                   <span className="text-[15px] font-bold" style={{ color: '#1A2332' }}>Feeding</span>
                 </div>
-                <ChevronDown
-                  size={16}
-                  style={{ color: '#6B7C93' }}
-                  className={cn('transition-transform duration-300', expandedSections.feeding && 'rotate-180')}
-                />
+                <ChevronDown size={16} style={{ color: '#6B7C93' }} className={cn('transition-transform duration-300', expandedSections.feeding && 'rotate-180')} />
               </button>
-              <div className={cn(
-                'overflow-hidden transition-all duration-300 ease-in-out',
-                expandedSections.feeding ? 'max-h-[500px] opacity-100' : 'max-h-0 opacity-0'
-              )}>
+              <div className={cn('overflow-hidden transition-all duration-300 ease-in-out', expandedSections.feeding ? 'max-h-[500px] opacity-100' : 'max-h-0 opacity-0')}>
                 <div className="px-3 pb-3 pt-1 border-t border-[hsl(216,20%,90%)]">
                   <div className="space-y-1.5">
                     <label className={labelClass} style={{ color: '#6B7C93' }}>Feeding Details</label>
@@ -727,35 +715,19 @@ const NewCaseScreen = () => {
             </div>
             <div className="space-y-1.5">
               <label className={labelClass} style={{ color: '#6B7C93' }}>Assessment</label>
-              <textarea
-                value={progressNoteAssessment}
-                onChange={(e) => setProgressNoteAssessment(e.target.value)}
-                placeholder="Clinical assessment..."
-                rows={3}
-                className={cn(inputClass, 'h-auto py-3 resize-none')}
-              />
+              <textarea value={progressNoteAssessment} onChange={(e) => setProgressNoteAssessment(e.target.value)} placeholder="Clinical assessment..." rows={3} className={cn(inputClass, 'h-auto py-3 resize-none')} />
             </div>
 
             {/* Nested: Vital Signs */}
             <div className="rounded-[14px] border border-[hsl(216,20%,90%)] bg-[hsl(210,40%,98%)] overflow-hidden">
-              <button
-                onClick={() => toggleSection('vitals')}
-                className="w-full px-3 py-3 flex items-center justify-between"
-              >
+              <button onClick={() => toggleSection('vitals')} className="w-full px-3 py-3 flex items-center justify-between">
                 <div className="flex items-center gap-2">
                   <HeartPulse size={16} className="text-primary" />
                   <span className="text-[15px] font-bold" style={{ color: '#1A2332' }}>Vital Signs</span>
                 </div>
-                <ChevronDown
-                  size={16}
-                  style={{ color: '#6B7C93' }}
-                  className={cn('transition-transform duration-300', expandedSections.vitals && 'rotate-180')}
-                />
+                <ChevronDown size={16} style={{ color: '#6B7C93' }} className={cn('transition-transform duration-300', expandedSections.vitals && 'rotate-180')} />
               </button>
-              <div className={cn(
-                'overflow-hidden transition-all duration-300 ease-in-out',
-                expandedSections.vitals ? 'max-h-[800px] opacity-100' : 'max-h-0 opacity-0'
-              )}>
+              <div className={cn('overflow-hidden transition-all duration-300 ease-in-out', expandedSections.vitals ? 'max-h-[800px] opacity-100' : 'max-h-0 opacity-0')}>
                 <div className="px-3 pb-3 pt-1 border-t border-[hsl(216,20%,90%)]">
                   <div className="space-y-4">
                     <div className="grid grid-cols-2 gap-3">
@@ -768,7 +740,6 @@ const NewCaseScreen = () => {
                         <input type="text" inputMode="numeric" pattern="[0-9]*" value={spo2} onChange={(e) => setSpo2(e.target.value.replace(/\D/g, ''))} placeholder="94" className={cn(inputClass, 'h-12')} />
                       </div>
                     </div>
-
                     <div className="grid grid-cols-2 gap-3">
                       <div className="space-y-1.5">
                         <label className={labelClass} style={{ color: '#6B7C93' }}>Temp (°C)</label>
@@ -779,7 +750,6 @@ const NewCaseScreen = () => {
                         <input type="text" inputMode="numeric" pattern="[0-9]*" value={rr} onChange={(e) => setRr(e.target.value.replace(/\D/g, ''))} placeholder="46" className={cn(inputClass, 'h-12')} />
                       </div>
                     </div>
-
                     <div className="grid grid-cols-2 gap-3">
                       <div className="space-y-1.5">
                         <label className={labelClass} style={{ color: '#6B7C93' }}>BP (mmHg)</label>
@@ -790,7 +760,6 @@ const NewCaseScreen = () => {
                         <input type="text" inputMode="decimal" value={weight} onChange={(e) => setWeight(e.target.value.replace(/[^0-9.]/g, ''))} placeholder="13.2" className={cn(inputClass, 'h-12')} />
                       </div>
                     </div>
-
                     <div className="space-y-1.5">
                       <label className={labelClass} style={{ color: '#6B7C93' }}>Date & Time</label>
                       <input type="datetime-local" value={vitalDateTime} onChange={(e) => setVitalDateTime(e.target.value)} className={cn(inputClass, 'h-12')} />
