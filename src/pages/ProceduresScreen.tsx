@@ -1,6 +1,6 @@
 import React, { useState, useMemo, useRef, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { ArrowLeft, Plus, Stethoscope, X, ChevronDown, CalendarIcon, Pencil, Trash2 } from 'lucide-react';
+import { ArrowLeft, Plus, Stethoscope, X, ChevronDown, CalendarIcon, Pencil, Trash2, Loader2 } from 'lucide-react';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from '@/components/ui/alert-dialog';
 import ExportSheet from '@/components/ExportSheet';
 import { format } from 'date-fns';
@@ -10,78 +10,30 @@ import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
-import { Badge } from '@/components/ui/badge';
-import { ScrollArea } from '@/components/ui/scroll-area';
+import { useProcedures, useProcedureStats, useCreateProcedure, useUpdateProcedure, useDeleteProcedure } from '@/hooks/useProcedures';
+import { useHospitals } from '@/hooks/useHospitals';
+import { usePatients } from '@/hooks/usePatients';
+import type { Procedure } from '@/services/procedureService';
 
 type ParticipationType = 'Performed' | 'Assisted' | 'Observed';
 type FilterType = 'All' | ParticipationType;
 
-interface Procedure {
-  id: string;
-  name: string;
-  date: string;
-  participation: ParticipationType;
-  patientName?: string;
-  hospital?: string;
-  supervisor?: string;
-  location?: string;
-  indication?: string;
-  notes?: string;
-}
-
-const EXISTING_HOSPITALS = [
-  'King Fahad Medical City',
-  'King Faisal Specialist Hospital',
-  'Prince Sultan Military Medical City',
-  'National Guard Hospital',
-];
-
 const CORE_PROCEDURES = [
-  'Bag-Mask Ventilation',
-  'Bladder Catheterization',
-  'Incision & Drainage of Abscess',
-  'Lumbar Puncture (LP)',
-  'Neonatal Endotracheal Intubation',
-  'Peripheral IV Catheter Placement',
-  'Umbilical Catheter Placement',
-  'Venipuncture',
+  'Bag-Mask Ventilation', 'Bladder Catheterization', 'Incision & Drainage of Abscess',
+  'Lumbar Puncture (LP)', 'Neonatal Endotracheal Intubation', 'Peripheral IV Catheter Placement',
+  'Umbilical Catheter Placement', 'Venipuncture',
 ];
-
 const ADVANCED_PROCEDURES = [
-  'ABG Sampling',
-  'Chest Tube Placement',
-  'Endotracheal Intubation (Non-Neonatal)',
-  'Thoracentesis',
+  'ABG Sampling', 'Chest Tube Placement', 'Endotracheal Intubation (Non-Neonatal)', 'Thoracentesis',
 ];
-
 const DAILY_PRACTICE = [
-  'Nasogastric Tube (NGT) Insertion',
-  'Intraosseous (IO) Access',
-  'Suprapubic Aspiration',
-  'Wound Suturing',
-  'Blood Culture Collection',
-  'Bone Marrow Aspiration',
+  'Nasogastric Tube (NGT) Insertion', 'Intraosseous (IO) Access', 'Suprapubic Aspiration',
+  'Wound Suturing', 'Blood Culture Collection', 'Bone Marrow Aspiration',
 ];
-
 const ALL_PROCEDURES = [
   { group: 'Core Procedures', items: CORE_PROCEDURES },
   { group: 'Advanced Procedures', items: ADVANCED_PROCEDURES },
   { group: 'Daily Practice', items: DAILY_PRACTICE },
-];
-
-const EXISTING_PATIENTS = [
-  { id: '1', name: 'Ahmed Ali' },
-  { id: '2', name: 'Fatima Hassan' },
-  { id: '3', name: 'Omar Khalid' },
-  { id: '4', name: 'Sara Mohammed' },
-];
-
-const MOCK_PROCEDURES: Procedure[] = [
-  { id: '1', name: 'Lumbar Puncture (LP)', date: '2026-03-08', participation: 'Performed', patientName: 'Ahmed Ali', hospital: 'King Fahad Medical City', supervisor: 'Dr. Nasser', indication: 'Rule out meningitis', notes: 'Successful on first attempt' },
-  { id: '2', name: 'Peripheral IV Catheter Placement', date: '2026-03-07', participation: 'Assisted', patientName: 'Fatima Hassan', hospital: 'National Guard Hospital', indication: 'IV access for antibiotics' },
-  { id: '3', name: 'Bag-Mask Ventilation', date: '2026-03-06', participation: 'Observed', patientName: 'Omar Khalid', supervisor: 'Dr. Layla', indication: 'Respiratory distress' },
-  { id: '4', name: 'Chest Tube Placement', date: '2026-03-05', participation: 'Performed', patientName: 'Sara Mohammed', hospital: 'King Faisal Specialist Hospital', supervisor: 'Dr. Ahmed', indication: 'Pneumothorax drainage' },
-  { id: '5', name: 'Venipuncture', date: '2026-03-04', participation: 'Performed', patientName: 'Ahmed Ali', indication: 'Blood sampling' },
 ];
 
 const participationStyles: Record<ParticipationType, { bg: string; text: string }> = {
@@ -90,30 +42,15 @@ const participationStyles: Record<ParticipationType, { bg: string; text: string 
   Observed:  { bg: 'bg-[#DBEAFE]', text: 'text-[#2563EB]' },
 };
 
-const statCards: { label: string; value: number; type: ParticipationType }[] = [
-  { label: 'Performed', value: 12, type: 'Performed' },
-  { label: 'Assisted', value: 8, type: 'Assisted' },
-  { label: 'Observed', value: 15, type: 'Observed' },
-];
-
 // ─── Procedure Search Dropdown ─────────────────────────
-const ProcedureSearchDropdown = ({
-  value,
-  onChange,
-}: {
-  value: string;
-  onChange: (v: string) => void;
-}) => {
+const ProcedureSearchDropdown = ({ value, onChange }: { value: string; onChange: (v: string) => void }) => {
   const [query, setQuery] = useState(value);
   const [open, setOpen] = useState(false);
   const ref = useRef<HTMLDivElement>(null);
 
   useEffect(() => { setQuery(value); }, [value]);
-
   useEffect(() => {
-    const handler = (e: MouseEvent) => {
-      if (ref.current && !ref.current.contains(e.target as Node)) setOpen(false);
-    };
+    const handler = (e: MouseEvent) => { if (ref.current && !ref.current.contains(e.target as Node)) setOpen(false); };
     document.addEventListener('mousedown', handler);
     return () => document.removeEventListener('mousedown', handler);
   }, []);
@@ -121,51 +58,28 @@ const ProcedureSearchDropdown = ({
   const filtered = useMemo(() => {
     if (!query.trim()) return ALL_PROCEDURES;
     const q = query.toLowerCase();
-    return ALL_PROCEDURES.map(g => ({
-      group: g.group,
-      items: g.items.filter(i => i.toLowerCase().includes(q)),
-    })).filter(g => g.items.length > 0);
+    return ALL_PROCEDURES.map(g => ({ group: g.group, items: g.items.filter(i => i.toLowerCase().includes(q)) })).filter(g => g.items.length > 0);
   }, [query]);
 
   const exactMatch = ALL_PROCEDURES.some(g => g.items.some(i => i.toLowerCase() === query.trim().toLowerCase()));
 
   return (
     <div ref={ref} className="relative">
-      <Input
-        placeholder="Search or type procedure name..."
-        value={query}
-        onChange={e => { setQuery(e.target.value); setOpen(true); }}
-        onFocus={() => setOpen(true)}
-        className="bg-card border-border"
-      />
+      <Input placeholder="Search or type procedure name..." value={query} onChange={e => { setQuery(e.target.value); setOpen(true); }} onFocus={() => setOpen(true)} className="bg-card border-border" />
       {open && (
         <div className="absolute z-50 mt-1 w-full bg-card border border-border rounded-xl shadow-elevated max-h-60 overflow-auto">
           {filtered.map(g => (
             <div key={g.group}>
               <div className="px-3 py-1.5 text-[11px] font-semibold text-muted-foreground uppercase tracking-wider">{g.group}</div>
               {g.items.map(item => (
-                <button
-                  key={item}
-                  type="button"
-                  className="w-full text-left px-3 py-2.5 text-sm text-foreground hover:bg-muted/50 transition-colors"
-                  onClick={() => { onChange(item); setQuery(item); setOpen(false); }}
-                >
-                  {item}
-                </button>
+                <button key={item} type="button" className="w-full text-left px-3 py-2.5 text-sm text-foreground hover:bg-muted/50 transition-colors" onClick={() => { onChange(item); setQuery(item); setOpen(false); }}>{item}</button>
               ))}
             </div>
           ))}
           {query.trim() && !exactMatch && (
-            <button
-              type="button"
-              className="w-full text-left px-3 py-2.5 text-sm text-primary font-medium hover:bg-muted/50 transition-colors border-t border-border"
-              onClick={() => { onChange(query.trim()); setOpen(false); }}
-            >
+            <button type="button" className="w-full text-left px-3 py-2.5 text-sm text-primary font-medium hover:bg-muted/50 transition-colors border-t border-border" onClick={() => { onChange(query.trim()); setOpen(false); }}>
               + Add "{query.trim()}"
             </button>
-          )}
-          {filtered.length === 0 && !query.trim() && (
-            <div className="px-3 py-4 text-sm text-muted-foreground text-center">No procedures found</div>
           )}
         </div>
       )}
@@ -174,25 +88,14 @@ const ProcedureSearchDropdown = ({
 };
 
 // ─── Hospital Search Dropdown ─────────────────────────
-const HospitalSearchDropdown = ({
-  value,
-  onChange,
-  hospitals,
-}: {
-  value: string;
-  onChange: (v: string) => void;
-  hospitals: string[];
-}) => {
+const HospitalSearchDropdown = ({ value, onChange, hospitals }: { value: string; onChange: (v: string) => void; hospitals: string[] }) => {
   const [query, setQuery] = useState(value);
   const [open, setOpen] = useState(false);
   const ref = useRef<HTMLDivElement>(null);
 
   useEffect(() => { setQuery(value); }, [value]);
-
   useEffect(() => {
-    const handler = (e: MouseEvent) => {
-      if (ref.current && !ref.current.contains(e.target as Node)) setOpen(false);
-    };
+    const handler = (e: MouseEvent) => { if (ref.current && !ref.current.contains(e.target as Node)) setOpen(false); };
     document.addEventListener('mousedown', handler);
     return () => document.removeEventListener('mousedown', handler);
   }, []);
@@ -205,24 +108,11 @@ const HospitalSearchDropdown = ({
 
   return (
     <div ref={ref} className="relative">
-      <Input
-        placeholder="Search or add hospital..."
-        value={query}
-        onChange={e => { setQuery(e.target.value); onChange(e.target.value); setOpen(true); }}
-        onFocus={() => setOpen(true)}
-        className="bg-card border-border"
-      />
+      <Input placeholder="Search or add hospital..." value={query} onChange={e => { setQuery(e.target.value); onChange(e.target.value); setOpen(true); }} onFocus={() => setOpen(true)} className="bg-card border-border" />
       {open && filtered.length > 0 && (
         <div className="absolute z-50 mt-1 w-full bg-card border border-border rounded-xl shadow-elevated max-h-48 overflow-auto">
           {filtered.map(h => (
-            <button
-              key={h}
-              type="button"
-              className="w-full text-left px-3 py-2.5 text-sm text-foreground hover:bg-muted/50 transition-colors"
-              onClick={() => { onChange(h); setQuery(h); setOpen(false); }}
-            >
-              {h}
-            </button>
+            <button key={h} type="button" className="w-full text-left px-3 py-2.5 text-sm text-foreground hover:bg-muted/50 transition-colors" onClick={() => { onChange(h); setQuery(h); setOpen(false); }}>{h}</button>
           ))}
         </div>
       )}
@@ -231,53 +121,31 @@ const HospitalSearchDropdown = ({
 };
 
 // ─── Patient Search Dropdown ─────────────────────────
-const PatientSearchDropdown = ({
-  value,
-  onChange,
-}: {
-  value: string;
-  onChange: (v: string) => void;
-}) => {
+const PatientSearchDropdown = ({ value, onChange, patients }: { value: string; onChange: (v: string) => void; patients: { id: string; name: string }[] }) => {
   const [query, setQuery] = useState(value);
   const [open, setOpen] = useState(false);
   const ref = useRef<HTMLDivElement>(null);
 
   useEffect(() => { setQuery(value); }, [value]);
-
   useEffect(() => {
-    const handler = (e: MouseEvent) => {
-      if (ref.current && !ref.current.contains(e.target as Node)) setOpen(false);
-    };
+    const handler = (e: MouseEvent) => { if (ref.current && !ref.current.contains(e.target as Node)) setOpen(false); };
     document.addEventListener('mousedown', handler);
     return () => document.removeEventListener('mousedown', handler);
   }, []);
 
   const filtered = useMemo(() => {
-    if (!query.trim()) return EXISTING_PATIENTS;
+    if (!query.trim()) return patients;
     const q = query.toLowerCase();
-    return EXISTING_PATIENTS.filter(p => p.name.toLowerCase().includes(q));
-  }, [query]);
+    return patients.filter(p => p.name.toLowerCase().includes(q));
+  }, [query, patients]);
 
   return (
     <div ref={ref} className="relative">
-      <Input
-        placeholder="Search or type patient name..."
-        value={query}
-        onChange={e => { setQuery(e.target.value); onChange(e.target.value); setOpen(true); }}
-        onFocus={() => setOpen(true)}
-        className="bg-card border-border"
-      />
+      <Input placeholder="Search or type patient name..." value={query} onChange={e => { setQuery(e.target.value); onChange(e.target.value); setOpen(true); }} onFocus={() => setOpen(true)} className="bg-card border-border" />
       {open && filtered.length > 0 && (
         <div className="absolute z-50 mt-1 w-full bg-card border border-border rounded-xl shadow-elevated max-h-48 overflow-auto">
           {filtered.map(p => (
-            <button
-              key={p.id}
-              type="button"
-              className="w-full text-left px-3 py-2.5 text-sm text-foreground hover:bg-muted/50 transition-colors"
-              onClick={() => { onChange(p.name); setQuery(p.name); setOpen(false); }}
-            >
-              {p.name}
-            </button>
+            <button key={p.id} type="button" className="w-full text-left px-3 py-2.5 text-sm text-foreground hover:bg-muted/50 transition-colors" onClick={() => { onChange(p.name); setQuery(p.name); setOpen(false); }}>{p.name}</button>
           ))}
         </div>
       )}
@@ -290,11 +158,22 @@ const ProceduresScreen = () => {
   const navigate = useNavigate();
   const [filter, setFilter] = useState<FilterType>('All');
   const [showForm, setShowForm] = useState(false);
-  const [procedures, setProcedures] = useState<Procedure[]>(MOCK_PROCEDURES);
-  const [hospitals, setHospitals] = useState<string[]>(EXISTING_HOSPITALS);
   const [editingId, setEditingId] = useState<string | null>(null);
   const [deleteId, setDeleteId] = useState<string | null>(null);
   const [showExport, setShowExport] = useState(false);
+
+  // Real data hooks
+  const filterParam = filter !== 'All' ? { participation: filter as ParticipationType } : undefined;
+  const { data: procedures = [], isLoading } = useProcedures(filterParam);
+  const { data: stats } = useProcedureStats();
+  const { data: hospitalList = [] } = useHospitals();
+  const { data: patientList = [] } = usePatients();
+  const createProcedure = useCreateProcedure();
+  const updateProcedure = useUpdateProcedure();
+  const deleteProcedure = useDeleteProcedure();
+
+  const hospitalNames = hospitalList.map(h => h.name);
+  const patients = patientList.map(p => ({ id: p.patientId, name: p.name }));
 
   useEffect(() => {
     const handler = () => setShowExport(true);
@@ -311,12 +190,6 @@ const ProceduresScreen = () => {
   const [formSupervisor, setFormSupervisor] = useState('');
   const [formIndication, setFormIndication] = useState('');
   const [formNotes, setFormNotes] = useState('');
-  const [showPatientDropdown, setShowPatientDropdown] = useState(false);
-
-  const filtered = useMemo(() => {
-    if (filter === 'All') return procedures;
-    return procedures.filter(p => p.participation === filter);
-  }, [filter, procedures]);
 
   const filters: FilterType[] = ['All', 'Performed', 'Assisted', 'Observed'];
 
@@ -324,14 +197,6 @@ const ProceduresScreen = () => {
     setFormName(''); setFormDate(new Date()); setFormParticipation('Performed');
     setFormPatient(''); setFormHospital(''); setFormSupervisor(''); setFormIndication(''); setFormNotes('');
     setEditingId(null);
-  };
-
-  const handleAddHospital = (name: string) => {
-    setHospitals(prev => [...prev, name]);
-  };
-
-  const handleBackNavigation = () => {
-    navigate('/');
   };
 
   const handleEdit = (proc: Procedure) => {
@@ -347,32 +212,41 @@ const ProceduresScreen = () => {
     setShowForm(true);
   };
 
-  const handleDelete = () => {
+  const handleDelete = async () => {
     if (deleteId) {
-      setProcedures(prev => prev.filter(p => p.id !== deleteId));
+      try { await deleteProcedure.mutateAsync(deleteId); } catch (e) { console.error(e); }
       setDeleteId(null);
     }
   };
 
-  const handleSave = () => {
-    if (editingId) {
-      setProcedures(prev => prev.map(p => p.id === editingId ? {
-        ...p, name: formName, date: format(formDate, 'yyyy-MM-dd'), participation: formParticipation,
-        patientName: formPatient || undefined, hospital: formHospital || undefined,
-        supervisor: formSupervisor || undefined, indication: formIndication || undefined, notes: formNotes || undefined,
-      } : p));
-    } else {
-      console.log('Save procedure', { formName, formDate, formParticipation, formPatient, formHospital, formSupervisor, formIndication, formNotes });
-    }
-    resetForm();
-    setShowForm(false);
+  const handleSave = async () => {
+    const payload = {
+      name: formName,
+      date: format(formDate, 'yyyy-MM-dd'),
+      participation: formParticipation,
+      patientName: formPatient || undefined,
+      hospital: formHospital || undefined,
+      supervisor: formSupervisor || undefined,
+      indication: formIndication || undefined,
+      notes: formNotes || undefined,
+    };
+    try {
+      if (editingId) {
+        await updateProcedure.mutateAsync({ id: editingId, data: payload });
+      } else {
+        await createProcedure.mutateAsync(payload);
+      }
+      resetForm();
+      setShowForm(false);
+    } catch (e) { console.error(e); }
   };
+
+  const isSaving = createProcedure.isPending || updateProcedure.isPending;
 
   // ─── Add Procedure Form ───
   if (showForm) {
     return (
       <div className="min-h-screen bg-background">
-        {/* Header */}
         <div className="sticky top-0 z-30 bg-background/95 backdrop-blur-md border-b border-border px-4 py-3 flex items-center gap-3">
           <button onClick={() => { resetForm(); setShowForm(false); }} className="p-1.5 -ml-1.5 rounded-xl hover:bg-muted/50 transition-colors">
             <X size={22} className="text-foreground" />
@@ -381,13 +255,11 @@ const ProceduresScreen = () => {
         </div>
 
         <div className="px-5 py-5 space-y-5 max-w-[430px] mx-auto pb-10">
-          {/* Procedure Name */}
           <div className="space-y-1.5">
             <label className="text-sm font-medium text-foreground">Procedure Name</label>
             <ProcedureSearchDropdown value={formName} onChange={setFormName} />
           </div>
 
-          {/* Date */}
           <div className="space-y-1.5">
             <label className="text-sm font-medium text-foreground">Date</label>
             <Popover>
@@ -403,7 +275,6 @@ const ProceduresScreen = () => {
             </Popover>
           </div>
 
-          {/* Participation */}
           <div className="space-y-1.5">
             <label className="text-sm font-medium text-foreground">Participation Type</label>
             <div className="flex gap-2">
@@ -425,62 +296,33 @@ const ProceduresScreen = () => {
             </div>
           </div>
 
-          {/* Patient */}
           <div className="space-y-1.5">
             <label className="text-sm font-medium text-foreground">Patient <span className="text-muted-foreground font-normal">(optional)</span></label>
-            <PatientSearchDropdown value={formPatient} onChange={setFormPatient} />
+            <PatientSearchDropdown value={formPatient} onChange={setFormPatient} patients={patients} />
           </div>
 
-          {/* Hospital */}
           <div className="space-y-1.5">
             <label className="text-sm font-medium text-foreground">Hospital <span className="text-muted-foreground font-normal">(optional)</span></label>
-            <HospitalSearchDropdown
-              value={formHospital}
-              onChange={setFormHospital}
-              hospitals={hospitals}
-            />
+            <HospitalSearchDropdown value={formHospital} onChange={setFormHospital} hospitals={hospitalNames} />
           </div>
 
-          {/* Supervisor */}
           <div className="space-y-1.5">
             <label className="text-sm font-medium text-foreground">Supervisor <span className="text-muted-foreground font-normal">(optional)</span></label>
-            <Input
-              placeholder="e.g. Dr. Ahmad"
-              value={formSupervisor}
-              onChange={e => setFormSupervisor(e.target.value)}
-              className="bg-card border-border"
-            />
+            <Input placeholder="e.g. Dr. Ahmad" value={formSupervisor} onChange={e => setFormSupervisor(e.target.value)} className="bg-card border-border" />
           </div>
 
-          {/* Indication */}
           <div className="space-y-1.5">
             <label className="text-sm font-medium text-foreground">Indication</label>
-            <Input
-              placeholder="Why was this procedure done?"
-              value={formIndication}
-              onChange={e => setFormIndication(e.target.value)}
-              className="bg-card border-border"
-            />
+            <Input placeholder="Why was this procedure done?" value={formIndication} onChange={e => setFormIndication(e.target.value)} className="bg-card border-border" />
           </div>
 
-          {/* Notes */}
           <div className="space-y-1.5">
             <label className="text-sm font-medium text-foreground">Notes <span className="text-muted-foreground font-normal">(optional)</span></label>
-            <Textarea
-              placeholder="Any complications or observations..."
-              value={formNotes}
-              onChange={e => setFormNotes(e.target.value)}
-              className="bg-card border-border min-h-[100px]"
-            />
+            <Textarea placeholder="Any complications or observations..." value={formNotes} onChange={e => setFormNotes(e.target.value)} className="bg-card border-border min-h-[100px]" />
           </div>
 
-          {/* Save */}
-          <Button
-            onClick={handleSave}
-            disabled={!formName.trim()}
-            className="w-full h-12 rounded-xl text-base font-semibold"
-          >
-            Save Procedure
+          <Button onClick={handleSave} disabled={!formName.trim() || isSaving} className="w-full h-12 rounded-xl text-base font-semibold">
+            {isSaving ? 'Saving...' : (editingId ? 'Update Procedure' : 'Save Procedure')}
           </Button>
         </div>
       </div>
@@ -493,11 +335,12 @@ const ProceduresScreen = () => {
       <div className="px-5 py-6 space-y-5 animate-fade-in pb-24">
         {/* Stats Row */}
         <div className="grid grid-cols-3 gap-3">
-          {statCards.map(s => (
-            <div
-              key={s.type}
-              className={cn("rounded-2xl p-4 text-center", participationStyles[s.type].bg)}
-            >
+          {([
+          { label: 'Performed', value: stats?.performed ?? 0, type: 'Performed' as ParticipationType },
+            { label: 'Assisted', value: stats?.assisted ?? 0, type: 'Assisted' as ParticipationType },
+            { label: 'Observed', value: stats?.observed ?? 0, type: 'Observed' as ParticipationType },
+          ]).map(s => (
+            <div key={s.type} className={cn("rounded-2xl p-4 text-center", participationStyles[s.type].bg)}>
               <div className={cn("text-2xl font-bold font-mono-stats", participationStyles[s.type].text)}>{s.value}</div>
               <div className={cn("text-xs font-medium mt-0.5", participationStyles[s.type].text)}>{s.label}</div>
             </div>
@@ -512,9 +355,7 @@ const ProceduresScreen = () => {
               onClick={() => setFilter(f)}
               className={cn(
                 "px-4 py-2 rounded-full text-sm font-medium whitespace-nowrap transition-all duration-150",
-                filter === f
-                  ? "bg-primary text-primary-foreground shadow-sm"
-                  : "bg-card text-muted-foreground border border-border hover:bg-muted/50"
+                filter === f ? "bg-primary text-primary-foreground shadow-sm" : "bg-card text-muted-foreground border border-border hover:bg-muted/50"
               )}
             >
               {f}
@@ -523,7 +364,11 @@ const ProceduresScreen = () => {
         </div>
 
         {/* Procedures List */}
-        {filtered.length === 0 ? (
+        {isLoading ? (
+          <div className="flex items-center justify-center py-16">
+            <Loader2 className="animate-spin text-primary" size={28} />
+          </div>
+        ) : procedures.length === 0 ? (
           <div className="flex flex-col items-center justify-center py-16 text-center">
             <div className="w-16 h-16 rounded-2xl bg-muted/50 flex items-center justify-center mb-4">
               <Stethoscope size={28} className="text-muted-foreground" />
@@ -539,11 +384,8 @@ const ProceduresScreen = () => {
           </div>
         ) : (
           <div className="space-y-3">
-            {filtered.map(proc => (
-              <div
-                key={proc.id}
-                className="bg-card rounded-2xl border border-border shadow-card p-4 space-y-2"
-              >
+            {procedures.map(proc => (
+              <div key={proc.id} className="bg-card rounded-2xl border border-border shadow-card p-4 space-y-2">
                 <div className="flex items-start justify-between gap-2">
                   <h3 className="text-sm font-semibold text-foreground flex-1">{proc.name}</h3>
                   <div className="flex items-center gap-2 shrink-0">
@@ -554,19 +396,11 @@ const ProceduresScreen = () => {
                   </div>
                 </div>
                 {(proc.patientName || proc.hospital) && (
-                  <p className="text-xs text-muted-foreground">
-                    {[proc.patientName, proc.hospital].filter(Boolean).join(' · ')}
-                  </p>
+                  <p className="text-xs text-muted-foreground">{[proc.patientName, proc.hospital].filter(Boolean).join(' · ')}</p>
                 )}
-                {proc.supervisor && (
-                  <p className="text-xs text-muted-foreground"><span className="font-medium text-foreground/70">Supervisor:</span> {proc.supervisor}</p>
-                )}
-                {proc.indication && (
-                  <p className="text-xs text-muted-foreground"><span className="font-medium text-foreground/70">Indication:</span> {proc.indication}</p>
-                )}
-                {proc.notes && (
-                  <p className="text-xs text-muted-foreground"><span className="font-medium text-foreground/70">Notes:</span> {proc.notes}</p>
-                )}
+                {proc.supervisor && <p className="text-xs text-muted-foreground"><span className="font-medium text-foreground/70">Supervisor:</span> {proc.supervisor}</p>}
+                {proc.indication && <p className="text-xs text-muted-foreground"><span className="font-medium text-foreground/70">Indication:</span> {proc.indication}</p>}
+                {proc.notes && <p className="text-xs text-muted-foreground"><span className="font-medium text-foreground/70">Notes:</span> {proc.notes}</p>}
                 <div className="flex gap-2 pt-1">
                   <button onClick={() => handleEdit(proc)} className="inline-flex items-center gap-1 text-xs font-medium px-3 py-1 rounded-full bg-[#EFF6FF] text-[#2563EB] hover:bg-[#DBEAFE] transition-colors">
                     <Pencil size={12} /> Edit
@@ -581,7 +415,6 @@ const ProceduresScreen = () => {
         )}
       </div>
 
-      {/* Delete Confirmation */}
       <AlertDialog open={!!deleteId} onOpenChange={(open) => !open && setDeleteId(null)}>
         <AlertDialogContent>
           <AlertDialogHeader>
@@ -595,7 +428,6 @@ const ProceduresScreen = () => {
         </AlertDialogContent>
       </AlertDialog>
 
-      {/* FAB — outside animate-fade-in so it's visible immediately */}
       <button
         onClick={() => setShowForm(true)}
         className="fixed bottom-[84px] left-1/2 translate-x-[110px] w-14 h-14 bg-primary rounded-[18px] flex items-center justify-center text-primary-foreground shadow-brand active:scale-90 transition-all z-50 group overflow-hidden"
@@ -603,7 +435,6 @@ const ProceduresScreen = () => {
         <Plus size={26} />
       </button>
 
-      {/* Export Sheet */}
       <ExportSheet
         open={showExport}
         onOpenChange={setShowExport}
