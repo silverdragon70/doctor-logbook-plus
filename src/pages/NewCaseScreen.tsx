@@ -215,6 +215,7 @@ const NewCaseScreen = () => {
     setIsSearchFocused(false);
   };
 
+
   const handleClearPatient = () => {
     setSelectedPatient(null);
     setSearchQuery('');
