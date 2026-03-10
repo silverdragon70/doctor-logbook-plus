@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { ArrowLeft, Building2, MapPin, Briefcase, CalendarDays, Stethoscope, Loader2 } from 'lucide-react';
+import { ArrowLeft, Building2, MapPin, Briefcase, CalendarDays, Stethoscope } from 'lucide-react';
 import { format } from 'date-fns';
 import { cn } from '@/lib/utils';
 import { Calendar } from '@/components/ui/calendar';
@@ -12,11 +12,9 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
-import { useCreateHospital } from '@/hooks/useHospitals';
 
 const AddHospitalScreen = () => {
   const navigate = useNavigate();
-  const { mutate: createHospital, isPending } = useCreateHospital();
   const [name, setName] = useState('');
   const [department, setDepartment] = useState('');
   const [location, setLocation] = useState('');
@@ -24,14 +22,6 @@ const AddHospitalScreen = () => {
   const [startDate, setStartDate] = useState<Date>();
 
   const isValid = name.trim() && department.trim();
-
-  const handleSave = () => {
-    if (!isValid) return;
-    createHospital(
-      { name, department, location, position, startDate: startDate?.toISOString() } as any,
-      { onSuccess: () => navigate(-1) }
-    );
-  };
 
   return (
     <div className="min-h-screen bg-background transition-colors duration-300">
@@ -147,16 +137,15 @@ const AddHospitalScreen = () => {
         {/* Save Button */}
         <div className="sticky bottom-0 px-5 py-4 border-t border-border bg-background/80 backdrop-blur-md">
           <button
-            onClick={handleSave}
-            disabled={!isValid || isPending}
+            onClick={() => console.log('save hospital', { name, department, location, position, startDate })}
+            disabled={!isValid}
             className={cn(
-              'w-full h-[50px] rounded-xl font-semibold text-[15px] transition-all shadow-brand flex items-center justify-center gap-2',
-              isValid && !isPending
+              'w-full h-[50px] rounded-xl font-semibold text-[15px] transition-all shadow-brand',
+              isValid
                 ? 'bg-primary text-primary-foreground active:scale-[0.98]'
                 : 'bg-muted text-muted-foreground cursor-not-allowed shadow-none'
             )}
           >
-            {isPending && <Loader2 className="animate-spin" size={16} />}
             Save Hospital
           </button>
         </div>

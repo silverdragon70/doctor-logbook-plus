@@ -1,7 +1,14 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Search, X, Filter, Clock, FileText, Loader2 } from 'lucide-react';
-import { useSearch, useRecentSearches, useSaveRecentSearch } from '@/hooks/useSearch';
+import { Search, X, Filter, Clock, FileText } from 'lucide-react';
+
+const recentSearches = ['Bronchitis', 'Cardiac', 'Lucas Miller', 'Room 402'];
+
+const searchResults = [
+  { caseId: '1', patientName: 'Lucas Miller', diagnosis: 'Acute bronchitis', date: '2025-01-15', complaint: 'Persistent cough', mediaCount: 2 },
+  { caseId: '5', patientName: 'Noah Davis', diagnosis: 'Bronchiolitis', date: '2025-01-05', complaint: 'Wheezing & cough', mediaCount: 0 },
+  { caseId: '6', patientName: 'Ava Thompson', diagnosis: 'Reactive airway disease', date: '2025-01-03', complaint: 'Recurrent wheeze', mediaCount: 3 },
+];
 
 const SearchScreen = () => {
   const [query, setQuery] = useState('');
@@ -9,14 +16,10 @@ const SearchScreen = () => {
   const [hasSearched, setHasSearched] = useState(false);
   const navigate = useNavigate();
 
-  const { data: results = [], isLoading } = useSearch(hasSearched ? query : '');
-  const { data: recentSearches = [] } = useRecentSearches();
-  const { mutate: saveSearch } = useSaveRecentSearch();
-
   const handleSearch = () => {
     if (query.trim()) {
       setHasSearched(true);
-      saveSearch(query.trim());
+      console.log('search', searchType, query);
     }
   };
 
@@ -68,7 +71,7 @@ const SearchScreen = () => {
             <span className="text-[12px] font-semibold uppercase tracking-wider">Recent Searches</span>
           </div>
           <div className="flex flex-wrap gap-2">
-            {(recentSearches as string[]).map((term: string) => (
+            {recentSearches.map((term) => (
               <button
                 key={term}
                 onClick={() => { setQuery(term); setHasSearched(true); }}
@@ -82,36 +85,30 @@ const SearchScreen = () => {
       ) : (
         <div className="space-y-3">
           <div className="flex items-center justify-between">
-            <h3 className="text-[14px] font-bold text-foreground">
-              {isLoading ? 'Searching...' : `${results.length} Results`}
-            </h3>
+            <h3 className="text-[14px] font-bold text-foreground">{searchResults.length} Results</h3>
             <button className="flex items-center gap-1 text-[12px] text-primary font-medium">
               <Filter size={12} /> Filter
             </button>
           </div>
-          {isLoading ? (
-            <div className="py-10 flex justify-center"><Loader2 className="animate-spin text-primary" size={24} /></div>
-          ) : (
-            results.map((result: any) => (
-              <div
-                key={result.caseId || result.id}
-                onClick={() => navigate(`/case/${result.caseId || result.id}`)}
-                className="p-3 bg-card border border-border rounded-xl active:scale-[0.98] transition-all cursor-pointer hover:shadow-card"
-              >
-                <div className="flex items-center justify-between mb-1">
-                  <h4 className="text-[14px] font-bold text-foreground">{result.patientName || result.patient_name}</h4>
-                  <span className="text-[10px] text-muted-foreground">{result.date || result.admission_date}</span>
-                </div>
-                <p className="text-[12px] text-primary font-semibold">{result.diagnosis}</p>
-                <p className="text-[11px] text-muted-foreground mt-0.5">{result.complaint || result.chief_complaint}</p>
-                {(result.mediaCount || 0) > 0 && (
-                  <div className="mt-2 flex items-center gap-1 text-[10px] text-muted-foreground">
-                    <FileText size={10} /> {result.mediaCount} images
-                  </div>
-                )}
+          {searchResults.map((result) => (
+            <div
+              key={result.caseId}
+              onClick={() => navigate(`/case/${result.caseId}`)}
+              className="p-3 bg-card border border-border rounded-xl active:scale-[0.98] transition-all cursor-pointer hover:shadow-card"
+            >
+              <div className="flex items-center justify-between mb-1">
+                <h4 className="text-[14px] font-bold text-foreground">{result.patientName}</h4>
+                <span className="text-[10px] text-muted-foreground">{result.date}</span>
               </div>
-            ))
-          )}
+              <p className="text-[12px] text-primary font-semibold">{result.diagnosis}</p>
+              <p className="text-[11px] text-muted-foreground mt-0.5">{result.complaint}</p>
+              {result.mediaCount > 0 && (
+                <div className="mt-2 flex items-center gap-1 text-[10px] text-muted-foreground">
+                  <FileText size={10} /> {result.mediaCount} images
+                </div>
+              )}
+            </div>
+          ))}
         </div>
       )}
     </div>

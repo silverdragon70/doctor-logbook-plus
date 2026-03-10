@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Plus, X, BookOpen, CalendarIcon, Pencil, Trash2, Loader2 } from 'lucide-react';
+import { Plus, X, BookOpen, CalendarIcon, Pencil, Trash2 } from 'lucide-react';
 import { format } from 'date-fns';
 import { cn } from '@/lib/utils';
 import { Calendar } from '@/components/ui/calendar';
@@ -10,20 +10,32 @@ import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from '@/components/ui/alert-dialog';
 import ExportSheet from '@/components/ExportSheet';
-import { useLectures, useCreateLecture, useUpdateLecture, useDeleteLecture } from '@/hooks/useLectures';
-import type { Lecture } from '@/services/lectureService';
+
+interface Lecture {
+  id: string;
+  topic: string;
+  date: string;
+  speaker?: string;
+  duration?: string;
+  location?: string;
+  notes?: string;
+}
+
+const MOCK_LECTURES: Lecture[] = [
+  { id: '1', topic: 'Neonatal Resuscitation Updates', date: '2026-03-08', speaker: 'Dr. Ahmad Al-Rashid', location: 'Main Auditorium', duration: '1 hour', notes: 'New NRP guidelines discussed' },
+  { id: '2', topic: 'Pediatric Fluid Management', date: '2026-03-06', speaker: 'Dr. Sara Mohammed', location: 'Conference Room B', duration: '45 mins' },
+  { id: '3', topic: 'Common Pediatric Emergencies', date: '2026-03-04', speaker: 'Dr. Khalid Hassan', location: 'Lecture Hall 2', duration: '1.5 hours' },
+  { id: '4', topic: 'Antimicrobial Stewardship in NICU', date: '2026-03-02', speaker: 'Dr. Layla Nasser', duration: '1 hour', notes: 'Focus on empiric therapy' },
+  { id: '5', topic: 'Growth Monitoring & Nutrition', date: '2026-02-28', location: 'Online - Zoom', duration: '30 mins' },
+];
 
 const LecturesScreen = () => {
   const navigate = useNavigate();
   const [showForm, setShowForm] = useState(false);
+  const [lectures, setLectures] = useState<Lecture[]>(MOCK_LECTURES);
   const [editingId, setEditingId] = useState<string | null>(null);
   const [deleteId, setDeleteId] = useState<string | null>(null);
   const [showExport, setShowExport] = useState(false);
-
-  const { data: lectures = [], isLoading } = useLectures();
-  const createLecture = useCreateLecture();
-  const updateLecture = useUpdateLecture();
-  const deleteLecture = useDeleteLecture();
 
   useEffect(() => {
     const handler = () => setShowExport(true);
@@ -56,34 +68,26 @@ const LecturesScreen = () => {
     setShowForm(true);
   };
 
-  const handleDelete = async () => {
+  const handleDelete = () => {
     if (deleteId) {
-      try { await deleteLecture.mutateAsync(deleteId); } catch (e) { console.error(e); }
+      setLectures(prev => prev.filter(l => l.id !== deleteId));
       setDeleteId(null);
     }
   };
 
-  const handleSave = async () => {
-    const payload = {
-      topic: formTopic,
-      date: format(formDate, 'yyyy-MM-dd'),
-      speaker: formSpeaker || undefined,
-      duration: formDuration || undefined,
-      location: formLocation || undefined,
-      notes: formNotes || undefined,
-    };
-    try {
-      if (editingId) {
-        await updateLecture.mutateAsync({ id: editingId, data: payload });
-      } else {
-        await createLecture.mutateAsync(payload);
-      }
-      resetForm();
-      setShowForm(false);
-    } catch (e) { console.error(e); }
+  const handleSave = () => {
+    if (editingId) {
+      setLectures(prev => prev.map(l => l.id === editingId ? {
+        ...l, topic: formTopic, date: format(formDate, 'yyyy-MM-dd'),
+        speaker: formSpeaker || undefined, duration: formDuration || undefined,
+        location: formLocation || undefined, notes: formNotes || undefined,
+      } : l));
+    } else {
+      console.log('Save lecture', { formTopic, formDate, formSpeaker, formDuration, formLocation, formNotes });
+    }
+    resetForm();
+    setShowForm(false);
   };
-
-  const isSaving = createLecture.isPending || updateLecture.isPending;
 
   // ─── Add/Edit Lecture Form ───
   if (showForm) {
@@ -137,8 +141,8 @@ const LecturesScreen = () => {
             <Textarea placeholder="Any notes or takeaways..." value={formNotes} onChange={e => setFormNotes(e.target.value)} className="bg-card border-border min-h-[100px]" />
           </div>
 
-          <Button onClick={handleSave} disabled={!formTopic.trim() || isSaving} className="w-full h-12 rounded-xl text-base font-semibold">
-            {isSaving ? 'Saving...' : (editingId ? 'Update Lecture' : 'Save Lecture')}
+          <Button onClick={handleSave} disabled={!formTopic.trim()} className="w-full h-12 rounded-xl text-base font-semibold">
+            {editingId ? 'Update Lecture' : 'Save Lecture'}
           </Button>
         </div>
       </div>
@@ -158,11 +162,7 @@ const LecturesScreen = () => {
         </div>
 
         {/* List */}
-        {isLoading ? (
-          <div className="flex items-center justify-center py-16">
-            <Loader2 className="animate-spin text-primary" size={28} />
-          </div>
-        ) : lectures.length === 0 ? (
+        {lectures.length === 0 ? (
           <div className="flex flex-col items-center justify-center py-16 text-center">
             <div className="w-16 h-16 rounded-2xl bg-muted/50 flex items-center justify-center mb-4">
               <BookOpen size={28} className="text-muted-foreground" />
@@ -178,13 +178,17 @@ const LecturesScreen = () => {
                   <h3 className="text-sm font-semibold text-foreground flex-1">{lec.topic}</h3>
                   <span className="text-xs text-muted-foreground shrink-0">{format(new Date(lec.date), 'dd MMM')}</span>
                 </div>
-                {lec.speaker && <p className="text-xs text-muted-foreground">🎤 {lec.speaker}</p>}
+                {lec.speaker && (
+                  <p className="text-xs text-muted-foreground">🎤 {lec.speaker}</p>
+                )}
                 {(lec.location || lec.duration) && (
                   <p className="text-xs text-muted-foreground">
                     {[lec.location && `📍 ${lec.location}`, lec.duration && `⏱ ${lec.duration}`].filter(Boolean).join('  ·  ')}
                   </p>
                 )}
-                {lec.notes && <p className="text-xs text-muted-foreground"><span className="font-medium text-foreground/70">Notes:</span> {lec.notes}</p>}
+                {lec.notes && (
+                  <p className="text-xs text-muted-foreground"><span className="font-medium text-foreground/70">Notes:</span> {lec.notes}</p>
+                )}
                 <div className="flex gap-2 pt-1">
                   <button onClick={() => handleEdit(lec)} className="inline-flex items-center gap-1 text-xs font-medium px-3 py-1 rounded-full bg-[#EFF6FF] text-[#2563EB] hover:bg-[#DBEAFE] transition-colors">
                     <Pencil size={12} /> Edit
@@ -199,6 +203,7 @@ const LecturesScreen = () => {
         )}
       </div>
 
+      {/* Delete Confirmation */}
       <AlertDialog open={!!deleteId} onOpenChange={(open) => !open && setDeleteId(null)}>
         <AlertDialogContent>
           <AlertDialogHeader>
@@ -212,6 +217,7 @@ const LecturesScreen = () => {
         </AlertDialogContent>
       </AlertDialog>
 
+      {/* FAB */}
       <button
         onClick={() => setShowForm(true)}
         className="fixed bottom-[84px] left-1/2 translate-x-[110px] w-14 h-14 bg-primary rounded-[18px] flex items-center justify-center text-primary-foreground shadow-brand active:scale-90 transition-all z-50 group overflow-hidden"
@@ -219,6 +225,7 @@ const LecturesScreen = () => {
         <Plus size={26} />
       </button>
 
+      {/* Export Sheet */}
       <ExportSheet
         open={showExport}
         onOpenChange={setShowExport}

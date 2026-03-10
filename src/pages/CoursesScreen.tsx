@@ -1,6 +1,6 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Plus, X, GraduationCap, CalendarIcon, Upload, FileText, Pencil, Trash2, Loader2 } from 'lucide-react';
+import { Plus, X, GraduationCap, CalendarIcon, Upload, FileText, Pencil, Trash2 } from 'lucide-react';
 import { format } from 'date-fns';
 import { cn } from '@/lib/utils';
 import { Calendar } from '@/components/ui/calendar';
@@ -10,27 +10,32 @@ import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from '@/components/ui/alert-dialog';
 import ExportSheet from '@/components/ExportSheet';
-import { useCourses, useCreateCourse, useUpdateCourse, useDeleteCourse } from '@/hooks/useCourses';
-import type { Course } from '@/services/courseService';
+
+interface Course {
+  id: string;
+  name: string;
+  date: string;
+  provider?: string;
+  duration?: string;
+  hasCertificate: boolean;
+  certificateName?: string;
+  notes?: string;
+}
+
+const MOCK_COURSES: Course[] = [
+  { id: '1', name: 'Pediatric Advanced Life Support (PALS)', date: '2026-03-01', provider: 'American Heart Association', duration: '2 days', hasCertificate: true, certificateName: 'PALS_Certificate.pdf', notes: 'Renewal completed' },
+  { id: '2', name: 'Neonatal Resuscitation Program (NRP)', date: '2026-02-15', provider: 'AAP', duration: '1 day', hasCertificate: true, certificateName: 'NRP_cert.jpg' },
+  { id: '3', name: 'Point-of-Care Ultrasound Workshop', date: '2026-01-20', provider: 'King Fahad Medical City', duration: '3 days', hasCertificate: false, notes: 'Hands-on training with FAST exam' },
+];
 
 const CoursesScreen = () => {
   const navigate = useNavigate();
   const [showForm, setShowForm] = useState(false);
+  const [courses, setCourses] = useState<Course[]>(MOCK_COURSES);
   const [editingId, setEditingId] = useState<string | null>(null);
   const [deleteId, setDeleteId] = useState<string | null>(null);
   const [showExport, setShowExport] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
-
-  const { data: courses = [], isLoading } = useCourses();
-  const createCourse = useCreateCourse();
-  const updateCourse = useUpdateCourse();
-  const deleteCourse = useDeleteCourse();
-
-  useEffect(() => {
-    const handler = () => setShowExport(true);
-    window.addEventListener('open-export-sheet', handler);
-    return () => window.removeEventListener('open-export-sheet', handler);
-  }, []);
 
   // Form state
   const [formName, setFormName] = useState('');
@@ -75,35 +80,28 @@ const CoursesScreen = () => {
     setShowForm(true);
   };
 
-  const handleDelete = async () => {
+  const handleDelete = () => {
     if (deleteId) {
-      try { await deleteCourse.mutateAsync(deleteId); } catch (e) { console.error(e); }
+      setCourses(prev => prev.filter(c => c.id !== deleteId));
       setDeleteId(null);
     }
   };
 
-  const handleSave = async () => {
-    const payload = {
-      name: formName,
-      date: format(formDate, 'yyyy-MM-dd'),
-      provider: formProvider || undefined,
-      duration: formDuration || undefined,
-      hasCertificate: !!formCertFile,
-      certificatePath: formCertFile ? formCertFile.name : undefined,
-      notes: formNotes || undefined,
-    };
-    try {
-      if (editingId) {
-        await updateCourse.mutateAsync({ id: editingId, data: payload });
-      } else {
-        await createCourse.mutateAsync(payload);
-      }
-      resetForm();
-      setShowForm(false);
-    } catch (e) { console.error(e); }
+  const handleSave = () => {
+    if (editingId) {
+      setCourses(prev => prev.map(c => c.id === editingId ? {
+        ...c, name: formName, date: format(formDate, 'yyyy-MM-dd'),
+        provider: formProvider || undefined, duration: formDuration || undefined,
+        notes: formNotes || undefined,
+        hasCertificate: formCertFile ? true : c.hasCertificate,
+        certificateName: formCertFile ? formCertFile.name : c.certificateName,
+      } : c));
+    } else {
+      console.log('Save course', { formName, formDate, formProvider, formDuration, formCertFile, formNotes });
+    }
+    resetForm();
+    setShowForm(false);
   };
-
-  const isSaving = createCourse.isPending || updateCourse.isPending;
 
   // ─── Add/Edit Course Form ───
   if (showForm) {
@@ -149,7 +147,13 @@ const CoursesScreen = () => {
 
           <div className="space-y-1.5">
             <label className="text-sm font-medium text-foreground">Certificate <span className="text-muted-foreground font-normal">(optional)</span></label>
-            <input ref={fileInputRef} type="file" accept="image/jpeg,image/png,application/pdf" onChange={handleFileChange} className="hidden" />
+            <input
+              ref={fileInputRef}
+              type="file"
+              accept="image/jpeg,image/png,application/pdf"
+              onChange={handleFileChange}
+              className="hidden"
+            />
             {formCertFile ? (
               <div className="flex items-center gap-3 bg-card border border-border rounded-xl p-3">
                 {formCertPreview ? (
@@ -168,7 +172,10 @@ const CoursesScreen = () => {
                 </button>
               </div>
             ) : (
-              <button onClick={() => fileInputRef.current?.click()} className="w-full flex items-center justify-center gap-2 bg-card border border-dashed border-border rounded-xl p-4 text-sm text-muted-foreground hover:bg-muted/30 transition-colors">
+              <button
+                onClick={() => fileInputRef.current?.click()}
+                className="w-full flex items-center justify-center gap-2 bg-card border border-dashed border-border rounded-xl p-4 text-sm text-muted-foreground hover:bg-muted/30 transition-colors"
+              >
                 <Upload size={18} />
                 Upload Certificate
               </button>
@@ -180,8 +187,8 @@ const CoursesScreen = () => {
             <Textarea placeholder="Any notes about this course..." value={formNotes} onChange={e => setFormNotes(e.target.value)} className="bg-card border-border min-h-[100px]" />
           </div>
 
-          <Button onClick={handleSave} disabled={!formName.trim() || isSaving} className="w-full h-12 rounded-xl text-base font-semibold">
-            {isSaving ? 'Saving...' : (editingId ? 'Update Course' : 'Save Course')}
+          <Button onClick={handleSave} disabled={!formName.trim()} className="w-full h-12 rounded-xl text-base font-semibold">
+            {editingId ? 'Update Course' : 'Save Course'}
           </Button>
         </div>
       </div>
@@ -205,11 +212,7 @@ const CoursesScreen = () => {
         </div>
 
         {/* List */}
-        {isLoading ? (
-          <div className="flex items-center justify-center py-16">
-            <Loader2 className="animate-spin text-primary" size={28} />
-          </div>
-        ) : courses.length === 0 ? (
+        {courses.length === 0 ? (
           <div className="flex flex-col items-center justify-center py-16 text-center">
             <div className="w-16 h-16 rounded-2xl bg-muted/50 flex items-center justify-center mb-4">
               <GraduationCap size={28} className="text-muted-foreground" />
@@ -225,14 +228,20 @@ const CoursesScreen = () => {
                   <h3 className="text-sm font-semibold text-foreground flex-1">{course.name}</h3>
                   <span className="text-xs text-muted-foreground shrink-0">{format(new Date(course.date), 'dd MMM')}</span>
                 </div>
-                {course.provider && <p className="text-xs text-muted-foreground">🏛 {course.provider}</p>}
-                {course.duration && <p className="text-xs text-muted-foreground">⏱ {course.duration}</p>}
+                {course.provider && (
+                  <p className="text-xs text-muted-foreground">🏛 {course.provider}</p>
+                )}
+                {course.duration && (
+                  <p className="text-xs text-muted-foreground">⏱ {course.duration}</p>
+                )}
                 {course.hasCertificate && (
                   <span className="inline-flex items-center gap-1 text-[11px] font-semibold px-2.5 py-0.5 rounded-full bg-[#FEF3C7] text-[#D97706]">
                     📜 Certificate
                   </span>
                 )}
-                {course.notes && <p className="text-xs text-muted-foreground"><span className="font-medium text-foreground/70">Notes:</span> {course.notes}</p>}
+                {course.notes && (
+                  <p className="text-xs text-muted-foreground"><span className="font-medium text-foreground/70">Notes:</span> {course.notes}</p>
+                )}
                 <div className="flex gap-2 pt-1">
                   <button onClick={() => handleEdit(course)} className="inline-flex items-center gap-1 text-xs font-medium px-3 py-1 rounded-full bg-[#EFF6FF] text-[#2563EB] hover:bg-[#DBEAFE] transition-colors">
                     <Pencil size={12} /> Edit
@@ -247,6 +256,7 @@ const CoursesScreen = () => {
         )}
       </div>
 
+      {/* Delete Confirmation */}
       <AlertDialog open={!!deleteId} onOpenChange={(open) => !open && setDeleteId(null)}>
         <AlertDialogContent>
           <AlertDialogHeader>
@@ -260,6 +270,7 @@ const CoursesScreen = () => {
         </AlertDialogContent>
       </AlertDialog>
 
+      {/* FAB */}
       <button
         onClick={() => setShowForm(true)}
         className="fixed bottom-[84px] left-1/2 translate-x-[110px] w-14 h-14 bg-primary rounded-[18px] flex items-center justify-center text-primary-foreground shadow-brand active:scale-90 transition-all z-50 group overflow-hidden"
@@ -267,11 +278,12 @@ const CoursesScreen = () => {
         <Plus size={26} />
       </button>
 
+      {/* Export Sheet */}
       <ExportSheet
         open={showExport}
         onOpenChange={setShowExport}
         title="Courses"
-        data={courses.map(c => ({ ...c, certificate: c.hasCertificate ? (c.certificatePath || 'Yes') : 'No' }))}
+        data={courses.map(c => ({ ...c, certificate: c.hasCertificate ? (c.certificateName || 'Yes') : 'No' }))}
         dateKey="date"
         columns={[
           { header: 'Course Name', key: 'name' },

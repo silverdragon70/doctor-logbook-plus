@@ -1,14 +1,30 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
-import { ArrowLeft, CalendarIcon, Loader2 } from 'lucide-react';
+import { ArrowLeft, CalendarIcon } from 'lucide-react';
 import { format } from 'date-fns';
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
 import { Calendar } from '@/components/ui/calendar';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { usePatient, useUpdatePatient } from '@/hooks/usePatients';
-import { useHospitals } from '@/hooks/useHospitals';
+
+const mockPatient = {
+  patientId: '1',
+  name: 'Lucas Miller',
+  dobDay: '12',
+  dobMonth: '03',
+  dobYear: '2018',
+  gender: 'male' as 'male' | 'female',
+  fileNumber: 'PED-2024-001',
+  hospital: 'cairo-university',
+  admissionDate: new Date('2025-01-15'),
+};
+
+const hospitals = [
+  { value: 'cairo-university', label: 'Cairo University Hospital' },
+  { value: 'ain-shams', label: 'Ain Shams University Hospital' },
+  { value: 'kasr-alainy', label: 'Kasr Al-Ainy Hospital' },
+];
 
 const inputClass =
   'w-full h-11 px-4 rounded-[12px] text-[14px] text-foreground placeholder:text-muted-foreground focus:outline-none transition-colors'
@@ -18,54 +34,21 @@ const labelClass = 'text-[12px] font-bold uppercase tracking-wide';
 
 const EditPatientScreen = () => {
   const navigate = useNavigate();
-  const { id } = useParams<{ id: string }>();
-  const { data, isLoading } = usePatient(id!);
-  const { data: hospitals = [] } = useHospitals();
-  const updatePatient = useUpdatePatient();
+  const { id } = useParams();
 
-  const patient = data?.patient;
+  const [name, setName] = useState(mockPatient.name);
+  const [dobDay, setDobDay] = useState(mockPatient.dobDay);
+  const [dobMonth, setDobMonth] = useState(mockPatient.dobMonth);
+  const [dobYear, setDobYear] = useState(mockPatient.dobYear);
+  const [gender, setGender] = useState<'male' | 'female'>(mockPatient.gender);
+  const [fileNumber, setFileNumber] = useState(mockPatient.fileNumber);
+  const [hospital, setHospital] = useState(mockPatient.hospital);
+  const [admissionDate, setAdmissionDate] = useState<Date | undefined>(mockPatient.admissionDate);
 
-  const [name, setName] = useState('');
-  const [dobDay, setDobDay] = useState('');
-  const [dobMonth, setDobMonth] = useState('');
-  const [dobYear, setDobYear] = useState('');
-  const [gender, setGender] = useState<'male' | 'female'>('male');
-  const [fileNumber, setFileNumber] = useState('');
-  const [hospital, setHospital] = useState('');
-  const [admissionDate, setAdmissionDate] = useState<Date | undefined>(undefined);
-
-  // Populate form when patient data loads
-  useEffect(() => {
-    if (patient) {
-      setName(patient.name ?? '');
-      setDobDay(patient.dobDay ?? '');
-      setDobMonth(patient.dobMonth ?? '');
-      setDobYear(patient.dobYear ?? '');
-      setGender(patient.gender ?? 'male');
-      setFileNumber(patient.fileNumber ?? '');
-    }
-  }, [patient]);
-
-  const handleSave = async () => {
-    if (!id) return;
-    try {
-      await updatePatient.mutateAsync({
-        id,
-        data: { name, dobDay, dobMonth, dobYear, gender, fileNumber: fileNumber || undefined },
-      });
-      navigate(-1);
-    } catch (e) {
-      console.error('Failed to update patient', e);
-    }
+  const handleSave = () => {
+    console.log('save patient', { id, name, dobDay, dobMonth, dobYear, gender, fileNumber, hospital, admissionDate });
+    navigate(-1);
   };
-
-  if (isLoading) {
-    return (
-      <div className="min-h-screen bg-background flex items-center justify-center">
-        <Loader2 className="animate-spin text-primary" size={32} />
-      </div>
-    );
-  }
 
   return (
     <div className="min-h-screen bg-background animate-fade-in">
@@ -162,14 +145,14 @@ const EditPatientScreen = () => {
             />
           </div>
           <div className="space-y-1.5">
-            <label className={labelClass} style={{ color: '#6B7C93' }}>Hospital</label>
+            <label className={labelClass} style={{ color: '#6B7C93' }}>Hospital <span className="text-destructive">*</span></label>
             <Select value={hospital} onValueChange={setHospital}>
               <SelectTrigger className="w-full h-11 bg-[hsl(210,40%,98%)] border-[1.5px] border-[hsl(216,20%,90%)] rounded-[12px] text-[14px] focus:border-primary">
                 <SelectValue placeholder="Select" />
               </SelectTrigger>
               <SelectContent>
                 {hospitals.map((h) => (
-                  <SelectItem key={h.id} value={h.id}>{h.name}</SelectItem>
+                  <SelectItem key={h.value} value={h.value}>{h.label}</SelectItem>
                 ))}
               </SelectContent>
             </Select>
@@ -204,10 +187,10 @@ const EditPatientScreen = () => {
         {/* Save Button */}
         <Button
           onClick={handleSave}
-          disabled={!name.trim() || !dobDay || !dobMonth || !dobYear || !gender || updatePatient.isPending}
+          disabled={!name.trim() || !dobDay || !dobMonth || !dobYear || !gender || !hospital || !admissionDate}
           className="w-full h-12 rounded-[12px] text-[15px] font-semibold"
         >
-          {updatePatient.isPending ? 'Saving...' : 'Save Changes'}
+          Save Changes
         </Button>
       </div>
     </div>
